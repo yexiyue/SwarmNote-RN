@@ -4,11 +4,16 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "biome check src/",
+    "lint:ci": "biome ci src/",
+    "format": "biome check --fix src/",
+    "lingui:extract": "lingui extract",
+    "changelog": "git-cliff -o CHANGELOG.md",
+    "changelog:latest": "git-cliff --unreleased",
+    "reset-project": "node ./scripts/reset-project.js"
   },
   "dependencies": {
     "@react-navigation/bottom-tabs": "^7.15.5",
@@ -45,8 +50,23 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.10",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@lingui/cli": "^5.9.5",
+    "@lingui/macro": "^5.9.5",
+    "@lingui/react": "^5.9.5",
+    "@lingui/vite-plugin": "^5.9.5",
     "@types/react": "~19.2.2",
+    "git-cliff": "^2.12.0",
+    "lefthook": "^2.1.5",
     "typescript": "~5.9.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "lefthook",
+      "esbuild"
+    ]
   },
   "private": true
 }

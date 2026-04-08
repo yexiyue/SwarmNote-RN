@@ -26,8 +26,23 @@ pnpm ios
 # 启动 Web 版本
 pnpm web
 
-# Lint 检查
+# Lint（Biome check）
 pnpm lint
+
+# Lint CI 模式（无自动修复，非零退出码）
+pnpm lint:ci
+
+# 自动修复 lint + format
+pnpm format
+
+# i18n: 提取翻译消息
+pnpm lingui:extract
+
+# 生成 CHANGELOG
+pnpm changelog
+
+# 显示未发布变更
+pnpm changelog:latest
 
 # 添加 RNR UI 组件
 pnpm dlx @react-native-reusables/cli@latest add <component-name>
@@ -148,6 +163,17 @@ swarmnote-mobile（本仓库）
 | `invoke('cmd', args)` | uniffi 直接函数调用 |
 | `app.emit("event")` | uniffi callback interface |
 | `src/components/ui/` | `src/components/ui/`（同路径） |
+
+## Code Quality Toolchain
+
+- **Biome** (`biome.json`): lint + format（替代 ESLint + Prettier），`recommended` 规则集，自动 organize imports，2 空格缩进，行宽 100。排除 `src/locales/**`，`src/global.css` 关闭 `noUnknownAtRules`（Tailwind v3 指令）
+- **Lefthook** (`lefthook.yml`): Git hooks 管理
+  - `pre-commit`: Biome check（并行执行）
+  - `commit-msg`: commitlint 校验 Conventional Commits 格式
+- **commitlint** (`commitlint.config.js`): 提交信息必须遵循 Conventional Commits（`feat:`, `fix:`, `docs:`, `chore:` 等）
+- **git-cliff** (`cliff.toml`): 基于 Conventional Commits 自动生成 CHANGELOG
+- **Lingui** (`lingui.config.ts`): i18n 国际化，zh 为源语言，en 翻译，catalogs 在 `src/locales/`
+- **GitHub Actions** (`.github/workflows/ci.yml`): PR/push 到 main/develop 时自动跑 Biome lint + TypeScript check
 
 ## Key Config Files
 
