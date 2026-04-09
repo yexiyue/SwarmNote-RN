@@ -1,10 +1,13 @@
 import { i18n } from "@lingui/core";
 import * as Localization from "expo-localization";
+import enMessages from "./locales/en/messages.po";
+import zhMessages from "./locales/zh/messages.po";
 
 export const locales = { zh: "中文", en: "English" } as const;
 export type Locale = keyof typeof locales;
 
 const SOURCE_LOCALE: Locale = "zh";
+const catalogMap = { zh: zhMessages, en: enMessages };
 
 /** 自动检测移动端系统语言 */
 export function detectLocale(): Locale {
@@ -15,7 +18,7 @@ export function detectLocale(): Locale {
 
 /** 同步初始化源语言，保证 App 首屏无缝渲染 */
 export function initI18n() {
-  i18n.load(SOURCE_LOCALE, {});
+  i18n.load(SOURCE_LOCALE, zhMessages);
   i18n.activate(SOURCE_LOCALE);
 }
 
@@ -23,13 +26,7 @@ export function initI18n() {
 export async function activateLocale(locale: Locale) {
   if (i18n.locale === locale) return;
 
-  if (locale === SOURCE_LOCALE) {
-    i18n.load(locale, {});
-    i18n.activate(locale);
-    return;
-  }
-
-  const { messages } = await import(`./locales/${locale}/messages.po`);
+  const messages = catalogMap[locale] ?? {};
   i18n.load(locale, messages);
   i18n.activate(locale);
 }
