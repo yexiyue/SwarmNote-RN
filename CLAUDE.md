@@ -77,43 +77,32 @@ npx expo run:ios
 
 ## Architecture
 
-### 目录结构
+> **当前状态**：项目处于初始模板阶段，`src/` 下的代码大部分是 Expo 模板生成的示例代码，尚未开始实际业务开发。以下架构描述的是已配置好的基础设施和规划方向。
 
-```text
-swarmnote-mobile/
-├── src/
-│   ├── app/                # Expo Router 文件路由
-│   │   ├── _layout.tsx     # 根布局（ThemeProvider + PortalHost）
-│   │   ├── index.tsx       # 首页
-│   │   └── (tabs)/         # Tab 导航（按需创建）
-│   ├── components/
-│   │   └── ui/             # RNR 组件（copy-paste，勿直接修改源码）
-│   ├── lib/
-│   │   ├── theme.ts        # 主题配置（NAV_THEME，CSS 变量的 JS 镜像）
-│   │   └── utils.ts        # cn() 工具函数（clsx + tailwind-merge）
-│   ├── hooks/              # 自定义 hooks
-│   ├── stores/             # Zustand stores（待创建）
-│   └── global.css          # Tailwind CSS 变量（亮色/暗色主题）
-├── assets/                 # 图片、字体等静态资源
-├── app.json                # Expo 配置
-├── babel.config.js         # NativeWind babel preset
-├── metro.config.js         # withNativeWind + inlineRem: 16
-├── tailwind.config.js      # 主题色、圆角、动画
-├── components.json         # RNR CLI 配置（shadcn 风格）
-├── nativewind-env.d.ts     # NativeWind TypeScript 类型
-└── tsconfig.json           # 路径别名 @/ → src/
-```
+### 关键目录
+
+- `src/app/` — Expo Router 文件路由
+- `src/components/ui/` — RNR 组件（copy-paste，勿直接修改源码）
+- `src/lib/` — `theme.ts`（NAV_THEME）+ `utils.ts`（cn()）
+- `src/hooks/` — 自定义 hooks
+- `src/stores/` — Zustand stores（待创建）
+- `src/global.css` — Tailwind CSS 变量（亮色/暗色主题）
+- `dev-notes/` — 开发笔记（uniffi 集成指南等）
+
+### 平台特定文件
+
+React Native 平台后缀约定（Metro bundler 自动选择）：`*.tsx`（原生端）、`*.web.tsx`（Web 端覆盖）。
 
 ### 主题系统（4 个文件联动）
 
 | 文件 | 职责 |
-|------|------|
+| ---- | ---- |
 | `src/global.css` | 定义 CSS 变量（`:root` 亮色 / `.dark:root` 暗色） |
 | `tailwind.config.js` | 将 CSS 变量映射为 Tailwind 工具类 |
 | `src/lib/theme.ts` | CSS 变量的 JS 镜像，供 React Navigation ThemeProvider 使用 |
 | `components.json` | RNR CLI 配置，指定组件路径和样式方案 |
 
-**修改主题色时**：改 `global.css` → 同步更新 `theme.ts` → `tailwind.config.js` 通常不需要改。
+**修改主题色时**：改 `global.css` → 同步更新 `lib/theme.ts` → `tailwind.config.js` 通常不需要改。
 
 ### Rust 桥接架构（待实现）
 
@@ -155,7 +144,7 @@ swarmnote-mobile（本仓库）
 ### 与桌面端的对应关系
 
 | 桌面端 (SwarmNote) | 移动端 (本项目) |
-|---|---|
+| --- | --- |
 | shadcn/ui | React Native Reusables |
 | Tailwind CSS 4 | NativeWind v4 (Tailwind 3) |
 | TanStack Router | Expo Router |
