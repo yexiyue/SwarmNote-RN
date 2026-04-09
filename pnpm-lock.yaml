@@ -114,12 +114,18 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^20.5.0
         version: 20.5.0
+      '@lingui/babel-plugin-lingui-macro':
+        specifier: ^5.9.5
+        version: 5.9.5(typescript@5.9.3)
       '@lingui/cli':
         specifier: ^5.9.5
         version: 5.9.5(typescript@5.9.3)
       '@lingui/macro':
         specifier: ^5.9.5
         version: 5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5(typescript@5.9.3))(react@19.2.0)
+      '@lingui/metro-transformer':
+        specifier: ^5.9.5
+        version: 5.9.5(@expo/metro-config@55.0.14(expo@55.0.12)(typescript@5.9.3))(expo@55.0.12)(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(typescript@5.9.3)
       '@lingui/react':
         specifier: ^5.9.5
         version: 5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5(typescript@5.9.3))(react@19.2.0)
@@ -1258,6 +1264,22 @@ packages:
   '@lingui/message-utils@5.9.5':
     resolution: {integrity: sha512-t3dNbjb1dWkvcpXGMXIEyBDO3l4B8J2ColZXi0NTG1ioAj+sDfFxFB8fepVgd3JAk+AwARlOLvF14oS0mAdgpw==}
     engines: {node: '>=20.0.0'}
+
+  '@lingui/metro-transformer@5.9.5':
+    resolution: {integrity: sha512-Krdt2VAokJLgBlncXEg02nM8V1gEZTbrJN7h58qMix/wByxOIoofXPXAs+Vvt53X294oV0rf9S5EznEyzf9k6w==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@expo/metro-config': '*'
+      '@react-native/metro-babel-transformer': '*'
+      expo: '>=50.0.0'
+      react-native: '>=0.73.0'
+    peerDependenciesMeta:
+      '@expo/metro-config':
+        optional: true
+      '@react-native/metro-babel-transformer':
+        optional: true
+      expo:
+        optional: true
 
   '@lingui/react@5.9.5':
     resolution: {integrity: sha512-jzYoA/f4jrTfpOB+jrMhlC835UwqSXJdepr7cfWsmg+Rpp3HBSREtfrogaz1LqLI/AVnkmfp10Mo6VOp/8qeOQ==}
@@ -5921,6 +5943,21 @@ snapshots:
     dependencies:
       '@messageformat/parser': 5.1.1
       js-sha256: 0.10.1
+
+  '@lingui/metro-transformer@5.9.5(@expo/metro-config@55.0.14(expo@55.0.12)(typescript@5.9.3))(expo@55.0.12)(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(typescript@5.9.3)':
+    dependencies:
+      '@babel/runtime': 7.29.2
+      '@lingui/cli': 5.9.5(typescript@5.9.3)
+      '@lingui/conf': 5.9.5(typescript@5.9.3)
+      memoize-one: 6.0.0
+      react-native: 0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0)
+    optionalDependencies:
+      '@expo/metro-config': 55.0.14(expo@55.0.12)(typescript@5.9.3)
+      expo: 55.0.12(@babel/core@7.29.0)(@expo/dom-webview@55.0.5)(@expo/metro-runtime@55.0.9)(expo-router@55.0.11)(react-dom@19.2.0(react@19.2.0))(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+      - typescript
 
   '@lingui/react@5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5(typescript@5.9.3))(react@19.2.0)':
     dependencies:

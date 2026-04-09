@@ -1,0 +1,125 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-04-09 18:14+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/app/explore.tsx:92
+msgid "Android, iOS, and web support"
+msgstr ""
+
+#: src/app/explore.tsx:140
+msgid "Animations"
+msgstr ""
+
+#: src/app/index.tsx:62
+msgid "Dev tools"
+msgstr ""
+
+#: src/components/app-tabs.web.tsx:71
+msgid "Docs"
+msgstr ""
+
+#: src/app/explore.tsx:46
+#: src/components/app-tabs.tsx:27
+#: src/components/app-tabs.web.tsx:30
+msgid "Explore"
+msgstr ""
+
+#: src/app/explore.tsx:58
+msgid "Expo documentation"
+msgstr ""
+
+#: src/components/app-tabs.web.tsx:63
+msgid "Expo Starter"
+msgstr ""
+
+#: src/app/explore.tsx:71
+msgid "File-based routing"
+msgstr ""
+
+#: src/app/explore.tsx:110
+msgid "For static images, you can use the <0>@2x</0> and <1>@3x</1> suffixes to provide files for different screen densities."
+msgstr ""
+
+#: src/app/index.tsx:64
+msgid "Fresh start"
+msgstr ""
+
+#: src/app/index.tsx:54
+msgid "get started"
+msgstr ""
+
+#: src/components/app-tabs.tsx:19
+#: src/components/app-tabs.web.tsx:25
+msgid "Home"
+msgstr ""
+
+#: src/app/explore.tsx:108
+msgid "Images"
+msgstr ""
+
+#: src/app/explore.tsx:87
+#: src/app/explore.tsx:120
+#: src/app/explore.tsx:135
+msgid "Learn more"
+msgstr ""
+
+#: src/app/explore.tsx:125
+msgid "Light and dark mode components"
+msgstr ""
+
+#: src/app/index.tsx:33
+msgid "press <0>{shortcut}</0>"
+msgstr ""
+
+#: src/app/index.tsx:24
+msgid "shake device or press <0>m</0> in terminal"
+msgstr ""
+
+#: src/app/explore.tsx:80
+msgid "The layout file in <0>src/app/_layout.tsx</0> sets up the tab navigator."
+msgstr ""
+
+#: src/app/explore.tsx:73
+msgid "This app has two screens: <0>src/app/index.tsx</0> and <1>src/app/explore.tsx</1>"
+msgstr ""
+
+#: src/app/explore.tsx:49
+msgid ""
+"This starter app includes example\n"
+"code to help you get started."
+msgstr ""
+
+#: src/app/explore.tsx:127
+msgid "This template has light and dark mode support. The <0>useColorScheme()</0> hook lets you inspect what the user's current color scheme is, and so you can adjust UI colors accordingly."
+msgstr ""
+
+#: src/app/explore.tsx:142
+msgid "This template includes an example of an animated component. The <0>src/components/ui/collapsible.tsx</0> component uses the powerful <1>react-native-reanimated</1> library to animate opening this hint."
+msgstr ""
+
+#: src/app/index.tsx:59
+msgid "Try editing"
+msgstr ""
+
+#: src/app/index.tsx:17
+msgid "use browser devtools"
+msgstr ""
+
+#: src/app/index.tsx:49
+msgid "Welcome to Expo"
+msgstr ""
+
+#: src/app/explore.tsx:95
+msgid "You can open this project on Android, iOS, and the web. To open the web version, press <0>w</0> in the terminal running this project."
+msgstr ""
