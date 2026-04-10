@@ -14,7 +14,7 @@ class SwarmnoteCoreModule(reactContext: ReactApplicationContext) :
   }
 
   // Two native methods implemented in cpp-adapter.cpp, and ultimately
-  // swarmnote-core.cpp
+  // react-native-swarmnote-core.cpp
 
   external fun nativeInstallRustCrate(runtimePointer: Long, callInvoker: CallInvokerHolder): Boolean
   external fun nativeCleanupRustCrate(runtimePointer: Long): Boolean
@@ -37,7 +37,7 @@ class SwarmnoteCoreModule(reactContext: ReactApplicationContext) :
     const val NAME = "SwarmnoteCore"
 
     init {
-      System.loadLibrary("swarmnote-core")
+      System.loadLibrary("react-native-swarmnote-core")
     }
   }
 }

@@ -2,7 +2,7 @@
 #include <jni.h>
 #include <jsi/jsi.h>
 #include <ReactCommon/CallInvokerHolder.h>
-#include "swarmnote-core.h"
+#include "react-native-swarmnote-core.h"
 
 namespace jsi = facebook::jsi;
 namespace react = facebook::react;
