@@ -32,7 +32,7 @@ swarm-p2p-core      — P2P 网络 SDK（共享基础库）
 | UI 组件 | React Native Reusables | shadcn/ui 的 RN 移植版 |
 | 状态管理 | Zustand | 与桌面端一致 |
 | 国际化 | Lingui | zh 源语言，en 翻译 |
-| Rust 桥接 | uniffi-bindgen-react-native | 待集成，桥接 Rust 核心逻辑 |
+| Rust 桥接 | uniffi-bindgen-react-native | 已集成，桥接 Rust 核心逻辑 |
 | Lint/Format | Biome | 替代 ESLint + Prettier |
 | Git Hooks | Lefthook | pre-commit (Biome) + commit-msg (commitlint) |
 | 包管理 | pnpm | `.npmrc` 配置 `node-linker=hoisted` |
@@ -64,6 +64,10 @@ swarmnote-mobile/
 │   ├── stores/             # Zustand stores（待创建）
 │   ├── locales/            # i18n 翻译文件
 │   └── global.css          # Tailwind CSS 变量（亮/暗主题）
+├── packages/
+│   └── swarmnote-core/     # Rust 桥接库（Turbo Module）
+│       ├── rust/mobile-core/   # Rust 源码
+│       └── ubrn.config.yaml    # uniffi 构建配置
 ├── assets/                 # 图片、字体等静态资源
 ├── dev-notes/              # 开发笔记、技术调研
 ├── milestones/             # 版本规划文档
@@ -73,6 +77,7 @@ swarmnote-mobile/
 ├── tailwind.config.js      # 主题色、圆角、动画
 ├── biome.json              # Lint + Format 配置
 ├── components.json         # RNR CLI 配置
+├── pnpm-workspace.yaml     # pnpm monorepo 工作区
 ├── lefthook.yml            # Git hooks
 ├── cliff.toml              # Changelog 生成
 ├── lingui.config.ts        # i18n 配置
@@ -85,7 +90,8 @@ swarmnote-mobile/
 
 - Node.js 22+
 - pnpm 10+
-- Android Studio（Android 开发）
+- Rust 工具链（`rustup`）+ Android NDK targets
+- Android Studio + Android SDK（Android 开发）
 - Xcode（iOS 开发，仅 macOS）
 
 ### 快速开始
@@ -93,19 +99,52 @@ swarmnote-mobile/
 ```bash
 # 安装依赖
 pnpm install
-
-# 启动 Metro 开发服务器
-pnpm start
-
-# Android
-pnpm android
-
-# iOS（仅 macOS）
-pnpm ios
-
-# Web
-pnpm web
 ```
+
+#### Android
+
+```bash
+# 1. 安装 Rust Android 交叉编译 targets（首次）
+rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+
+# 2. 编译 Rust 并生成 TS/C++ 绑定
+cd packages/swarmnote-core
+pnpm ubrn:android
+
+# 3. 回到项目根目录，生成原生项目并运行
+cd ../..
+npx expo prebuild --platform android
+npx expo run:android
+```
+
+#### iOS（仅 macOS）
+
+```bash
+# 1. 安装 Rust iOS 交叉编译 targets（首次）
+rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+
+# 2. 编译 Rust 并生成 TS/C++ 绑定
+cd packages/swarmnote-core
+pnpm ubrn:ios
+
+# 3. 回到项目根目录，生成原生项目并运行
+cd ../..
+npx expo prebuild --platform ios
+npx expo run:ios
+```
+
+> **注意**：本项目使用 Rust 原生模块，**不支持 Expo Go**，必须使用 Development Build。
+
+#### Rust 代码变更后
+
+修改 `packages/swarmnote-core/rust/` 下的 Rust 代码后，需要重新编译：
+
+```bash
+cd packages/swarmnote-core
+pnpm ubrn:android    # 或 pnpm ubrn:ios
+```
+
+然后重新运行 `npx expo run:android`（或 `run:ios`）即可。
 
 ### 常用命令
 
@@ -133,28 +172,30 @@ pnpm dlx @react-native-reusables/cli@latest doctor         # 诊断配置
 - **不支持 Expo Go** — 使用 Development Build（`npx expo run:android` / `npx expo run:ios`）
 - **pnpm 必须 hoisted** — `.npmrc` 中的 `node-linker=hoisted` 不可删除
 - **修改 babel/metro 配置后** — 必须清缓存：`npx expo start --clear`
+- **修改 Rust 代码后** — 需要重新 `pnpm ubrn:android`（或 `ubrn:ios`），然后 `npx expo run:android`
 - **暗色模式 CSS 选择器** — 用 `.dark:root`（NativeWind 约定），不是 `.dark`
 - **RN 样式不继承** — 每个 `<Text>` 需单独加 className
 
-## Rust 桥接架构（待实现）
+## Rust 桥接架构
 
-移动端通过 uniffi-bindgen-react-native 桥接桌面端的 Rust 核心逻辑：
+移动端通过 uniffi-bindgen-react-native 桥接 Rust 核心逻辑：
 
 ```
-swarmnote（桌面端仓库）
-├── crates/app-core/        # 平台无关 Rust 核心（#[uniffi::export]）
-├── libs/core/              # swarm-p2p-core (P2P 网络)
-├── crates/yrs-blocknote/   # CRDT ↔ Markdown
-└── src-tauri/              # Tauri 薄包装层
-
-swarmnote-mobile（本仓库）
-├── packages/core/          # 桥接库（Turbo Module，待创建）
-│   ├── ubrn.config.yaml
-│   └── rust_modules/       # submodule → 桌面端仓库
-└── src/                    # RN 前端，调用生成的 TS API
+swarmnote-mobile/
+├── packages/swarmnote-core/        # Rust 桥接库（React Native Turbo Module）
+│   ├── ubrn.config.yaml            # uniffi 构建配置
+│   ├── rust/mobile-core/           # Rust crate（#[uniffi::export]）
+│   │   ├── Cargo.toml
+│   │   └── src/lib.rs
+│   ├── src/generated/              # ubrn 生成的 TS 绑定
+│   ├── cpp/generated/              # ubrn 生成的 C++ JSI 绑定
+│   └── android/                    # Android 原生代码 + .a 静态库
+└── src/                            # RN 前端，调用生成的 TS API
 ```
 
 调用链路：`TypeScript → Hermes JSI → C++ → Rust`，无 JSON 序列化，性能优于 Tauri 的 WebView invoke。
+
+> 当前 `mobile-core` 是独立的最小化 crate（验证链路用）。后续桌面端 `app-core` 抽离后将替换为共享 crate。
 
 ## 开发路线
 

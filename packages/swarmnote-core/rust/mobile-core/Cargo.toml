@@ -1,0 +1,12 @@
+[package]
+name = "mobile-core"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+name = "mobile_core"
+
+[dependencies]
+uniffi = { version = "0.31.0", features = ["bindgen", "build", "cli"] }
+

@@ -1,0 +1,104 @@
+{
+  "name": "react-native-swarmnote-core",
+  "version": "0.1.0",
+  "description": "Rust core bindings for SwarmNote mobile via uniffi-bindgen-react-native",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
+    "*.podspec",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "clean": "del-cli android/build lib",
+    "prepare": "bob build",
+    "typecheck": "tsc",
+    "ubrn:android": "ubrn build android --and-generate",
+    "ubrn:ios": "ubrn build ios --and-generate",
+    "ubrn:checkout": "ubrn checkout",
+    "ubrn:clean": "rm -rfv cpp/ android/CMakeLists.txt android/src/main/java android/*.cpp ios/ src/Native* src/index.*ts* src/generated/"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "rust",
+    "uniffi"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yexiyue/SwarmNote-RN.git"
+  },
+  "author": "yexiyue <yexiyue666@qq.com> (https://github.com/yexiyue)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yexiyue/SwarmNote-RN/issues"
+  },
+  "homepage": "https://github.com/yexiyue/SwarmNote-RN#readme",
+  "devDependencies": {
+    "@react-native/babel-preset": "0.83.0",
+    "del-cli": "^7.0.0",
+    "react": "19.2.0",
+    "react-native": "0.83.0",
+    "react-native-builder-bob": "^0.41.0",
+    "typescript": "^6.0.2",
+    "uniffi-bindgen-react-native": "latest"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ],
+      "codegen"
+    ]
+  },
+  "codegenConfig": {
+    "name": "SwarmnoteCoreSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "outputDir": {
+      "ios": "ios/generated",
+      "android": "android/generated"
+    },
+    "android": {
+      "javaPackageName": "com.swarmnotecore"
+    },
+    "includesGeneratedCode": true
+  }
+}
