@@ -135,10 +135,8 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
-if (isNewArchitectureEnabled()) {
-  react {
-    jsRootDir = file("../src/")
-    libraryName = "SwarmnoteCore"
-    codegenJavaPackageName = "com.swarmnotecore"
-  }
+react {
+  jsRootDir = file("../src/")
+  libraryName = "SwarmnoteCore"
+  codegenJavaPackageName = "com.swarmnotecore"
 }

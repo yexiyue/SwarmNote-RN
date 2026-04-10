@@ -6,3 +6,8 @@ rust:
 bindings:
   cpp: cpp/generated
   ts: src/generated
+
+noOverwrite:
+  - android/build.gradle
+  - package.json
+  - SwarmnoteCore.podspec

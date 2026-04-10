@@ -60,7 +60,7 @@
     "@react-native/babel-preset": "0.83.0",
     "del-cli": "^7.0.0",
     "react": "19.2.0",
-    "react-native": "0.83.0",
+    "react-native": "0.83.4",
     "react-native-builder-bob": "^0.41.0",
     "typescript": "^6.0.2",
     "uniffi-bindgen-react-native": "latest"
@@ -98,7 +98,16 @@
     },
     "android": {
       "javaPackageName": "com.swarmnotecore"
-    },
-    "includesGeneratedCode": true
+    }
+  },
+  "create-react-native-library": {
+    "type": "turbo-module",
+    "languages": "cpp",
+    "version": "0.61.0"
+  },
+  "dependencies": {
+    "expo": "~55.0.12",
+    "react": "19.2.0",
+    "react-native": "0.83.4"
   }
 }
