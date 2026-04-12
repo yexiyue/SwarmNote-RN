@@ -36,6 +36,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# editor-web build output
+packages/editor-web/dist/
+packages/editor/dist/
+
 app-example
 
 # generated native folders
@@ -45,3 +49,4 @@ app-example
 .claude
 .omc
 **/openspec
+**/.obsidian

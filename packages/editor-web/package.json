@@ -1,0 +1,21 @@
+{
+  "name": "@swarmnote/editor-web",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
+  "dependencies": {
+    "@swarmnote/editor": "workspace:*",
+    "comlink": "^4.4.2",
+    "yjs": "^13.6.20",
+    "y-protocols": "^1.0.6"
+  },
+  "devDependencies": {
+    "tsdown": "^0.9.0",
+    "typescript": "~5.9.2"
+  }
+}
