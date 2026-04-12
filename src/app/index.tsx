@@ -1,4 +1,5 @@
 import * as Device from "expo-device";
+import { Link } from "expo-router";
 import { Platform, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { greet } from "react-native-swarmnote-core";
@@ -57,6 +58,19 @@ export default function HomeScreen() {
         <Pressable>
           <ThemedText type="code">{greet("SwarmNote")}</ThemedText>
         </Pressable>
+
+        <Link href={"/editor-test" as never} asChild>
+          <Pressable
+            style={{
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              borderRadius: 8,
+              backgroundColor: "rgba(100,100,255,0.15)",
+            }}
+          >
+            <ThemedText type="code">Open Editor Test</ThemedText>
+          </Pressable>
+        </Link>
 
         {Platform.OS === "web" && <WebBadge />}
       </SafeAreaView>

@@ -1,13 +1,14 @@
-import type { EditorInitOptions } from "@swarmnote/editor-web";
+import type { EditorInitOptions } from "@swarmnote/editor-web/src/types";
 import { useCallback, useMemo, useRef } from "react";
 import { View } from "react-native";
 import type { WebViewMessageEvent } from "react-native-webview";
 import WebView from "react-native-webview";
 import { useEditorBridge } from "./useEditorBridge";
 
-// TODO: 这个字符串在构建阶段从 packages/editor-web/dist/ 读取
-// 暂时用 placeholder,后续用 Metro asset 或 build-time codegen 替代
-const EDITOR_BUNDLE_JS = "/* editor bundle will be injected here */";
+// Joplin 模式: tsdown 构建 IIFE → codegen 脚本包装成 CJS 字符串模块 → Metro require
+// 构建命令: pnpm --filter @swarmnote/editor-web run build
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const EDITOR_BUNDLE_JS: string = require("@swarmnote/editor-web/dist/bundle");
 
 interface MarkdownEditorProps {
   initialText?: string;

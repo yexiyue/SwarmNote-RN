@@ -2,13 +2,39 @@ import * as Comlink from 'comlink';
 import * as Y from 'yjs';
 import { createEditor, DEFAULT_SETTINGS } from '@swarmnote/editor';
 import type { EditorControl } from '@swarmnote/editor';
-import type { EditorApi, EditorInitOptions, HostApi } from './types';
+import type { EditorApi, EditorInitOptions } from './types';
+
+// WebView 侧的 Comlink endpoint:
+// - postMessage → ReactNativeWebView.postMessage (发给 RN)
+// - addEventListener('message') → 监听 RN 通过 injectJavaScript 发来的 MessageEvent
+function createWebViewEndpoint(): Comlink.Endpoint {
+  return {
+    postMessage(msg: unknown) {
+      const rn = (globalThis as unknown as { ReactNativeWebView?: { postMessage(s: string): void } }).ReactNativeWebView;
+      if (rn) {
+        rn.postMessage(JSON.stringify(msg));
+      }
+    },
+    addEventListener(type: string, handler: EventListenerOrEventListenerObject) {
+      globalThis.addEventListener(type, handler as EventListener);
+    },
+    removeEventListener(type: string, handler: EventListenerOrEventListenerObject) {
+      globalThis.removeEventListener(type, handler as EventListener);
+    },
+  };
+}
 
 let editor: EditorControl | null = null;
 let ydoc: Y.Doc | null = null;
 
-// HostApi proxy — 会在 Comlink 连接建立后被设置
-let hostApi: Comlink.Remote<HostApi> | null = null;
+// HostApi: WebView → RN 的回调通道
+// TODO: 后续用 Comlink 的反向 expose 实现,当前先用 postMessage 直接发
+function notifyHost(method: string, ...args: unknown[]) {
+  const rn = (globalThis as unknown as { ReactNativeWebView?: { postMessage(s: string): void } }).ReactNativeWebView;
+  if (rn) {
+    rn.postMessage(JSON.stringify({ type: 'hostCall', method, args }));
+  }
+}
 
 const editorApi: EditorApi = {
   init(options: EditorInitOptions) {
@@ -23,9 +49,8 @@ const editorApi: EditorApi = {
 
       // 监听本地 update → 发给 RN
       ydoc.on('update', (update: Uint8Array, origin: unknown) => {
-        // 只广播本地产生的更新（origin 不是 'remote' 的）
-        if (origin !== 'remote' && hostApi) {
-          hostApi.onYjsUpdate(update);
+        if (origin !== 'remote') {
+          notifyHost('onYjsUpdate', update);
         }
       });
     }
@@ -35,11 +60,11 @@ const editorApi: EditorApi = {
       settings: { ...DEFAULT_SETTINGS, ...options.settings },
       yjsCollab: ydoc ? { ydoc, fragmentName: 'document' } : undefined,
       onEvent(event) {
-        if (event.kind === 'change' && hostApi) {
-          hostApi.onDocChange();
+        if (event.kind === 'change') {
+          notifyHost('onDocChange');
         }
-        if ((event.kind === 'focus' || event.kind === 'blur') && hostApi) {
-          hostApi.onFocusChange(event.kind === 'focus');
+        if (event.kind === 'focus' || event.kind === 'blur') {
+          notifyHost('onFocusChange', event.kind === 'focus');
         }
       },
     });
@@ -81,7 +106,4 @@ const editorApi: EditorApi = {
 };
 
 // 暴露 EditorApi 给 RN 侧通过 Comlink 调用
-Comlink.expose(editorApi);
-
-// 导出类型供外部使用
-export type { EditorApi, HostApi, EditorInitOptions } from './types';
+Comlink.expose(editorApi, createWebViewEndpoint());

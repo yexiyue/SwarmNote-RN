@@ -20,6 +20,9 @@ importers:
       '@rn-primitives/portal':
         specifier: ^1.4.0
         version: 1.4.0(@types/react@19.2.14)(react-native-web@0.21.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
+      '@swarmnote/editor-web':
+        specifier: workspace:*
+        version: link:packages/editor-web
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
