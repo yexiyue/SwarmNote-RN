@@ -38,6 +38,7 @@
 | `--accent` | `38 14% 94%` | #F2EFEA | 强调表面（hover 态、选中行背景） |
 | `--accent-foreground` | `28 10% 14%` | #27211C | 强调表面上的文字 |
 | `--destructive` | `0 80% 60%` | #EB4747 | 危险/删除操作 |
+| `--destructive-foreground` | `0 0% 100%` | #FFFFFF | 危险按钮上的文字（纯白） |
 | `--border` | `30 10% 87%` | #E2DDD8 | 边框（whisper 级，暖色调） |
 | `--input` | `30 8% 89%` | #E5E1DC | 输入框边框 |
 | `--ring` | `40 72% 46%` | #C99816 | 焦点环（与 primary 一致） |
@@ -62,6 +63,7 @@
 | `--accent` | `25 5% 19%` | #332F2C | 暗色强调表面 |
 | `--accent-foreground` | `36 10% 93%` | #EFECE7 | 暗色强调文字 |
 | `--destructive` | `0 70% 55%` | #D94444 | 危险（暗色适配，略降饱和度） |
+| `--destructive-foreground` | `0 0% 100%` | #FFFFFF | 危险按钮上的文字（纯白） |
 | `--border` | `25 5% 20%` | #353230 | 暗色边框 |
 | `--input` | `25 4% 17%` | #2D2A28 | 暗色输入框边框 |
 | `--ring` | `40 72% 52%` | #DBA81E | 焦点环 |
@@ -95,7 +97,7 @@
 | 分割线/边框 | `--border` | `border-border` |
 | 输入框边框 | `--input` | `border-input` |
 | 焦点环 | `--ring` | `ring-ring` |
-| 危险操作 | `--destructive` | `bg-destructive text-destructive` |
+| 危险操作 | `--destructive` / `--destructive-foreground` | `bg-destructive text-destructive-foreground` |
 | 禁用/静音 | `--muted` / `--muted-foreground` | `bg-muted text-muted-foreground` |
 
 ### 对比度备注
@@ -109,167 +111,9 @@
 
 未来如需更多品牌色层次，可在 `global.css` 中添加：
 
-```css
-/* 可选：品牌色扩展 */
---brand: 40 72% 46%;           /* 同 primary */
---brand-hover: 40 72% 40%;     /* 按下/悬停态，更深 */
---brand-light: 40 50% 94%;     /* 浅金色背景（badge、tag） */
---brand-foreground: 40 25% 10%;
-```
-
-## 实施代码（待应用）
-
-应用时需修改 3 个文件：
-
-### 1. `src/global.css`
-
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  :root {
-    --background: 40 18% 99%;
-    --foreground: 28 10% 14%;
-    --card: 36 15% 97%;
-    --card-foreground: 28 10% 14%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 28 10% 14%;
-    --primary: 40 72% 46%;
-    --primary-foreground: 40 25% 10%;
-    --secondary: 35 12% 93%;
-    --secondary-foreground: 28 8% 20%;
-    --muted: 33 10% 92%;
-    --muted-foreground: 25 6% 46%;
-    --accent: 38 14% 94%;
-    --accent-foreground: 28 10% 14%;
-    --destructive: 0 80% 60%;
-    --border: 30 10% 87%;
-    --input: 30 8% 89%;
-    --ring: 40 72% 46%;
-    --radius: 0.625rem;
-    --chart-1: 40 72% 46%;
-    --chart-2: 152 45% 40%;
-    --chart-3: 210 22% 38%;
-    --chart-4: 16 55% 55%;
-    --chart-5: 140 28% 48%;
-  }
-
-  .dark\:root {
-    --background: 25 6% 10%;
-    --foreground: 36 10% 93%;
-    --card: 24 5% 14%;
-    --card-foreground: 36 10% 93%;
-    --popover: 24 5% 12%;
-    --popover-foreground: 36 10% 93%;
-    --primary: 40 72% 52%;
-    --primary-foreground: 25 20% 8%;
-    --secondary: 25 4% 18%;
-    --secondary-foreground: 35 8% 88%;
-    --muted: 25 4% 17%;
-    --muted-foreground: 20 4% 55%;
-    --accent: 25 5% 19%;
-    --accent-foreground: 36 10% 93%;
-    --destructive: 0 70% 55%;
-    --border: 25 5% 20%;
-    --input: 25 4% 17%;
-    --ring: 40 72% 52%;
-    --chart-1: 40 72% 55%;
-    --chart-2: 152 50% 48%;
-    --chart-3: 210 28% 55%;
-    --chart-4: 16 60% 60%;
-    --chart-5: 140 32% 55%;
-  }
-}
-```
-
-### 2. `src/lib/theme.ts`
-
-```typescript
-import { DarkTheme, DefaultTheme, type Theme } from "@react-navigation/native";
-
-export const THEME = {
-  light: {
-    background: "hsl(40 18% 99%)",
-    foreground: "hsl(28 10% 14%)",
-    card: "hsl(36 15% 97%)",
-    cardForeground: "hsl(28 10% 14%)",
-    popover: "hsl(0 0% 100%)",
-    popoverForeground: "hsl(28 10% 14%)",
-    primary: "hsl(40 72% 46%)",
-    primaryForeground: "hsl(40 25% 10%)",
-    secondary: "hsl(35 12% 93%)",
-    secondaryForeground: "hsl(28 8% 20%)",
-    muted: "hsl(33 10% 92%)",
-    mutedForeground: "hsl(25 6% 46%)",
-    accent: "hsl(38 14% 94%)",
-    accentForeground: "hsl(28 10% 14%)",
-    destructive: "hsl(0 80% 60%)",
-    border: "hsl(30 10% 87%)",
-    input: "hsl(30 8% 89%)",
-    ring: "hsl(40 72% 46%)",
-    radius: "0.625rem",
-    chart1: "hsl(40 72% 46%)",
-    chart2: "hsl(152 45% 40%)",
-    chart3: "hsl(210 22% 38%)",
-    chart4: "hsl(16 55% 55%)",
-    chart5: "hsl(140 28% 48%)",
-  },
-  dark: {
-    background: "hsl(25 6% 10%)",
-    foreground: "hsl(36 10% 93%)",
-    card: "hsl(24 5% 14%)",
-    cardForeground: "hsl(36 10% 93%)",
-    popover: "hsl(24 5% 12%)",
-    popoverForeground: "hsl(36 10% 93%)",
-    primary: "hsl(40 72% 52%)",
-    primaryForeground: "hsl(25 20% 8%)",
-    secondary: "hsl(25 4% 18%)",
-    secondaryForeground: "hsl(35 8% 88%)",
-    muted: "hsl(25 4% 17%)",
-    mutedForeground: "hsl(20 4% 55%)",
-    accent: "hsl(25 5% 19%)",
-    accentForeground: "hsl(36 10% 93%)",
-    destructive: "hsl(0 70% 55%)",
-    border: "hsl(25 5% 20%)",
-    input: "hsl(25 4% 17%)",
-    ring: "hsl(40 72% 52%)",
-    radius: "0.625rem",
-    chart1: "hsl(40 72% 55%)",
-    chart2: "hsl(152 50% 48%)",
-    chart3: "hsl(210 28% 55%)",
-    chart4: "hsl(16 60% 60%)",
-    chart5: "hsl(140 32% 55%)",
-  },
-};
-
-export const NAV_THEME: Record<"light" | "dark", Theme> = {
-  light: {
-    ...DefaultTheme,
-    colors: {
-      background: THEME.light.background,
-      border: THEME.light.border,
-      card: THEME.light.card,
-      notification: THEME.light.destructive,
-      primary: THEME.light.primary,
-      text: THEME.light.foreground,
-    },
-  },
-  dark: {
-    ...DarkTheme,
-    colors: {
-      background: THEME.dark.background,
-      border: THEME.dark.border,
-      card: THEME.dark.card,
-      notification: THEME.dark.destructive,
-      primary: THEME.dark.primary,
-      text: THEME.dark.foreground,
-    },
-  },
-};
-```
-
-### 3. `tailwind.config.js`
-
-**不需要修改** — 已通过 CSS 变量映射，改 `global.css` 即可生效。
+| 变量 | HSL | 用途 |
+| ---- | --- | ---- |
+| `--brand` | `40 72% 46%` | 同 primary |
+| `--brand-hover` | `40 72% 40%` | 按下/悬停态，更深 |
+| `--brand-light` | `40 50% 94%` | 浅金色背景（badge、tag） |
+| `--brand-foreground` | `40 25% 10%` | 品牌色上的文字 |

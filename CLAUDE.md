@@ -52,6 +52,28 @@ cd packages/editor-web && pnpm build               # 编辑器 WebView bundle
 
 `src/global.css` 是唯一真相源。改主题色只改这个文件，JS 侧通过 `useThemeColors()` 动态读取。不需要 `tailwind.config.js`，不需要 `theme.ts`。
 
+### Pencil 设计文件（.pen）
+
+设计稿位于 `dev-notes/design/mobile-design.pen`，主题变量已与 `src/global.css` 对齐。
+
+**切换主题**：通过 `batch_design` 修改根 frame 的 `theme` 属性：
+
+```javascript
+U("MzSDs", {theme: {"Mode": "Light"}})   // 亮色
+U("MzSDs", {theme: {"Mode": "Dark"}})    // 暗色
+```
+
+**设置主题变量**：使用 `set_variables` + `replace: true`，每个变量的亮/暗值都必须显式带 theme 标记：
+
+```json
+{"value": "#FDFCFA", "theme": {"Mode": "Light"}}
+{"value": "#1B1918", "theme": {"Mode": "Dark"}}
+```
+
+不带 theme 的值只是 fallback，不会注册到 Mode 轴，切换时不生效。
+
+**配色参考**：`dev-notes/design/theme-palette.md`
+
 ### 项目知识库
 
 详细的架构说明、最佳实践、踩坑记录在 `dev-notes/knowledge/` 下按主题组织：
