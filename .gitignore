@@ -46,8 +46,11 @@ app-example
 /ios
 /android
 
-# claude code (保留 skills 和 settings.json，忽略个人配置)
+# claude code (只提交项目级 skills 和 settings.json)
 .claude/settings.local.json
+.claude/skills/*
+!.claude/skills/dev-workflow/
+!.claude/skills/uniffi-bindgen-rn/
 .omc
 **/openspec
 **/.obsidian
