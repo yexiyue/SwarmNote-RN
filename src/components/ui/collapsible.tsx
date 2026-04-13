@@ -1,66 +1,33 @@
-import { SymbolView } from "expo-symbols";
+import { ChevronRight } from "lucide-react-native";
 import { type PropsWithChildren, useState } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Spacing } from "@/constants/theme";
-import { useTheme } from "@/hooks/use-theme";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
   const [isOpen, setIsOpen] = useState(false);
-  const theme = useTheme();
+  const colors = useThemeColors();
 
   return (
-    <ThemedView>
+    <View>
       <Pressable
-        style={({ pressed }) => [styles.heading, pressed && styles.pressedHeading]}
+        className="flex-row items-center gap-2 active:opacity-70"
         onPress={() => setIsOpen((value) => !value)}
       >
-        <ThemedView type="backgroundElement" style={styles.button}>
-          <SymbolView
-            name={{ ios: "chevron.right", android: "chevron_right", web: "chevron_right" }}
+        <View className="w-8 h-8 rounded-lg bg-muted items-center justify-center">
+          <ChevronRight
             size={14}
-            weight="bold"
-            tintColor={theme.text}
-            style={{ transform: [{ rotate: isOpen ? "-90deg" : "90deg" }] }}
+            color={colors.foreground}
+            style={{ transform: [{ rotate: isOpen ? "90deg" : "0deg" }] }}
           />
-        </ThemedView>
-
-        <ThemedText type="small">{title}</ThemedText>
+        </View>
+        <Text className="text-sm text-foreground">{title}</Text>
       </Pressable>
       {isOpen && (
         <Animated.View entering={FadeIn.duration(200)}>
-          <ThemedView type="backgroundElement" style={styles.content}>
-            {children}
-          </ThemedView>
+          <View className="mt-3 ml-8 p-4 rounded-lg bg-muted">{children}</View>
         </Animated.View>
       )}
-    </ThemedView>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  heading: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.two,
-  },
-  pressedHeading: {
-    opacity: 0.7,
-  },
-  button: {
-    width: Spacing.four,
-    height: Spacing.four,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  content: {
-    marginTop: Spacing.three,
-    borderRadius: Spacing.three,
-    marginLeft: Spacing.four,
-    padding: Spacing.four,
-  },
-});

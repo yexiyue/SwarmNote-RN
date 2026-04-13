@@ -46,7 +46,8 @@ app-example
 /ios
 /android
 
-.claude
+# claude code (保留 skills 和 settings.json，忽略个人配置)
+.claude/settings.local.json
 .omc
 **/openspec
 **/.obsidian

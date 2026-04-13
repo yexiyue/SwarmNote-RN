@@ -1,0 +1,51 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'CHANGED=$(git diff --name-only HEAD 2>/dev/null | grep -E \"^src/\" | head -1); if [ -n \"$CHANGED\" ]; then echo \"[dev-workflow] 检测到 src/ 下有代码变更，请运行 /simplify 检查代码质量\"; fi'"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(ls -la .cursor* .cursorrules .github/copilot*)",
+      "Bash(xargs -I {} ls -lh {})",
+      "Bash(GH_PAGER=cat gh auth status)",
+      "Bash(GH_PAGER=cat gh repo view --json name,owner -q '.owner.login + \"/\" + .name')",
+      "Bash(GH_PAGER=cat gh label list --json name -q '.[].name')",
+      "Bash(GH_PAGER=cat gh project view 4 --owner yexiyue --format json)",
+      "Bash(GH_PAGER=cat gh label delete \"invalid\" --yes)",
+      "Bash(GH_PAGER=cat gh label create \"type:feature\" --color \"1D76DB\" --description \"新功能\")",
+      "Bash(GH_PAGER=cat gh label create \"type:bug\" --color \"D73A4A\" --description \"Bug 修复\")",
+      "Bash(GH_PAGER=cat gh label create \"type:chore\" --color \"0E8A16\" --description \"维护、重构、工具链\")",
+      "Bash(GH_PAGER=cat gh label create \"type:docs\" --color \"0075CA\" --description \"文档\")",
+      "Bash(GH_PAGER=cat gh label create \"type:spike\" --color \"D4C5F9\" --description \"技术调研（限时）\")",
+      "Bash(GH_PAGER=cat gh label create \"priority:critical\" --color \"B60205\" --description \"必须立即修复\")",
+      "Bash(GH_PAGER=cat gh label create \"priority:high\" --color \"D93F0B\" --description \"下个 Sprint 必须完成\")",
+      "Bash(GH_PAGER=cat gh label create \"priority:medium\" --color \"FBCA04\" --description \"尽快完成\")",
+      "Bash(GH_PAGER=cat gh label create \"priority:low\" --color \"C2E0C6\" --description \"有空再做\")",
+      "Bash(GH_PAGER=cat gh label create \"size:xs\" --color \"EDEDED\" --description \"< 1 小时\")",
+      "Bash(GH_PAGER=cat gh label create \"size:s\" --color \"D4C5F9\" --description \"1-4 小时\")",
+      "Bash(GH_PAGER=cat gh label create \"size:m\" --color \"BFD4F2\" --description \"4-8 小时\")",
+      "Bash(GH_PAGER=cat gh label create \"size:l\" --color \"FBCA04\" --description \"1-2 天\")",
+      "Bash(GH_PAGER=cat gh label create \"size:xl\" --color \"D93F0B\" --description \"> 2 天（应拆分）\")",
+      "Bash(GH_PAGER=cat gh label create \"status:ready\" --color \"0E8A16\" --description \"已细化，可进入 Sprint\")",
+      "Bash(GH_PAGER=cat gh label create \"status:in-progress\" --color \"1D76DB\" --description \"开发中\")",
+      "Bash(GH_PAGER=cat gh label create \"status:blocked\" --color \"B60205\" --description \"被阻塞\")",
+      "Bash(GH_PAGER=cat gh label create \"status:review\" --color \"D4C5F9\" --description \"等待 Review\")",
+      "Bash(GH_PAGER=cat gh label create \"layer:L0\" --color \"0E8A16\" --description \"无依赖，可立即开始\")",
+      "Bash(GH_PAGER=cat gh project field-list 4 --owner yexiyue --format json)",
+      "Bash(gh project:*)",
+      "Bash(GH_PAGER=cat gh repo view --json name -q '.name')",
+      "Bash(gh issue create --title 'navigation: Drawer + Tab 混合导航骨架' --label type:feature,priority:critical,size:l,layer:L1,mvp --milestone v0.1.0 --body ':*)",
+      "Bash(GH_PAGER=cat gh run list --limit 3)",
+      "Bash(GH_PAGER=cat gh run view 24171431874 --log-failed)",
+      "WebFetch(domain:jhugman.github.io)"
+    ]
+  }
+}
