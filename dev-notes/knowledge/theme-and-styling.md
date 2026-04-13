@@ -141,3 +141,29 @@ const navTheme = useNavTheme();
 ### 浮层组件依赖
 
 Dialog、AlertDialog、Popover、Tooltip、DropdownMenu、Select 等浮层组件依赖 `<PortalHost />`，已在根布局 `_layout.tsx` 配置。
+
+## Pencil 设计文件
+
+### 设计稿位置
+
+`dev-notes/design/mobile-design.pen`，使用 Pencil MCP 工具操作。
+
+### 主题变量
+
+.pen 文件的主题变量已与 `src/global.css` 对齐。设置变量时每个值都必须显式带 theme 标记：
+
+```json
+{"value": "#FDFCFA", "theme": {"Mode": "Light"}}
+{"value": "#1B1918", "theme": {"Mode": "Dark"}}
+```
+
+不带 theme 的值只是 fallback，不会注册到 Mode 轴，切换时不生效。
+
+### 自定义组件
+
+设计系统 frame `MzSDs` 中包含两个自定义可复用组件：
+
+- `Code Pairing Card/Idle` (RbpHz) — 配对码卡片未生成状态
+- `Code Pairing Card/Generated` (b5PSu) — 配对码卡片已生成状态
+
+Pencil 不支持 Figma 式组件变体，不同状态用独立 reusable 组件 + `/` 命名分层。
