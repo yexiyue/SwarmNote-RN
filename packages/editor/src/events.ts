@@ -8,6 +8,7 @@ export const EditorEventType = {
   Blur: 'blur',
   SearchStateChange: 'searchStateChange',
   CollaborationUpdate: 'collaborationUpdate',
+  LinkOpen: 'linkOpen',
   Remove: 'remove',
 } as const;
 
@@ -46,6 +47,11 @@ export interface EditorSelectionFormattingChangeEvent {
   formatting: SelectionFormatting;
 }
 
+export interface EditorLinkOpenEvent {
+  kind: typeof EditorEventType.LinkOpen;
+  url: string;
+}
+
 export interface EditorRemoveEvent {
   kind: typeof EditorEventType.Remove;
 }
@@ -58,4 +64,5 @@ export type EditorEvent =
   | EditorBlurEvent
   | EditorSearchStateChangeEvent
   | EditorCollaborationUpdateEvent
+  | EditorLinkOpenEvent
   | EditorRemoveEvent;

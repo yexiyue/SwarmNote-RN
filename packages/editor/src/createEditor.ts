@@ -1,9 +1,11 @@
+import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { EditorState, type Extension } from '@codemirror/state';
-import { history, historyKeymap, standardKeymap } from '@codemirror/commands';
+import { history, historyKeymap, indentWithTab, standardKeymap } from '@codemirror/commands';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
+import { languages as codeLanguages } from '@codemirror/language-data';
 import { syntaxHighlighting } from '@codemirror/language';
 import { searchKeymap } from '@codemirror/search';
-import { EditorView, drawSelection, dropCursor, keymap } from '@codemirror/view';
+import { EditorView, drawSelection, dropCursor, highlightActiveLine, keymap } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
 
 import { EditorControlImpl } from './EditorControl';
@@ -17,6 +19,13 @@ import {
   createSearchExtension,
   markdownHighlightExtension,
 } from './extensions';
+import { createBlockImageExtension } from './extensions/renderBlockImages';
+import { createCtrlClickLinksExtension } from './extensions/links/ctrlClickLinksExtension';
+import { createLinkTooltipExtension } from './extensions/links/linkTooltipExtension';
+import { insertNewlineContinueMarkup } from './editorCommands/insertNewlineContinueMarkup';
+import { markdownMathExtension } from './extensions/markdownMathExtension';
+import { markdownFrontMatterExtension } from './extensions/markdownFrontMatterExtension';
+import { createLineAwareClipboardExtension } from './extensions/lineAwareClipboardExtension';
 import type { EditorControl, EditorProps } from './types';
 import { createSelectionRange } from './utils/selection';
 
@@ -36,17 +45,22 @@ export function createEditor(
   } = props;
 
   const settingsRuntime = createEditorSettingsExtension(settings);
-  const markdownExtensions = settings.features.markdownHighlight
-    ? [markdownHighlightExtension]
-    : [];
+  const markdownExtensions = [
+    ...(settings.features.markdownHighlight ? [markdownHighlightExtension] : []),
+    ...(settings.features.mathRendering ? [markdownMathExtension] : []),
+    markdownFrontMatterExtension,
+  ];
 
   const extensions: Extension[] = [
     history(),
     drawSelection(),
     dropCursor(),
+    highlightActiveLine(),
+    closeBrackets(),
     markdown({
       base: markdownLanguage,
       extensions: markdownExtensions,
+      codeLanguages,
     }),
     syntaxHighlighting(classHighlighter),
     settingsRuntime.extension,
@@ -54,8 +68,22 @@ export function createEditor(
       ? [createMarkdownDecorationExtension()]
       : []),
     ...(settings.features.inlineRendering
-      ? [createInlineRenderingExtension()]
+      ? [createInlineRenderingExtension({
+          mathRendering: settings.features.mathRendering,
+        })]
       : []),
+    ...(settings.features.blockImageRendering
+      ? [createBlockImageExtension()]
+      : []),
+    ...(onEvent
+      ? [
+          createCtrlClickLinksExtension((url) => {
+            onEvent({ kind: EditorEventType.LinkOpen, url });
+          }),
+        ]
+      : []),
+    createLinkTooltipExtension(),
+    createLineAwareClipboardExtension(),
     ...(settings.features.collaboration
       ? createCollaborationExtension(collaboration)
       : []),
@@ -73,6 +101,9 @@ export function createEditor(
         ]
       : []),
     keymap.of([
+      ...closeBracketsKeymap,
+      { key: 'Enter', run: insertNewlineContinueMarkup },
+      indentWithTab,
       ...standardKeymap,
       ...historyKeymap,
       ...(settings.features.search ? searchKeymap : []),

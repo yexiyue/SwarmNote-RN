@@ -1,4 +1,4 @@
-import { redo, selectAll, undo } from '@codemirror/commands';
+import { copyLineDown, deleteLine, indentLess, indentMore, redo, selectAll, undo } from '@codemirror/commands';
 import { EditorSelection } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import {
@@ -20,6 +20,9 @@ import {
   toggleItalic,
   toggleList,
 } from './editorCommands';
+import { insertLineAfter } from './editorCommands/insertLineAfter';
+import { sortSelectedLines } from './editorCommands/sortSelectedLines';
+import { jumpToHash } from './editorCommands/jumpToHash';
 import type {
   EditorCommandType,
   EditorControl,
@@ -53,6 +56,13 @@ export class EditorControlImpl implements EditorControl {
       case 'insertHorizontalRule':
       case 'insertTable':
       case 'selectAll':
+      case 'duplicateLine':
+      case 'deleteLine':
+      case 'indentMore':
+      case 'indentLess':
+      case 'insertLineAfter':
+      case 'sortSelectedLines':
+      case 'jumpToHash':
       case 'focus':
       case 'blur':
       case 'scrollSelectionIntoView':
@@ -90,6 +100,20 @@ export class EditorControlImpl implements EditorControl {
         return insertTable(this.view);
       case 'selectAll':
         return selectAll(this.view);
+      case 'duplicateLine':
+        return copyLineDown(this.view);
+      case 'deleteLine':
+        return deleteLine(this.view);
+      case 'indentMore':
+        return indentMore(this.view);
+      case 'indentLess':
+        return indentLess(this.view);
+      case 'insertLineAfter':
+        return insertLineAfter(this.view);
+      case 'sortSelectedLines':
+        return sortSelectedLines(this.view);
+      case 'jumpToHash':
+        return jumpToHash(this.view, typeof args[0] === 'string' ? args[0] : '');
       case 'focus':
         return this.focus();
       case 'blur':

@@ -8,6 +8,7 @@ import {
 import { EditorView, lineNumbers } from '@codemirror/view';
 import type { EditorSettings, EditorSettingsUpdate } from '../types';
 import { DEFAULT_SETTINGS } from '../types';
+import { createEditorTheme } from '../theme/createTheme';
 
 export interface EditorSettingsCompartments {
   editable: Compartment;
@@ -16,6 +17,7 @@ export interface EditorSettingsCompartments {
   readOnly: Compartment;
   spellcheck: Compartment;
   tabSize: Compartment;
+  theme: Compartment;
 }
 
 export interface EditorSettingsExtensionRuntime {
@@ -35,6 +37,14 @@ function mergeSettings(
       ...current.features,
       ...update.features,
     },
+    theme: {
+      ...current.theme,
+      ...update.theme,
+      colors: {
+        ...current.theme.colors,
+        ...update.theme?.colors,
+      },
+    },
   };
 }
 
@@ -48,6 +58,7 @@ function createSettingsExtensions(settings: EditorSettings) {
       spellcheck: settings.spellcheck ? 'true' : 'false',
     }),
     tabSize: EditorState.tabSize.of(settings.tabSize),
+    theme: createEditorTheme(settings.theme),
   };
 }
 
@@ -59,6 +70,7 @@ function createCompartments(): EditorSettingsCompartments {
     readOnly: new Compartment(),
     spellcheck: new Compartment(),
     tabSize: new Compartment(),
+    theme: new Compartment(),
   };
 }
 
@@ -75,6 +87,7 @@ function createSettingsReconfigureEffects(
     compartments.readOnly.reconfigure(extensions.readOnly),
     compartments.spellcheck.reconfigure(extensions.spellcheck),
     compartments.tabSize.reconfigure(extensions.tabSize),
+    compartments.theme.reconfigure(extensions.theme),
   ];
 }
 
@@ -113,6 +126,7 @@ export function createEditorSettingsExtension(
       compartments.readOnly.of(initialExtensions.readOnly),
       compartments.spellcheck.of(initialExtensions.spellcheck),
       compartments.tabSize.of(initialExtensions.tabSize),
+      compartments.theme.of(initialExtensions.theme),
     ],
     field,
   };

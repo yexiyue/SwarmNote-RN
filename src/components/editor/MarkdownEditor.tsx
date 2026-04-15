@@ -3,7 +3,7 @@ import { DEFAULT_SETTINGS } from "@swarmnote/editor/types";
 import type { EditorInitOptions } from "@swarmnote/editor-web";
 import { Asset } from "expo-asset";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { View } from "react-native";
+import { useColorScheme, View } from "react-native";
 import type { WebViewMessageEvent } from "react-native-webview";
 import WebView from "react-native-webview";
 import { useEditorBridge } from "./useEditorBridge";
@@ -78,11 +78,15 @@ export function MarkdownEditor({
     [setWebViewRef],
   );
 
+  const colorScheme = useColorScheme();
+  const appearance = colorScheme === "dark" ? "dark" : "light";
+
   const options: EditorInitOptions = useMemo(
     () => ({
       initialText,
       settings: {
         ...DEFAULT_SETTINGS,
+        theme: { appearance },
       },
       collaboration: enableYjs
         ? {
@@ -91,8 +95,14 @@ export function MarkdownEditor({
           }
         : undefined,
     }),
-    [enableYjs, initialText],
+    [appearance, enableYjs, initialText],
   );
+
+  // Sync theme when color scheme changes at runtime
+  useEffect(() => {
+    if (!editorApi || !editorCreated) return;
+    void editorApi.updateSettings({ theme: { appearance } });
+  }, [appearance, editorApi, editorCreated]);
 
   useEffect(() => {
     console.log("[Editor] createEditor effect:", {

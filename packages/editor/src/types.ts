@@ -15,6 +15,13 @@ export enum EditorCommandType {
   InsertHorizontalRule = 'insertHorizontalRule',
   InsertTable = 'insertTable',
   SelectAll = 'selectAll',
+  DuplicateLine = 'duplicateLine',
+  DeleteLine = 'deleteLine',
+  IndentMore = 'indentMore',
+  IndentLess = 'indentLess',
+  InsertLineAfter = 'insertLineAfter',
+  SortSelectedLines = 'sortSelectedLines',
+  JumpToHash = 'jumpToHash',
   Focus = 'focus',
   Blur = 'blur',
   ScrollSelectionIntoView = 'scrollSelectionIntoView',
@@ -31,8 +38,31 @@ export interface EditorFeatureToggles {
   markdownHighlight: boolean;
   markdownDecorations: boolean;
   inlineRendering: boolean;
+  blockImageRendering: boolean;
+  mathRendering: boolean;
   search: boolean;
   collaboration: boolean;
+}
+
+export type EditorAppearance = 'light' | 'dark';
+
+export interface EditorThemeConfig {
+  appearance: EditorAppearance;
+  fontFamily?: string;
+  fontSize?: number;
+  colors?: {
+    background?: string;
+    foreground?: string;
+    selection?: string;
+    activeLine?: string;
+    border?: string;
+    codeBackground?: string;
+    heading?: string;
+    link?: string;
+    comment?: string;
+    keyword?: string;
+    string?: string;
+  };
 }
 
 export interface EditorSettings {
@@ -45,11 +75,13 @@ export interface EditorSettings {
   editable: boolean;
   showLineNumbers: boolean;
   features: EditorFeatureToggles;
+  theme: EditorThemeConfig;
 }
 
 export interface EditorSettingsUpdate
-  extends Partial<Omit<EditorSettings, 'features'>> {
+  extends Partial<Omit<EditorSettings, 'features' | 'theme'>> {
   features?: Partial<EditorFeatureToggles>;
+  theme?: Partial<EditorThemeConfig>;
 }
 
 export interface SearchState {
@@ -147,6 +179,10 @@ export const DEFAULT_SEARCH_STATE: SearchState = {
   totalMatches: 0,
 };
 
+export const DEFAULT_THEME: EditorThemeConfig = {
+  appearance: 'light',
+};
+
 export const DEFAULT_SETTINGS: EditorSettings = {
   readonly: false,
   lineWrapping: true,
@@ -156,10 +192,13 @@ export const DEFAULT_SETTINGS: EditorSettings = {
   spellcheck: false,
   editable: true,
   showLineNumbers: false,
+  theme: DEFAULT_THEME,
   features: {
     markdownHighlight: true,
     markdownDecorations: true,
-    inlineRendering: false,
+    inlineRendering: true,
+    blockImageRendering: true,
+    mathRendering: true,
     search: true,
     collaboration: true,
   },

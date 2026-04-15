@@ -1,12 +1,12 @@
 import { Decoration } from '@codemirror/view';
 import type { InlineRenderingSpec, RevealStrategy } from './types';
 
-const lineRevealNodes = new Set(['HeaderMark', 'CodeMark']);
+const lineRevealNodes = new Set(['HeaderMark', 'CodeMark', 'QuoteMark']);
 const activeRevealNodes = new Set([
   'EmphasisMark',
   'StrikethroughMark',
   'HighlightMarker',
-  'QuoteMark',
+  'LinkMark',
 ]);
 
 const hiddenDecoration = Decoration.replace({});
@@ -19,6 +19,7 @@ export const replaceFormatCharacters: InlineRenderingSpec = {
     'StrikethroughMark',
     'HighlightMarker',
     'QuoteMark',
+    'LinkMark',
   ],
   extension: {
     createDecoration() {

@@ -6,6 +6,7 @@
  * 2. 创建双通道 Comlink Endpoint 并连线
  * 3. 环境检测：WebView 模式 vs 浏览器独立调试模式
  */
+import 'katex/dist/katex.min.css';
 import * as Comlink from 'comlink';
 import { DEFAULT_SETTINGS } from '@swarmnote/editor';
 import {

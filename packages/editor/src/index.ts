@@ -12,15 +12,18 @@ export {
   DEFAULT_SEARCH_STATE,
   DEFAULT_SELECTION_FORMATTING,
   DEFAULT_SETTINGS,
+  DEFAULT_THEME,
   EditorCommandType,
 } from './types';
 export type {
+  EditorAppearance,
   EditorCollaborationConfig,
   EditorControl,
   EditorProps,
   EditorSelectionRange,
   EditorSettings,
   EditorSettingsUpdate,
+  EditorThemeConfig,
   ListType,
   SearchState,
   SelectionFormatting,

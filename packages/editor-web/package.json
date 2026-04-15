@@ -11,6 +11,7 @@
   "dependencies": {
     "@swarmnote/editor": "workspace:*",
     "comlink": "^4.4.2",
+    "katex": "^0.16.45",
     "y-protocols": "^1.0.6",
     "yjs": "^13.6.20"
   },
