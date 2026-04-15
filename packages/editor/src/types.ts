@@ -1,67 +1,166 @@
 import type { EditorView } from '@codemirror/view';
+import type { EditorEvent } from './events';
+
+export enum EditorCommandType {
+  Undo = 'undo',
+  Redo = 'redo',
+  ToggleBold = 'toggleBold',
+  ToggleItalic = 'toggleItalic',
+  ToggleCode = 'toggleCode',
+  ToggleHeading = 'toggleHeading',
+  ToggleOrderedList = 'toggleOrderedList',
+  ToggleUnorderedList = 'toggleUnorderedList',
+  ToggleCheckList = 'toggleCheckList',
+  InsertCodeBlock = 'insertCodeBlock',
+  InsertHorizontalRule = 'insertHorizontalRule',
+  InsertTable = 'insertTable',
+  SelectAll = 'selectAll',
+  Focus = 'focus',
+  Blur = 'blur',
+  ScrollSelectionIntoView = 'scrollSelectionIntoView',
+}
+
+export interface EditorSelectionRange {
+  anchor: number;
+  head: number;
+  from: number;
+  to: number;
+}
+
+export interface EditorFeatureToggles {
+  markdownHighlight: boolean;
+  markdownDecorations: boolean;
+  inlineRendering: boolean;
+  search: boolean;
+  collaboration: boolean;
+}
 
 export interface EditorSettings {
   readonly: boolean;
   lineWrapping: boolean;
   indentWithTabs: boolean;
   tabSize: number;
+  autofocus: boolean;
+  spellcheck: boolean;
+  editable: boolean;
+  showLineNumbers: boolean;
+  features: EditorFeatureToggles;
+}
+
+export interface EditorSettingsUpdate
+  extends Partial<Omit<EditorSettings, 'features'>> {
+  features?: Partial<EditorFeatureToggles>;
+}
+
+export interface SearchState {
+  query: string;
+  replaceQuery: string;
+  caseSensitive: boolean;
+  wholeWord: boolean;
+  regexp: boolean;
+  isOpen: boolean;
+  activeMatchIndex: number | null;
+  totalMatches: number;
+}
+
+export interface EditorCollaborationConfig {
+  ydoc: unknown;
+  fragmentName?: string;
+  localOrigin?: string;
+  remoteOrigin?: string;
 }
 
 export interface EditorProps {
   initialText: string;
+  initialSelection?: EditorSelectionRange;
   settings: EditorSettings;
-  yjsCollab?: YjsCollabOptions;
+  initialSearchState?: SearchState | null;
+  autofocus?: boolean;
+  collaboration?: EditorCollaborationConfig;
   onEvent?: (event: EditorEvent) => void;
 }
 
-export interface YjsCollabOptions {
-  ydoc: unknown; // Y.Doc — typed as unknown to avoid forcing yjs import on consumers
-  fragmentName?: string;
-}
-
-export type EditorEventKind =
-  | 'change'
-  | 'selectionChange'
-  | 'focus'
-  | 'blur';
-
-export interface EditorEvent {
-  kind: EditorEventKind;
-  // Extensible payload
-  [key: string]: unknown;
-}
-
 export interface EditorControl {
-  // Content
+  readonly view: EditorView;
+
+  supportsCommand(name: EditorCommandType | string): boolean;
+  execCommand(name: EditorCommandType | string, ...args: unknown[]): unknown;
+
   getText(): string;
   setText(text: string): void;
   insertText(text: string): void;
+  replaceSelection(text: string): void;
 
-  // Selection
-  getSelection(): { from: number; to: number };
-  select(from: number, to?: number): void;
+  getSelection(): EditorSelectionRange;
+  select(anchor: number, head?: number): void;
 
-  // Commands
-  execCommand(name: string, ...args: unknown[]): unknown;
+  getSettings(): EditorSettings;
+  updateSettings(settings: EditorSettingsUpdate): void;
 
-  // Formatting
-  toggleBold(): void;
-  toggleItalic(): void;
-  toggleCode(): void;
-  toggleHeading(level?: number): void;
+  getSearchState(): SearchState | null;
+  setSearchState(state: SearchState | null, source?: string): void;
+  clearSearch(source?: string): void;
 
-  // Lifecycle
+  getSelectionFormatting(): SelectionFormatting;
+
   focus(): void;
   blur(): void;
   destroy(): void;
-
-  // Underlying view (escape hatch)
-  readonly view: EditorView;
 }
+
+export type ListType = 'ordered' | 'unordered' | 'check';
+
+export interface SelectionFormatting {
+  bold: boolean;
+  italic: boolean;
+  code: boolean;
+  strikethrough: boolean;
+  highlight: boolean;
+  heading: number;
+  listType: ListType | null;
+  listLevel: number;
+  inBlockquote: boolean;
+  inCodeBlock: boolean;
+}
+
+export const DEFAULT_SELECTION_FORMATTING: SelectionFormatting = {
+  bold: false,
+  italic: false,
+  code: false,
+  strikethrough: false,
+  highlight: false,
+  heading: 0,
+  listType: null,
+  listLevel: 0,
+  inBlockquote: false,
+  inCodeBlock: false,
+};
+
+export const DEFAULT_SEARCH_STATE: SearchState = {
+  query: '',
+  replaceQuery: '',
+  caseSensitive: false,
+  wholeWord: false,
+  regexp: false,
+  isOpen: false,
+  activeMatchIndex: null,
+  totalMatches: 0,
+};
 
 export const DEFAULT_SETTINGS: EditorSettings = {
   readonly: false,
   lineWrapping: true,
   indentWithTabs: false,
   tabSize: 2,
+  autofocus: false,
+  spellcheck: false,
+  editable: true,
+  showLineNumbers: false,
+  features: {
+    markdownHighlight: true,
+    markdownDecorations: true,
+    inlineRendering: false,
+    search: true,
+    collaboration: true,
+  },
 };

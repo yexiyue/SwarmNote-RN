@@ -1,11 +1,105 @@
-import { EditorView } from '@codemirror/view';
+import { redo, selectAll, undo } from '@codemirror/commands';
 import { EditorSelection } from '@codemirror/state';
-import { undo, redo } from '@codemirror/commands';
-import type { EditorControl } from './types';
-import { toggleBold, toggleItalic, toggleCode, toggleHeading } from './commands/markdown';
+import { EditorView } from '@codemirror/view';
+import {
+  clearSearch,
+  getEditorSettings,
+  getEditorSettingsEffects,
+  getSearchState,
+  setSearchState,
+  type EditorSettingsExtensionRuntime,
+} from './extensions';
+import {
+  computeSelectionFormatting,
+  insertCodeBlock,
+  insertHorizontalRule,
+  insertTable,
+  toggleBold,
+  toggleCode,
+  toggleHeading,
+  toggleItalic,
+  toggleList,
+} from './editorCommands';
+import type {
+  EditorCommandType,
+  EditorControl,
+  EditorSettings,
+  EditorSettingsUpdate,
+  SearchState,
+} from './types';
+import { createSelectionRange } from './utils';
 
 export class EditorControlImpl implements EditorControl {
-  constructor(public readonly view: EditorView) {}
+  constructor(
+    public readonly view: EditorView,
+    private readonly options: {
+      settingsRuntime: EditorSettingsExtensionRuntime;
+      onDestroy?: () => void;
+    },
+  ) {}
+
+  supportsCommand(name: EditorCommandType | string): boolean {
+    switch (name) {
+      case 'undo':
+      case 'redo':
+      case 'toggleBold':
+      case 'toggleItalic':
+      case 'toggleCode':
+      case 'toggleHeading':
+      case 'toggleOrderedList':
+      case 'toggleUnorderedList':
+      case 'toggleCheckList':
+      case 'insertCodeBlock':
+      case 'insertHorizontalRule':
+      case 'insertTable':
+      case 'selectAll':
+      case 'focus':
+      case 'blur':
+      case 'scrollSelectionIntoView':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  execCommand(name: EditorCommandType | string, ...args: unknown[]): unknown {
+    switch (name) {
+      case 'undo':
+        return undo(this.view);
+      case 'redo':
+        return redo(this.view);
+      case 'toggleBold':
+        return toggleBold(this.view);
+      case 'toggleItalic':
+        return toggleItalic(this.view);
+      case 'toggleCode':
+        return toggleCode(this.view);
+      case 'toggleHeading':
+        return toggleHeading(this.view, typeof args[0] === 'number' ? args[0] : 2);
+      case 'toggleOrderedList':
+        return toggleList(this.view, 'ordered');
+      case 'toggleUnorderedList':
+        return toggleList(this.view, 'unordered');
+      case 'toggleCheckList':
+        return toggleList(this.view, 'check');
+      case 'insertCodeBlock':
+        return insertCodeBlock(this.view);
+      case 'insertHorizontalRule':
+        return insertHorizontalRule(this.view);
+      case 'insertTable':
+        return insertTable(this.view);
+      case 'selectAll':
+        return selectAll(this.view);
+      case 'focus':
+        return this.focus();
+      case 'blur':
+        return this.blur();
+      case 'scrollSelectionIntoView':
+        return this.view.dispatch({ scrollIntoView: true });
+      default:
+        return undefined;
+    }
+  }
 
   getText(): string {
     return this.view.state.doc.toString();
@@ -18,59 +112,58 @@ export class EditorControlImpl implements EditorControl {
   }
 
   insertText(text: string): void {
-    const { from } = this.view.state.selection.main;
+    this.replaceSelection(text);
+  }
+
+  replaceSelection(text: string): void {
+    const selection = this.view.state.selection.main;
     this.view.dispatch({
-      changes: { from, insert: text },
-      selection: EditorSelection.cursor(from + text.length),
+      changes: { from: selection.from, to: selection.to, insert: text },
+      selection: EditorSelection.cursor(selection.from + text.length),
     });
   }
 
-  getSelection(): { from: number; to: number } {
-    const { from, to } = this.view.state.selection.main;
-    return { from, to };
+  getSelection() {
+    const selection = this.view.state.selection.main;
+    return createSelectionRange(selection.anchor, selection.head);
   }
 
-  select(from: number, to?: number): void {
+  select(anchor: number, head?: number): void {
+    const resolvedHead = head ?? anchor;
     this.view.dispatch({
-      selection: EditorSelection.single(from, to ?? from),
+      selection: EditorSelection.single(anchor, resolvedHead),
     });
     this.view.focus();
   }
 
-  execCommand(name: string, ...args: unknown[]): unknown {
-    switch (name) {
-      case 'undo':
-        return undo(this.view);
-      case 'redo':
-        return redo(this.view);
-      case 'toggleBold':
-        return this.toggleBold();
-      case 'toggleItalic':
-        return this.toggleItalic();
-      case 'toggleCode':
-        return this.toggleCode();
-      case 'scrollSelectionIntoView':
-        return this.view.dispatch({ scrollIntoView: true });
-      default:
-        console.warn(`Unknown command: ${name}`);
-        return undefined;
-    }
+  getSettings(): EditorSettings {
+    return getEditorSettings(this.view.state, this.options.settingsRuntime);
   }
 
-  toggleBold(): void {
-    toggleBold(this.view);
+  updateSettings(settings: EditorSettingsUpdate): void {
+    this.view.dispatch({
+      effects: getEditorSettingsEffects(
+        this.view.state,
+        this.options.settingsRuntime,
+        settings,
+      ),
+    });
   }
 
-  toggleItalic(): void {
-    toggleItalic(this.view);
+  getSearchState(): SearchState | null {
+    return getSearchState(this.view.state);
   }
 
-  toggleCode(): void {
-    toggleCode(this.view);
+  setSearchState(state: SearchState | null, source?: string): void {
+    setSearchState(this.view, state, source);
   }
 
-  toggleHeading(level = 2): void {
-    toggleHeading(this.view, level);
+  clearSearch(source?: string): void {
+    clearSearch(this.view, source);
+  }
+
+  getSelectionFormatting() {
+    return computeSelectionFormatting(this.view.state);
   }
 
   focus(): void {
@@ -82,6 +175,7 @@ export class EditorControlImpl implements EditorControl {
   }
 
   destroy(): void {
+    this.options.onDestroy?.();
     this.view.destroy();
   }
 }

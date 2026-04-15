@@ -1,81 +1,85 @@
+import type { EditorEvent } from "@swarmnote/editor/events";
 import type { EditorApi, HostApi } from "@swarmnote/editor-web";
 import * as Comlink from "comlink";
-import { useCallback, useMemo, useRef } from "react";
-import { createRNEndpoint, type WebViewRef } from "@/lib/comlink-webview-adapter";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  createRNEndpoint,
+  registerTransferHandlers,
+  type WebViewRef,
+} from "@/lib/comlink-webview-adapter";
+
+registerTransferHandlers(Comlink);
 
 interface UseEditorBridgeOptions {
-  onDocChange?: () => void;
-  onYjsUpdate?: (update: Uint8Array) => void;
-  onFocusChange?: (hasFocus: boolean) => void;
+  onRuntimeReady?: () => void;
+  onEditorEvent?: (event: EditorEvent) => void;
 }
 
 interface EditorBridge {
-  /** 远端编辑器 API (调用 WebView 内的编辑器) */
   editorApi: Comlink.Remote<EditorApi> | null;
-  /** 给 WebView ref 的 getter */
   setWebViewRef: (ref: WebViewRef | null) => void;
-  /** WebView onMessage handler — 传给 <WebView onMessage={...} /> */
   onWebViewMessage: (event: { nativeEvent: { data: string } }) => void;
 }
 
-/**
- * 管理 RN ↔ WebView 的 Comlink 桥接。
- *
- * 用法:
- * ```tsx
- * const { editorApi, setWebViewRef, onWebViewMessage } = useEditorBridge({
- *   onDocChange: () => console.log('doc changed'),
- *   onYjsUpdate: (update) => rustBridge.applyLocalUpdate(docId, update),
- * });
- * ```
- */
+const RUNTIME_CHANNEL = "editor-runtime";
+const HOST_CHANNEL = "editor-host";
+
 export function useEditorBridge(options: UseEditorBridgeOptions = {}): EditorBridge {
   const webviewRef = useRef<WebViewRef | null>(null);
-  const endpointRef = useRef<ReturnType<typeof createRNEndpoint> | null>(null);
+  const runtimeEndpointRef = useRef<ReturnType<typeof createRNEndpoint> | null>(null);
+  const hostEndpointRef = useRef<ReturnType<typeof createRNEndpoint> | null>(null);
+
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   const editorApi = useMemo(() => {
-    const endpoint = createRNEndpoint(() => webviewRef.current);
-    endpointRef.current = endpoint;
+    const endpoint = createRNEndpoint(RUNTIME_CHANNEL, () => webviewRef.current);
+    runtimeEndpointRef.current = endpoint;
     return Comlink.wrap<EditorApi>(endpoint);
   }, []);
+
+  const hostEndpoint = useMemo(() => {
+    const endpoint = createRNEndpoint(HOST_CHANNEL, () => webviewRef.current);
+    hostEndpointRef.current = endpoint;
+    return endpoint;
+  }, []);
+
+  useEffect(() => {
+    const hostApi: HostApi = {
+      onRuntimeReady() {
+        optionsRef.current.onRuntimeReady?.();
+      },
+      onEditorEvent(event) {
+        optionsRef.current.onEditorEvent?.(event);
+      },
+      log(message: string) {
+        console.log("[Editor WebView]", message);
+      },
+    };
+
+    Comlink.expose(hostApi, hostEndpoint);
+  }, [hostEndpoint]);
 
   const setWebViewRef = useCallback((ref: WebViewRef | null) => {
     webviewRef.current = ref;
   }, []);
 
-  // 用 ref 存回调,避免 HostApi 对象随回调变化而重建
-  const optionsRef = useRef(options);
-  optionsRef.current = options;
-
-  // HostApi: 暴露给 WebView 调用的回调
-  const _hostApi: HostApi = useMemo(
-    () => ({
-      onDocChange() {
-        optionsRef.current.onDocChange?.();
-      },
-      onYjsUpdate(update: Uint8Array) {
-        optionsRef.current.onYjsUpdate?.(update);
-      },
-      onFocusChange(hasFocus: boolean) {
-        optionsRef.current.onFocusChange?.(hasFocus);
-      },
-      log(message: string) {
-        console.log("[Editor WebView]", message);
-      },
-    }),
-    [],
-  );
-
-  // TODO: 用 Comlink.expose(hostApi, endpoint) 让 WebView 能调 RN 的 HostApi
-  // 这需要一个反向 endpoint,暂时先用单向(RN → WebView)
-
   const onWebViewMessage = useCallback((event: { nativeEvent: { data: string } }) => {
-    const data = JSON.parse(event.nativeEvent.data);
-    // 把 WebView 发来的消息转发给 Comlink endpoint listener
-    const endpoint = endpointRef.current as ReturnType<typeof createRNEndpoint> & {
-      dispatchMessage(data: unknown): void;
-    };
-    endpoint?.dispatchMessage(data);
+    const raw = event.nativeEvent.data;
+
+    // 拦截调试日志（不走 Comlink）
+    try {
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      if (parsed?.__debugLog) {
+        console.log("[Editor WebView]", parsed.__debugLog);
+        return;
+      }
+    } catch {
+      // 非 JSON，继续交给 Comlink
+    }
+
+    runtimeEndpointRef.current?.dispatchMessage(raw);
+    hostEndpointRef.current?.dispatchMessage(raw);
   }, []);
 
   return { editorApi, setWebViewRef, onWebViewMessage };

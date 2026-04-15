@@ -1,109 +1,54 @@
+/**
+ * editor-web 入口
+ *
+ * 负责：
+ * 1. 注册 Comlink transferHandler
+ * 2. 创建双通道 Comlink Endpoint 并连线
+ * 3. 环境检测：WebView 模式 vs 浏览器独立调试模式
+ */
 import * as Comlink from 'comlink';
-import * as Y from 'yjs';
-import { createEditor, DEFAULT_SETTINGS } from '@swarmnote/editor';
-import type { EditorControl } from '@swarmnote/editor';
-import type { EditorApi, EditorInitOptions } from './types';
+import { DEFAULT_SETTINGS } from '@swarmnote/editor';
+import {
+  createWebViewEndpoint,
+  isWebViewEnvironment,
+  registerTransferHandlers,
+} from './comlink-endpoint';
+import { createEditorRuntime } from './editor-runtime';
+import type { HostApi } from './types';
 
-// WebView 侧的 Comlink endpoint:
-// - postMessage → ReactNativeWebView.postMessage (发给 RN)
-// - addEventListener('message') → 监听 RN 通过 injectJavaScript 发来的 MessageEvent
-function createWebViewEndpoint(): Comlink.Endpoint {
-  return {
-    postMessage(msg: unknown) {
-      const rn = (globalThis as unknown as { ReactNativeWebView?: { postMessage(s: string): void } }).ReactNativeWebView;
-      if (rn) {
-        rn.postMessage(JSON.stringify(msg));
-      }
-    },
-    addEventListener(type: string, handler: EventListenerOrEventListenerObject) {
-      globalThis.addEventListener(type, handler as EventListener);
-    },
-    removeEventListener(type: string, handler: EventListenerOrEventListenerObject) {
-      globalThis.removeEventListener(type, handler as EventListener);
-    },
-  };
+export type {
+  EditorApi,
+  EditorInitOptions,
+  HostApi,
+  HostEventHandler,
+  RuntimeCreateEditorOptions,
+  RuntimeState,
+} from './types';
+
+// 注册自定义 transferHandler（Uint8Array 等）
+registerTransferHandlers();
+
+// 创建双通道 Endpoint
+const HOST_CHANNEL = 'editor-host';
+const RUNTIME_CHANNEL = 'editor-runtime';
+
+const hostEndpoint = createWebViewEndpoint(HOST_CHANNEL);
+const runtimeEndpoint = createWebViewEndpoint(RUNTIME_CHANNEL);
+
+// 连线：wrap 远端 HostApi，expose 本地 EditorApi
+const host = Comlink.wrap<HostApi>(hostEndpoint);
+const runtimeApi = createEditorRuntime(host);
+Comlink.expose(runtimeApi, runtimeEndpoint);
+
+// 环境分支
+if (isWebViewEnvironment()) {
+  // RN WebView 模式：通过 Comlink 通知宿主 runtime 已就绪
+  host.onRuntimeReady();
+} else {
+  // 独立浏览器模式：直接创建编辑器用于开发调试
+  runtimeApi.createEditor({
+    initialText:
+      '# Hello SwarmNote\n\n这是浏览器独立模式。\n\n## 功能测试\n\n- **加粗** 和 *斜体*\n- `行内代码`\n- [链接](https://example.com)\n\n### 代码块\n\n```typescript\nconst hello = "world";\nconsole.log(hello);\n```\n\n> 引用文本\n\n1. 有序列表\n2. 第二项\n\n- [ ] 待办事项\n- [x] 已完成\n\n---\n',
+    settings: DEFAULT_SETTINGS,
+  });
 }
-
-let editor: EditorControl | null = null;
-let ydoc: Y.Doc | null = null;
-
-// HostApi: WebView → RN 的回调通道
-// TODO: 后续用 Comlink 的反向 expose 实现,当前先用 postMessage 直接发
-function notifyHost(method: string, ...args: unknown[]) {
-  const rn = (globalThis as unknown as { ReactNativeWebView?: { postMessage(s: string): void } }).ReactNativeWebView;
-  if (rn) {
-    rn.postMessage(JSON.stringify({ type: 'hostCall', method, args }));
-  }
-}
-
-const editorApi: EditorApi = {
-  init(options: EditorInitOptions) {
-    const parent = document.getElementById('editor-root');
-    if (!parent) {
-      throw new Error('Cannot find #editor-root element');
-    }
-
-    // 初始化 yjs（如果启用）
-    if (options.enableYjs) {
-      ydoc = new Y.Doc();
-
-      // 监听本地 update → 发给 RN
-      ydoc.on('update', (update: Uint8Array, origin: unknown) => {
-        if (origin !== 'remote') {
-          notifyHost('onYjsUpdate', update);
-        }
-      });
-    }
-
-    editor = createEditor(parent, {
-      initialText: options.initialText,
-      settings: { ...DEFAULT_SETTINGS, ...options.settings },
-      yjsCollab: ydoc ? { ydoc, fragmentName: 'document' } : undefined,
-      onEvent(event) {
-        if (event.kind === 'change') {
-          notifyHost('onDocChange');
-        }
-        if (event.kind === 'focus' || event.kind === 'blur') {
-          notifyHost('onFocusChange', event.kind === 'focus');
-        }
-      },
-    });
-  },
-
-  getText() {
-    if (!editor) throw new Error('Editor not initialized');
-    return editor.getText();
-  },
-
-  setText(text: string) {
-    if (!editor) throw new Error('Editor not initialized');
-    editor.setText(text);
-  },
-
-  execCommand(name: string, ...args: unknown[]) {
-    if (!editor) throw new Error('Editor not initialized');
-    editor.execCommand(name, ...args);
-  },
-
-  updateSettings(_settings: Partial<unknown>) {
-    // TODO: 动态更新 settings（需要 CM6 Compartment 机制）
-  },
-
-  applyYjsUpdate(update: Uint8Array) {
-    if (!ydoc) return;
-    Y.applyUpdate(ydoc, update, 'remote');
-  },
-
-  select(from: number, to?: number) {
-    if (!editor) return;
-    editor.select(from, to);
-  },
-
-  focus() {
-    if (!editor) return;
-    editor.focus();
-  },
-};
-
-// 暴露 EditorApi 给 RN 侧通过 Comlink 调用
-Comlink.expose(editorApi, createWebViewEndpoint());

@@ -1,85 +1,147 @@
 import { EditorState, type Extension } from '@codemirror/state';
-import { EditorView, drawSelection, dropCursor, keymap, lineNumbers } from '@codemirror/view';
 import { history, historyKeymap, standardKeymap } from '@codemirror/commands';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { syntaxHighlighting } from '@codemirror/language';
-import { classHighlighter } from '@lezer/highlight';
 import { searchKeymap } from '@codemirror/search';
+import { EditorView, drawSelection, dropCursor, keymap } from '@codemirror/view';
+import { classHighlighter } from '@lezer/highlight';
 
-import type { EditorProps } from './types';
 import { EditorControlImpl } from './EditorControl';
-import type { EditorControl } from './types';
+import { EditorEventType } from './events';
+import { computeSelectionFormatting } from './editorCommands';
+import {
+  createCollaborationExtension,
+  createEditorSettingsExtension,
+  createInlineRenderingExtension,
+  createMarkdownDecorationExtension,
+  createSearchExtension,
+  markdownHighlightExtension,
+} from './extensions';
+import type { EditorControl, EditorProps } from './types';
+import { createSelectionRange } from './utils/selection';
 
-// Android WebView 上 EditContext API 会破坏 IME，需要禁用
-// 公开 issue: https://github.com/codemirror/dev/issues/1450
-// 解决方案讨论: https://discuss.codemirror.net/t/experimental-support-for-editcontext/8144/3
 (EditorView as unknown as { EDIT_CONTEXT: boolean }).EDIT_CONTEXT = false;
 
-/**
- * 创建一个 CodeMirror 6 编辑器实例。
- *
- * 平台无关：桌面端直接调用，移动端在 WebView 内调用。
- */
 export function createEditor(
   parent: HTMLElement,
   props: EditorProps,
 ): EditorControl {
-  const { initialText, settings, yjsCollab, onEvent } = props;
+  const {
+    initialText,
+    initialSelection,
+    settings,
+    initialSearchState,
+    collaboration,
+    onEvent,
+  } = props;
+
+  const settingsRuntime = createEditorSettingsExtension(settings);
+  const markdownExtensions = settings.features.markdownHighlight
+    ? [markdownHighlightExtension]
+    : [];
 
   const extensions: Extension[] = [
-    // 基础
     history(),
     drawSelection(),
     dropCursor(),
-
-    // Markdown
-    markdown({ base: markdownLanguage }),
+    markdown({
+      base: markdownLanguage,
+      extensions: markdownExtensions,
+    }),
     syntaxHighlighting(classHighlighter),
-
-    // 行为
-    EditorView.lineWrapping,
-    EditorState.tabSize.of(settings.tabSize),
-    EditorState.readOnly.of(settings.readonly),
-
-    // 快捷键
-    keymap.of([...standardKeymap, ...historyKeymap, ...searchKeymap]),
+    settingsRuntime.extension,
+    ...(settings.features.markdownDecorations
+      ? [createMarkdownDecorationExtension()]
+      : []),
+    ...(settings.features.inlineRendering
+      ? [createInlineRenderingExtension()]
+      : []),
+    ...(settings.features.collaboration
+      ? createCollaborationExtension(collaboration)
+      : []),
+    ...(settings.features.search
+      ? [
+          createSearchExtension({
+            onSearchStateChange(search, source) {
+              onEvent?.({
+                kind: EditorEventType.SearchStateChange,
+                search,
+                source,
+              });
+            },
+          }),
+        ]
+      : []),
+    keymap.of([
+      ...standardKeymap,
+      ...historyKeymap,
+      ...(settings.features.search ? searchKeymap : []),
+    ]),
   ];
 
-  // yjs 协作扩展（可选）
-  if (yjsCollab) {
-    // 动态 import 避免不用 yjs 时增加 bundle 体积
-    // 调用方需要确保 yjsCollab.ydoc 是一个 Y.Doc 实例
-    const { yCollab } = require('y-codemirror.next') as typeof import('y-codemirror.next');
-    const Y = require('yjs') as typeof import('yjs');
-    const ydoc = yjsCollab.ydoc as InstanceType<typeof Y.Doc>;
-    const ytext = ydoc.getText(yjsCollab.fragmentName ?? 'document');
-    extensions.push(yCollab(ytext, null));
-  }
-
-  // 事件回调
   if (onEvent) {
     extensions.push(
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
-          onEvent({ kind: 'change' });
+          onEvent({
+            kind: EditorEventType.Change,
+          });
         }
+
         if (update.selectionSet) {
-          onEvent({ kind: 'selectionChange' });
+          const selection = update.state.selection.main;
+          onEvent({
+            kind: EditorEventType.SelectionChange,
+            selection: createSelectionRange(selection.anchor, selection.head),
+          });
+          onEvent({
+            kind: EditorEventType.SelectionFormattingChange,
+            formatting: computeSelectionFormatting(update.state),
+          });
         }
+
         if (update.focusChanged) {
-          onEvent({ kind: update.view.hasFocus ? 'focus' : 'blur' });
+          onEvent({
+            kind: update.view.hasFocus ? EditorEventType.Focus : EditorEventType.Blur,
+          });
         }
       }),
     );
   }
 
+  const selection = initialSelection
+    ? {
+        anchor: initialSelection.anchor,
+        head: initialSelection.head,
+      }
+    : undefined;
+
   const view = new EditorView({
     state: EditorState.create({
-      doc: yjsCollab ? '' : initialText, // yjs 模式下由 yCollab 管理初始内容
+      doc: collaboration ? '' : initialText,
+      selection,
       extensions,
     }),
     parent,
   });
 
-  return new EditorControlImpl(view);
+  const control = new EditorControlImpl(view, {
+    settingsRuntime,
+    onDestroy: onEvent
+      ? () => {
+          onEvent({ kind: EditorEventType.Remove });
+        }
+      : undefined,
+  });
+
+  if (initialSearchState && settings.features.search) {
+    control.setSearchState(initialSearchState, 'initialSearchState');
+  }
+
+  if (settings.autofocus || props.autofocus) {
+    view.focus();
+  }
+
+  return control;
 }
+

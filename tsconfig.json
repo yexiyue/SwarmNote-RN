@@ -5,7 +5,11 @@
     "moduleSuffixes": [".native", ""],
     "paths": {
       "@/*": ["./src/*"],
-      "@/assets/*": ["./assets/*"]
+      "@/assets/*": ["./assets/*"],
+      "@swarmnote/editor": ["./packages/editor/src/index.ts"],
+      "@swarmnote/editor/*": ["./packages/editor/src/*"],
+      "@swarmnote/editor-web": ["./packages/editor-web/src/index.ts"],
+      "@swarmnote/editor-web/*": ["./packages/editor-web/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"]

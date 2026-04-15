@@ -1,126 +1,174 @@
-import type { EditorInitOptions } from "@swarmnote/editor-web/src/types";
-import { useCallback, useMemo, useRef } from "react";
+import type { EditorEvent } from "@swarmnote/editor/events";
+import { DEFAULT_SETTINGS } from "@swarmnote/editor/types";
+import type { EditorInitOptions } from "@swarmnote/editor-web";
+import { Asset } from "expo-asset";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import type { WebViewMessageEvent } from "react-native-webview";
 import WebView from "react-native-webview";
 import { useEditorBridge } from "./useEditorBridge";
 
-// Joplin 模式: tsdown 构建 IIFE → codegen 脚本包装成 CJS 字符串模块 → Metro require
-// 构建命令: pnpm --filter @swarmnote/editor-web run build
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const EDITOR_BUNDLE_JS: string = require("@swarmnote/editor-web/dist/bundle");
+const EDITOR_HTML_MODULE = require("@swarmnote/editor-web/dist/index.html");
 
 interface MarkdownEditorProps {
   initialText?: string;
   enableYjs?: boolean;
-  onDocChange?: () => void;
-  onYjsUpdate?: (update: Uint8Array) => void;
-  onFocusChange?: (hasFocus: boolean) => void;
+  onEditorEvent?: (event: EditorEvent) => void;
 }
-
-const EDITOR_HTML = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; width: 100%; overflow: hidden; }
-    #editor-root {
-      height: 100%;
-      padding: 12px;
-      font-size: 16px;
-      line-height: 1.6;
-    }
-    .cm-editor { height: 100%; }
-    .cm-scroller { overflow: auto !important; }
-    .cm-content { padding-bottom: 50vh; }
-    .cm-focused { outline: none; }
-  </style>
-</head>
-<body>
-  <div id="editor-root"></div>
-</body>
-</html>`;
 
 export function MarkdownEditor({
   initialText = "",
   enableYjs = false,
-  onDocChange,
-  onYjsUpdate,
-  onFocusChange,
+  onEditorEvent,
 }: MarkdownEditorProps) {
   const webviewRef = useRef<WebView>(null);
+  const [htmlUri, setHtmlUri] = useState<string | null>(null);
+  const [runtimeReady, setRuntimeReady] = useState(false);
+  const [editorCreated, setEditorCreated] = useState(false);
+
+  // 加载 HTML 资源到本地文件系统（每次强制重新下载）
+  useEffect(() => {
+    let cancelled = false;
+    const asset = Asset.fromModule(EDITOR_HTML_MODULE);
+    // 强制重新下载，忽略缓存
+    asset.localUri = null;
+    (asset as unknown as { downloaded: boolean }).downloaded = false;
+    asset
+      .downloadAsync()
+      .then(() => {
+        if (!cancelled && asset.localUri) {
+          console.log("[Editor] HTML asset loaded:", asset.localUri);
+          setHtmlUri(asset.localUri);
+        }
+      })
+      .catch((err) => {
+        console.error("[Editor] HTML asset download failed:", err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const { editorApi, setWebViewRef, onWebViewMessage } = useEditorBridge({
-    onDocChange,
-    onYjsUpdate,
-    onFocusChange,
+    onRuntimeReady() {
+      console.log("[Editor] onRuntimeReady called, setting runtimeReady=true");
+      setRuntimeReady(true);
+    },
+    onEditorEvent,
   });
 
-  // WebView ref 设置
   const handleRef = useCallback(
     (ref: WebView | null) => {
+      console.log("[Editor] handleRef:", ref ? "WebView mounted" : "WebView unmounted");
+      if (!ref) {
+        setRuntimeReady(false);
+        setEditorCreated(false);
+      }
+
       (webviewRef as React.MutableRefObject<WebView | null>).current = ref;
-      setWebViewRef(ref ? { injectJavaScript: (js: string) => ref.injectJavaScript(js) } : null);
+      setWebViewRef(
+        ref
+          ? {
+              injectJavaScript: (js: string) => ref.injectJavaScript(js),
+            }
+          : null,
+      );
     },
     [setWebViewRef],
   );
 
-  // WebView 加载完成后初始化编辑器
-  const handleLoadEnd = useCallback(async () => {
-    if (!editorApi) return;
-
-    const options: EditorInitOptions = {
+  const options: EditorInitOptions = useMemo(
+    () => ({
       initialText,
       settings: {
-        readonly: false,
-        lineWrapping: true,
-        indentWithTabs: false,
-        tabSize: 2,
+        ...DEFAULT_SETTINGS,
       },
-      enableYjs,
-    };
-
-    await editorApi.init(options);
-    await editorApi.focus();
-  }, [editorApi, initialText, enableYjs]);
-
-  // 注入编辑器 bundle 的 JS
-  const injectedJavaScript = useMemo(
-    () => `
-      try {
-        ${EDITOR_BUNDLE_JS}
-      } catch(e) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({ error: e.message }));
-      }
-      true;
-    `,
-    [],
+      collaboration: enableYjs
+        ? {
+            ydoc: {},
+            fragmentName: "document",
+          }
+        : undefined,
+    }),
+    [enableYjs, initialText],
   );
+
+  useEffect(() => {
+    console.log("[Editor] createEditor effect:", {
+      hasApi: !!editorApi,
+      runtimeReady,
+      editorCreated,
+    });
+    if (!editorApi || !runtimeReady || editorCreated) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        console.log("[Editor] calling createEditor...");
+        await editorApi.createEditor(options);
+        if (cancelled) {
+          return;
+        }
+        console.log("[Editor] editor created successfully");
+        setEditorCreated(true);
+        await editorApi.focus();
+        console.log("[Editor] editor focused");
+      } catch (err) {
+        console.error("[Editor] createEditor failed:", err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [editorApi, editorCreated, options, runtimeReady]);
+
+  useEffect(() => {
+    return () => {
+      if (!editorApi) {
+        return;
+      }
+
+      void editorApi.destroyEditor();
+    };
+  }, [editorApi]);
 
   const handleMessage = useCallback(
     (event: WebViewMessageEvent) => {
+      console.log("[Editor] onMessage:", event.nativeEvent.data?.substring(0, 150));
       onWebViewMessage(event);
     },
     [onWebViewMessage],
   );
 
+  if (!htmlUri) {
+    return <View className="flex-1" />;
+  }
+
   return (
-    <View className="flex-1">
+    <View style={{ flex: 1 }}>
       <WebView
         ref={handleRef}
-        source={{ html: EDITOR_HTML }}
-        injectedJavaScript={injectedJavaScript}
+        source={{ uri: htmlUri }}
+        originWhitelist={["file://*"]}
         onMessage={handleMessage}
-        onLoadEnd={handleLoadEnd}
+        style={{ flex: 1, opacity: 0.99 }}
         javaScriptEnabled
         domStorageEnabled
-        scrollEnabled={false}
+        allowFileAccess
+        allowFileAccessFromFileURLs
+        scrollEnabled
+        nestedScrollEnabled
         keyboardDisplayRequiresUserAction={false}
         hideKeyboardAccessoryView={false}
         automaticallyAdjustContentInsets={false}
         contentInsetAdjustmentBehavior="never"
+        overScrollMode="never"
+        setSupportMultipleWindows={false}
       />
     </View>
   );

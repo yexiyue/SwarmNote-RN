@@ -8,94 +8,148 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SwarmNote Mobile — Expo + React Native 移动端，通过 uniffi 桥接 Rust 核心逻辑，与桌面端（Tauri）共享 P2P 同步、CRDT 协作能力。
+SwarmNote Mobile 是基于 Expo + React Native 的移动端应用。它通过 `uniffi-bindgen-react-native` 桥接 Rust 核心逻辑，与桌面端共享 P2P 同步、CRDT 协作和文档能力。
 
-## Commands
+## Common Commands
 
 ```bash
-pnpm install          # 安装依赖
-pnpm start            # Metro 开发服务器
-pnpm android          # Android 模拟器
-pnpm ios              # iOS 模拟器（仅 macOS）
-pnpm lint             # Biome check
-pnpm format           # 自动修复 lint + format
-pnpm lingui:extract   # 提取翻译消息
+# workspace
+pnpm install
+pnpm start                         # Metro dev server
+pnpm android                       # Android development build
+pnpm ios                           # iOS development build（仅 macOS）
+pnpm web                           # Web preview
+npx expo prebuild --platform android
+npx expo prebuild --platform ios
+npx expo start --clear             # 改 global.css / Metro / Babel / NativeWind 配置后必须
 
-# 包级别
-cd packages/swarmnote-core && pnpm ubrn:android   # Rust 编译
-cd packages/editor-web && pnpm build               # 编辑器 WebView bundle
+# quality
+pnpm lint                          # Biome check src/
+pnpm lint:ci                       # CI mode
+pnpm format                        # Biome auto-fix
+pnpm exec tsc --noEmit             # root TypeScript check
+pnpm lingui:extract                # extract i18n messages
+
+# editor packages
+pnpm --filter @swarmnote/editor typecheck
+pnpm --filter @swarmnote/editor-web build
+pnpm --filter @swarmnote/editor-web dev
+
+# rust bridge package
+pnpm --filter react-native-swarmnote-core typecheck
+pnpm --filter react-native-swarmnote-core ubrn:android
+pnpm --filter react-native-swarmnote-core ubrn:ios
+pnpm --filter react-native-swarmnote-core ubrn:checkout
 ```
 
-## Tech Stack
+## Tests and Validation
 
-| 层面 | 选型 |
-|------|------|
-| 框架 | Expo SDK 55 (React Native 0.83, React 19) |
-| 路由 | Expo Router（文件路由，`src/app/`） |
-| 样式 | NativeWind v5（Tailwind CSS 4，CSS-first） |
-| UI 组件 | React Native Reusables（shadcn/ui RN 移植版） |
-| 编辑器 | CodeMirror 6（WebView + Comlink RPC） |
-| Rust 桥接 | uniffi-bindgen-react-native（Turbo Module） |
-| 包管理 | pnpm monorepo |
+- 当前仓库**没有配置项目级测试命令**；`package.json` 和 CI 里都只有 lint + TypeScript check，不要臆造 `pnpm test` 或“单测命令”。
+- 目前可用的回归手段：
+  - `pnpm lint`
+  - `pnpm exec tsc --noEmit`
+  - 编辑器改动后打开 `src/app/editor-test.tsx` 对应页面做手工验证
+- 如果后续引入测试框架，再把“运行全部测试 / 单个测试”的命令补进本文件。
 
-## Architecture
+## High-Level Architecture
 
-### Monorepo
+### App shell and routing
 
-| 包 | 路径 | 用途 |
-|----|------|------|
-| `react-native-swarmnote-core` | `packages/swarmnote-core/` | Rust → RN 桥接 |
-| `@swarmnote/editor` | `packages/editor/` | 平台无关 CM6 编辑器核心 |
-| `@swarmnote/editor-web` | `packages/editor-web/` | WebView IIFE bundle |
+- Expo Router 使用 `src/app/` 文件路由。
+- 根布局 `src/app/_layout.tsx` 负责：
+  - 导入 `src/global.css`
+  - 用 `useNavTheme()` 注入 React Navigation theme
+  - 恢复持久化主题偏好
+  - 挂载 `PortalHost`，供 Dialog / Popover / Tooltip / Select 等浮层组件使用
+- 主导航目前由 `src/components/app-tabs.tsx` 提供，基于 `expo-router/unstable-native-tabs`。
 
-### 主题系统（单一真相源）
+### Theme system: CSS is the source of truth
 
-`src/global.css` 是唯一真相源。改主题色只改这个文件，JS 侧通过 `useThemeColors()` 动态读取。不需要 `tailwind.config.js`，不需要 `theme.ts`。
+- `src/global.css` 是主题变量的**唯一真相源**。
+- JS/TS 侧如果需要颜色值，不维护 `theme.ts` 镜像，而是通过 `src/hooks/useThemeColors.ts` 动态读取 CSS 变量。
+- NativeWind v5 + Tailwind CSS 4 采用 CSS-first 配置：
+  - `postcss.config.mjs` 使用 `@tailwindcss/postcss`
+  - `metro.config.js` 使用 `withNativewind(config)`
+  - 不要添加 `tailwind.config.js`
+  - 不要在 Babel 里加 `nativewind/babel`
+- 主题切换相关 API 使用 `react-native` 的 `useColorScheme` / `Appearance`，不要从 `nativewind` 导入。
 
-### Pencil 设计文件（.pen）
+### Editor stack: RN → WebView → Comlink → CodeMirror
 
-设计稿位于 `dev-notes/design/mobile-design.pen`，主题变量已与 `src/global.css` 对齐。
+编辑器不是直接在 React Native 里渲染，而是走一条分层链路：
 
-**切换主题**：通过 `batch_design` 修改根 frame 的 `theme` 属性：
+1. `src/components/editor/MarkdownEditor.tsx`
+   - 挂载 `react-native-webview`
+   - 把 `@swarmnote/editor-web/dist/bundle` 注入到 WebView
+2. `src/components/editor/useEditorBridge.ts`
+   - 在 RN 侧创建 Comlink bridge
+3. `src/lib/comlink-webview-adapter.ts`
+   - 把 `injectJavaScript` / `postMessage` 适配成 Comlink endpoint
+4. `packages/editor-web/`
+   - WebView 侧入口，暴露 `EditorApi`
+   - 创建 Yjs 文档、把编辑器事件回传给 RN
+5. `packages/editor/`
+   - 平台无关的 CodeMirror 6 核心
+   - `createEditor.ts` 里组装 markdown、history、selection、search、Yjs 扩展
 
-```javascript
-U("MzSDs", {theme: {"Mode": "Light"}})   // 亮色
-U("MzSDs", {theme: {"Mode": "Dark"}})    // 暗色
-```
+关键约束：
+- `packages/editor/` 保持平台无关，不引入 React Native 或 WebView 细节。
+- DOM / WebView 逻辑放 `packages/editor-web/`。
+- RN 容器和 bridge 逻辑放 `src/components/editor/`。
+- 修改 `packages/editor/` 或 `packages/editor-web/` 后，必须重新执行 `pnpm --filter @swarmnote/editor-web build`，否则移动端 WebView 仍会加载旧 bundle。
+- Android WebView 上必须禁用 CodeMirror 的 `EditContext`，该处理已在 `packages/editor/src/createEditor.ts` 中完成，不要删掉。
 
-**设置主题变量**：使用 `set_variables` + `replace: true`，每个变量的亮/暗值都必须显式带 theme 标记：
+### Rust bridge: Turbo Module + uniffi
 
-```json
-{"value": "#FDFCFA", "theme": {"Mode": "Light"}}
-{"value": "#1B1918", "theme": {"Mode": "Dark"}}
-```
+- `packages/swarmnote-core/` 是 React Native Turbo Module 包。
+- 调用链是：`TypeScript → Hermes JSI → C++ → Rust`。
+- Rust 源码位于 `packages/swarmnote-core/rust/mobile-core/`。
+- `src/generated/` 和 `cpp/generated/` 都是 `ubrn` 自动生成产物，**不要手改**。
+- 修改 Rust 代码后，需要重新执行 `pnpm --filter react-native-swarmnote-core ubrn:android` 或 `ubrn:ios`，然后重新跑 Expo development build。
 
-不带 theme 的值只是 fallback，不会注册到 Mode 轴，切换时不生效。
+### Monorepo package boundaries
 
-**配色参考**：`dev-notes/design/theme-palette.md`
+`pnpm-workspace.yaml` 目前包含 3 个工作区包：
 
-### 项目知识库
+- `react-native-swarmnote-core` — Rust bridge / native module
+- `@swarmnote/editor` — platform-agnostic editor core
+- `@swarmnote/editor-web` — WebView bundle and RPC host
 
-详细的架构说明、最佳实践、踩坑记录在 `dev-notes/knowledge/` 下按主题组织：
-- `theme-and-styling.md` — NativeWind v5、配色、RNR 组件
-- `editor.md` — CM6、WebView、Comlink
-- `rust-bridge.md` — uniffi、交叉编译
-- `toolchain.md` — Biome、Lingui、Metro、Expo
+改动时优先保持边界清晰，不要把平台相关代码泄漏到共享层。
 
-## Code Conventions
+## Documentation Conventions
 
-- **TypeScript** strict mode，路径别名 `@/` → `src/`
-- **样式**：NativeWind className，不用 `StyleSheet.create` 定主题色，不硬编码颜色
-- **UI 组件**：优先用 RNR（`@/components/ui/`），CLI 添加，不直接改源码
-- **useColorScheme** 从 `react-native` 导入（不是 `nativewind`）
-- **Git commits**: Conventional Commits，不加 `Co-authored-by` trailer
-- **Package manager**: pnpm（不用 npm/yarn）
+- `dev-notes/` 下生成的文档（blog、design 等）中，所有图表统一使用 **Mermaid** 语法（` ```mermaid `），不要用 ASCII art。
+- Mermaid 适用于流程图、时序图、架构图、状态机等所有可视化场景。
+- 此规则仅限写入文件的文档，对话中可以使用 ASCII art。
+- Mermaid 节点文本中**不支持 Markdown 列表语法**：数字加点加空格（如 `1.` + 空格）或短横加空格（如 `-` + 空格）会被误解析。解决方法是去掉空格，写成 `1.内容` 而非 `1.` + 空格 + `内容`。
+
+## Repository Conventions
+
+- TypeScript strict mode，路径别名 `@/* -> src/*`。
+- `tsconfig.json` 使用 `moduleSuffixes: [".native", ""]`，这是为 `react-native-css` 类型解析服务的，不要删。
+- 样式优先使用 NativeWind `className`；不要用 `StyleSheet.create` 去维护主题色，不要硬编码颜色。
+- UI 组件优先使用 `src/components/ui/` 下的 React Native Reusables 组件；通过 CLI 添加，不直接修改这些生成组件源码。
+- RNR 浮层组件依赖根布局里的 `<PortalHost />`；如果浮层显示异常，先检查 `_layout.tsx`。
+- commit message 使用 Conventional Commits；仓库通过 Lefthook + commitlint 校验。
+- 包管理固定使用 `pnpm`。
 
 ## Critical Notes
 
-- **不支持 Expo Go** — 必须用 Development Build
-- **pnpm 必须 hoisted** — `.npmrc` 中 `node-linker=hoisted` 不可删除
-- **修改 global.css 后** — 必须 `npx expo start --clear`
-- **lightningcss 锁定 1.30.1** — 否则 global.css 反序列化错误
-- **editor-web 修改后** — 必须 `pnpm build` 重新生成 bundle
-- **`src/generated/` 和 `cpp/generated/`** — 自动生成，勿手动编辑
+- **不支持 Expo Go**：仓库依赖原生模块，必须使用 development build。
+- **`.npmrc` 中 `node-linker=hoisted` 不能删**：Metro 不兼容 pnpm 默认的 symlink node_modules 布局。
+- **`lightningcss` 必须锁定为 `1.30.1`**：否则 `src/global.css` 可能出现反序列化错误。
+- **改 `src/global.css` 后必须 `npx expo start --clear`**。
+- **改编辑器包后必须重建 `@swarmnote/editor-web` bundle**。
+- **不要手改生成代码**：尤其是 `packages/swarmnote-core/src/generated/` 和 `packages/swarmnote-core/cpp/generated/`。
+
+## Project Knowledge Sources
+
+优先查项目知识库，而不是只凭目录猜测：
+
+- `dev-notes/knowledge/theme-and-styling.md`
+- `dev-notes/knowledge/editor.md`
+- `dev-notes/knowledge/rust-bridge.md`
+- `dev-notes/knowledge/toolchain.md`
+
+设计稿位于 `dev-notes/design/mobile-design.pen`，需要通过 Pencil MCP 工具读取和修改，不要用普通文件读取工具解析 `.pen`。

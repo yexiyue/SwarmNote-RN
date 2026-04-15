@@ -5,17 +5,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsdown && node scripts/codegen.mjs",
-    "dev": "tsdown --watch"
+    "build": "vite build",
+    "dev": "vite"
   },
   "dependencies": {
     "@swarmnote/editor": "workspace:*",
     "comlink": "^4.4.2",
-    "yjs": "^13.6.20",
-    "y-protocols": "^1.0.6"
+    "y-protocols": "^1.0.6",
+    "yjs": "^13.6.20"
   },
   "devDependencies": {
-    "tsdown": "^0.9.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vite": "^8.0.8",
+    "vite-plugin-singlefile": "^2.3.2"
   }
 }
