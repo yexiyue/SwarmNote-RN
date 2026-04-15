@@ -20,6 +20,7 @@ import {
   markdownHighlightExtension,
 } from './extensions';
 import { createBlockImageExtension } from './extensions/renderBlockImages';
+import { createBlockTableExtension } from './extensions/renderBlockTables';
 import { createCtrlClickLinksExtension } from './extensions/links/ctrlClickLinksExtension';
 import { createLinkTooltipExtension } from './extensions/links/linkTooltipExtension';
 import { insertNewlineContinueMarkup } from './editorCommands/insertNewlineContinueMarkup';
@@ -73,7 +74,7 @@ export function createEditor(
         })]
       : []),
     ...(settings.features.blockImageRendering
-      ? [createBlockImageExtension()]
+      ? [createBlockImageExtension(), createBlockTableExtension()]
       : []),
     ...(onEvent
       ? [
