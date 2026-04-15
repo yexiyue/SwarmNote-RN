@@ -23,6 +23,9 @@ const lineDecorations: Record<string, Decoration> = {
   ATXHeading4: Decoration.line({ attributes: { class: 'cm-h4 cm-headerLine cm-header' } }),
   ATXHeading5: Decoration.line({ attributes: { class: 'cm-h5 cm-headerLine cm-header' } }),
   ATXHeading6: Decoration.line({ attributes: { class: 'cm-h6 cm-headerLine cm-header' } }),
+  TableHeader: Decoration.line({ attributes: { class: 'cm-tableHeader' } }),
+  TableDelimiter: Decoration.line({ attributes: { class: 'cm-tableDelimiter' } }),
+  TableRow: Decoration.line({ attributes: { class: 'cm-tableRow' } }),
   FrontMatter: Decoration.line({ attributes: { class: 'cm-frontMatter' } }),
   FrontMatterMarker: Decoration.line({ attributes: { class: 'cm-frontMatter cm-frontMatterMarker' } }),
   FrontMatterContent: Decoration.line({ attributes: { class: 'cm-frontMatter cm-frontMatterContent' } }),
@@ -74,6 +77,16 @@ const markdownTheme = EditorView.theme({
   '.cm-highlighted': {
     backgroundColor: 'rgba(255, 214, 10, 0.35)',
     borderRadius: '2px',
+  },
+  '.cm-tableHeader, .cm-tableRow, .cm-tableDelimiter': {
+    fontFamily: 'monospace',
+    fontSize: '0.95em',
+  },
+  '.cm-tableHeader': {
+    fontWeight: '700',
+  },
+  '.cm-tableDelimiter': {
+    color: 'rgba(127, 127, 127, 0.5)',
   },
   '.cm-frontMatter': {
     color: 'rgba(127, 127, 127, 0.7)',
