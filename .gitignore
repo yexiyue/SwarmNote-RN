@@ -54,3 +54,4 @@ app-example
 .omc
 **/openspec
 **/.obsidian
+.playwright
