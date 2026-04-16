@@ -1,35 +1,33 @@
-# v0.2.0 - 编辑器核心能力
+# v0.2.0 - 编辑器体验完善
 
-> 完成从 BlockNote 到 CodeMirror 6 的编辑器架构迁移，实现 Markdown Live Preview、双端共享编辑器、yjs 实时协作对接 Rust 后端，并打磨移动端编辑体验。
+> 完善 Live Preview 渲染（图片、表格、公式等），引入 Tailwind CSS 统一 Widget 样式，打磨移动端编辑器 UX（工具栏、键盘、暗色模式、搜索、粘贴图片）。
 
 ## 目标
 
 这个版本完成后：
 
-- 移动端拥有一个功能完整的 Markdown 编辑器，支持 Live Preview（Obsidian 风格）
-- 编辑器核心代码（`@swarmnote/editor`）桌面端和移动端 100% 共享
-- yjs CRDT 协作链路打通：移动端编辑 → WebView Y.Doc → Rust 持久化 → P2P 广播
-- 桌面端完成从 BlockNote 到 CM6 的迁移，旧文档无损迁移
-- 移动端编辑体验接近 Joplin/Obsidian 水平（格式化工具栏、键盘适配等）
+- 编辑器 Live Preview 渲染完整：图片正常显示、表格 Obsidian 风格可编辑（含拖拽重排）、数学公式 KaTeX 渲染、Front Matter 折叠、Inline HTML 视觉化
+- 自定义 Widget 样式统一迁移到 Tailwind CSS（混合模式：CM6 核心样式不动，Widget 用 Tailwind）
+- 移动端编辑体验接近 Joplin/Obsidian 水平：格式化工具栏、键盘适配、暗色主题、文档内搜索、粘贴图片处理
 
-**产品定位转变**：从"Notion 式 block 笔记"→"Obsidian 式 Markdown Live Preview 笔记"。
+**聚焦移动端编辑器本身**，不涉及桌面端迁移和 Rust P2P 同步。
 
 ## 范围
 
 ### 包含
 
-- Markdown Live Preview 装饰扩展（CM6 Decoration + CSS）
-- 桌面端 BlockNote → CM6 迁移 + 数据迁移脚本
-- 移动端 Rust 后端对接（uniffi yjs 同步链路）
-- 移动端编辑器 UX 打磨（工具栏、键盘、暗色模式等）
+- Live Preview 收尾：图片渲染重做、表格渲染重做（Obsidian 高级表格）、数学公式、Front Matter、Inline HTML
+- 样式基础设施：editor-web 引入 Tailwind CSS（混合模式）
+- 移动端 UX：格式化工具栏、键盘适配、暗色主题、搜索面板、粘贴图片处理
 
 ### 不包含（推迟到后续版本）
 
-- Obsidian 特有 Markdown 方言（wikilinks、embeds、callouts）
-- KaTeX 数学公式渲染（可选，视进度加入）
-- 多人实时光标（Awareness）
+- 桌面端 BlockNote → CM6 迁移（属于桌面端仓库）
+- 移动端 Rust 后端对接 / yjs P2P 同步
 - 文件树 / 工作区管理
 - 设备配对 / P2P 发现
+- Obsidian 特有方言（wikilinks、embeds、callouts）
+- 多人实时光标（Awareness）
 
 ## 功能清单
 
@@ -37,48 +35,72 @@
 
 ```mermaid
 graph TD
-    A["Live Preview 装饰扩展"] --> B["桌面端 CM6 迁移"]
-    A --> C["移动端 UX 打磨"]
-    B --> D["移动端 Rust 后端对接"]
-    C --> D
+    F6["F6: Tailwind 集成"] --> F1["F1: 图片渲染重做"]
+    F6 --> F2["F2: 表格渲染重做"]
+    F3["F3: 数学公式"]
+    F4["F4: Front Matter"]
+    F5["F5: Inline HTML"]
+    F9["F9: 暗色主题"]
+    F6 --> F7["F7: 格式化工具栏"]
+    F6 --> F8["F8: 键盘适配"]
+    F1 --> F11["F11: 粘贴图片处理"]
+    F7 --> F10["F10: 搜索面板"]
+    F8 --> F10
 ```
 
 | 层级 | 功能 | 可并行 |
 | ---- | ---- | ------ |
-| L0（无依赖） | Live Preview 装饰扩展 | 独立开发 |
-| L1（依赖 L0） | 桌面端 CM6 迁移、移动端 UX 打磨 | 两者可并行 |
-| L2（依赖 L1） | 移动端 Rust 后端对接 | 依赖桌面端迁移完成（统一 yjs schema） |
+| L0（无依赖） | F6 Tailwind 集成、F3 数学公式、F4 Front Matter、F5 Inline HTML、F9 暗色主题 | 全部可并行 |
+| L1（依赖 L0） | F1 图片渲染重做、F2 表格渲染重做、F7 格式化工具栏、F8 键盘适配 | 全部可并行（均依赖 F6） |
+| L2（依赖 L1） | F10 搜索面板、F11 粘贴图片处理 | 两者可并行 |
 
-### 功能清单
+### 详细清单
 
-| 功能 | 优先级 | 依赖 | Feature 文档 | Issue |
-| ---- | ------ | ---- | ------------ | ----- |
-| Live Preview 装饰扩展 | P0 | - | [link](features/live-preview.md) | #17 |
-| 桌面端 CM6 迁移 | P0 | Live Preview | [link](features/desktop-migration.md) | #17 |
-| 移动端 Rust 后端对接 | P0 | 桌面端迁移 | [link](features/mobile-rust-sync.md) | #17 |
-| 移动端 UX 打磨 | P1 | Live Preview | [link](features/mobile-ux-polish.md) | #17 |
+| 功能 | 优先级 | 层级 | 依赖 | Feature 文档 | Issue |
+| ---- | ------ | ---- | ---- | ------------ | ----- |
+| F6: Tailwind 集成 | P0 | L0 | - | [live-preview-polish](features/live-preview-polish.md) | #20 |
+| F1: 图片渲染重做 | P0 | L1 | F6 | [live-preview-polish](features/live-preview-polish.md) | #25 |
+| F2: 表格渲染重做 | P0 | L1 | F6 | [live-preview-polish](features/live-preview-polish.md) | #26 |
+| F3: 数学公式 (KaTeX) | P1 | L0 | - | [live-preview-polish](features/live-preview-polish.md) | #21 |
+| F4: Front Matter | P1 | L0 | - | [live-preview-polish](features/live-preview-polish.md) | #22 |
+| F5: Inline HTML | P1 | L0 | - | [live-preview-polish](features/live-preview-polish.md) | #23 |
+| F12: Mermaid 图表渲染 | P1 | L0 | - | [live-preview-polish](features/live-preview-polish.md) | #31 |
+| F9: 暗色主题 | P0 | L0 | - | [mobile-ux-polish](features/mobile-ux-polish.md) | #24 |
+| F7: 格式化工具栏 | P0 | L1 | F6 | [mobile-ux-polish](features/mobile-ux-polish.md) | #27 |
+| F8: 键盘适配 | P0 | L1 | F6 | [mobile-ux-polish](features/mobile-ux-polish.md) | #28 |
+| F10: 搜索面板 | P1 | L2 | F7, F8 | [mobile-ux-polish](features/mobile-ux-polish.md) | #29 |
+| F11: 粘贴图片处理 | P2 | L2 | F1 | [mobile-ux-polish](features/mobile-ux-polish.md) | #30 |
 
-> 注：以上功能均为 #17 的子任务，后续可拆分为独立 Issue。
+## 前置条件（已完成）
 
-## 前置条件（v0.1.0 + 已完成工作）
-
-以下基础设施已在 v0.1.0 及后续开发中完成：
+以下工作已在 v0.1.0 及后续开发中完成：
 
 - [x] `@swarmnote/editor` 平台无关编辑器包（`packages/editor/`）
 - [x] `@swarmnote/editor-web` WebView IIFE bundle 包（`packages/editor-web/`）
-- [x] Comlink WebView Endpoint 适配器（替代 Joplin AGPLv3 的 RemoteMessenger）
+- [x] Comlink WebView Endpoint 适配器
 - [x] `useEditorBridge` Hook + `MarkdownEditor` 组件
-- [x] `y-codemirror.next` 集成（WebView 内 Y.Doc ↔ CM6 双向绑定）
-- [x] Android IME `EDIT_CONTEXT=false` workaround
-- [x] 构建管线：tsdown IIFE → codegen CJS 字符串 → Metro require 注入
+- [x] Live Preview 核心：标题、粗体、斜体、代码、链接、引用、列表、checkbox、divider 装饰
+- [x] Inline rendering 体系：格式字符隐藏、反斜杠转义、bullet widget
+- [x] 代码块 Widget（VS Code 语法高亮，15 种语言）
+- [x] 基础图片/表格 Widget（有 bug，本版本重做）
+- [x] 链接交互（Ctrl+Click、tooltip）
+- [x] 编辑器命令体系（格式切换、列表操作、缩进、回车续列表等）
+- [x] SelectionFormatting 事件（工具栏状态驱动）
+- [x] 蜂巢纸笺主题（Compartment 运行时切换）
 
 ## 验收标准
 
-- [ ] 移动端编辑器支持 Markdown Live Preview（标题、粗体、斜体、代码块、链接等可视化渲染）
-- [ ] 桌面端完成 CM6 切换，旧 BlockNote 文档全部无损迁移为 Y.Text
-- [ ] 移动端编辑内容可通过 uniffi → Rust → P2P 同步到桌面端
-- [ ] 格式化工具栏可用（加粗、斜体、标题、代码等常用操作）
-- [ ] 亮色/暗色模式下编辑器主题正确切换
+- [ ] 图片正常显示（URL 图片 + 本地文件路径均可渲染）
+- [ ] 表格始终渲染为 HTML table，单元格直接可编辑，支持行/列拖拽重排
+- [ ] 数学公式 `$inline$` 和 `$$block$$` 正确渲染（KaTeX）
+- [ ] YAML Front Matter `---` 区域可折叠
+- [ ] `<mark>` `<kbd>` `<sub>` `<sup>` 等 Inline HTML 正确渲染
+- [ ] Widget 样式使用 Tailwind CSS（混合模式）
+- [ ] 格式化工具栏在键盘上方正确显示，按钮功能正常
+- [ ] 键盘弹出/收起时编辑区域平滑调整，光标不被遮挡
+- [ ] 暗色模式下编辑器配色正确（背景、文字、语法高亮、Widget 等）
+- [ ] 文档内搜索/替换可用
+- [ ] 粘贴图片可保存到本地并插入 Markdown 链接
 - [ ] Android 中文输入正常（IME composition 无丢字/崩溃）
 - [ ] `pnpm lint` 无错误，TypeScript 编译通过
 
@@ -86,32 +108,24 @@ graph TD
 
 | 领域 | 选择 | 备注 |
 | ---- | ---- | ---- |
-| 编辑器 | **CodeMirror 6** | 替代 BlockNote，参考 Joplin 架构 |
-| Live Preview | **Lezer AST + CM6 Decoration + CSS** | 标准模式，Obsidian/Joplin/HyperMD 均采用 |
-| 跨 WebView RPC | **Comlink**（Apache 2.0） | 替代 Joplin 的 RemoteMessenger（AGPLv3） |
-| yjs ↔ CM6 | **y-codemirror.next** | yjs 作者维护，字符级 CRDT 开箱即用 |
-| yjs schema | **单个 Y.Text** | 替代 BlockNote 的 XML schema，Rust 侧用 yrs 原生 API |
-| Markdown 方言 | **GFM**（GitHub Flavored Markdown） | 后续按需扩展 Obsidian 特性 |
+| Widget 样式 | **Tailwind CSS（混合模式）** | CM6 核心样式保持 EditorView.theme()，自定义 Widget 用 Tailwind className |
+| Tailwind 集成 | **@tailwindcss/vite** | 在 editor-web 的 Vite 构建中引入，vite-plugin-singlefile 内联到单 HTML |
+| 表格渲染 | **Obsidian 高级表格风格** | 始终渲染为 HTML table，单元格直接可编辑，支持拖拽重排 |
+| 图片渲染 | **Obsidian reveal 风格** | 非聚焦时渲染图片，聚焦时显示原始 Markdown |
+| 数学公式 | **KaTeX** | 已有 katex 依赖和 markdownMathExtension.ts 框架 |
 
 ## 依赖与风险
 
-- **风险**：桌面端数据迁移（BlockNote Y.Doc → Y.Text）可能导致 CRDT 历史重置
-- **缓解**：格式升级时重置历史可接受，用 `yrs_blocknote::doc_to_markdown()` 做一次性迁移
-- **风险**：CM6 Widget Decoration 实现 Image/Video 块级渲染工作量较大
-- **缓解**：Phase 1 先只读渲染，交互编辑（缩放、caption）后续版本补充
-- **风险**：WebView 内 yjs JS 库在大文档场景下的性能
-- **缓解**：通过 Uint8Array 增量 update 传输而非全量同步，控制单次 update 体积
-
-## 参考资料
-
-- 架构设计文档：[`dev-notes/blog/editor-architecture-cm6-joplin.md`](../../dev-notes/blog/editor-architecture-cm6-joplin.md)
-- Comlink 集成博客：[`dev-notes/blog/comlink-codemirror-rn-integration.md`](../../dev-notes/blog/comlink-codemirror-rn-integration.md)
-- Joplin `@joplin/editor`：架构参考（AGPLv3，只参考不复制代码）
-- [CodeMirror 6 官方文档](https://codemirror.net/)
-- [y-codemirror.next](https://github.com/yjs/y-codemirror.next)
-- [Comlink](https://github.com/nicolo-ribaudo/comlink)
+- **风险**：表格拖拽重排在 CM6 Widget 中实现复杂度高（contentEditable + 拖拽交互 + Markdown 同步）
+- **缓解**：可分阶段实现——先修复基础可编辑，拖拽重排作为增强
+- **风险**：图片不显示的根因尚不明确（可能是 WebView 文件访问权限、CSP 策略、或 URL 解析问题）
+- **缓解**：先在浏览器 dev 模式排查，再针对 WebView 环境适配
+- **风险**：粘贴图片的存储方案待定（本地文件系统 vs SQLite BLOB）
+- **缓解**：先定义抽象接口，存储后端可后续切换
 
 ## 时间线
 
-- 开始日期：2026-04-12
+- 开始日期：2026-04-16
 - 目标发布日期：不设截止日期，按节奏推进
+- Milestone：[v0.2.0](https://github.com/yexiyue/SwarmNote-RN/milestone/2)
+- Project：[SwarmNote Mobile](https://github.com/users/yexiyue/projects/4)
