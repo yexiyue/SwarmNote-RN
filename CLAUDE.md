@@ -112,10 +112,43 @@ pnpm --filter react-native-swarmnote-core ubrn:checkout
 `pnpm-workspace.yaml` 目前包含 3 个工作区包：
 
 - `react-native-swarmnote-core` — Rust bridge / native module
-- `@swarmnote/editor` — platform-agnostic editor core
+- `@swarmnote/editor` — platform-agnostic editor core（**git submodule**，独立仓库 `yexiyue/swarmnote-editor`）
 - `@swarmnote/editor-web` — WebView bundle and RPC host
 
 改动时优先保持边界清晰，不要把平台相关代码泄漏到共享层。
+
+### Git submodule: `packages/editor/`
+
+`@swarmnote/editor` 是独立 Git 仓库（`yexiyue/swarmnote-editor`），通过 submodule 挂载在 `packages/editor/`。桌面端也会通过 submodule 引用同一个仓库，确保双端编辑器核心代码一致。
+
+**克隆仓库后初始化 submodule**：
+
+```bash
+git submodule update --init
+```
+
+**修改编辑器核心代码的提交流程**：
+
+```bash
+# 1. 在 submodule 内修改、提交、推送
+cd packages/editor
+git add .
+git commit -m "feat: ..."
+git push origin main
+
+# 2. 回到主仓库，更新 submodule 引用
+cd ../..
+git add packages/editor
+git commit -m "chore: update editor submodule"
+```
+
+**关键注意事项**：
+
+- `packages/editor/` 有自己独立的 `.git`，在其中的 commit 不会自动出现在主仓库。
+- 主仓库只记录 submodule 指向的 commit hash，更新后需要 `git add packages/editor` 提交新的引用。
+- 不要在主仓库层面直接修改 `packages/editor/` 内的文件然后在主仓库提交——这样做不会推送到 submodule 仓库。
+- `pnpm-workspace.yaml` 的 `packages/*` 通配符自动覆盖 submodule 路径，workspace 依赖解析正常。
+- 拉取最新 submodule：`git submodule update --remote packages/editor`。
 
 ## Documentation Conventions
 
