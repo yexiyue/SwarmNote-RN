@@ -55,3 +55,4 @@ app-example
 **/openspec
 **/.obsidian
 .playwright
+.playwright-cli

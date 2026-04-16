@@ -2,6 +2,7 @@ import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { EditorState, type Extension } from '@codemirror/state';
 import { history, historyKeymap, indentWithTab, standardKeymap } from '@codemirror/commands';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
+import { GFM } from '@lezer/markdown';
 import { languages as codeLanguages } from '@codemirror/language-data';
 import { syntaxHighlighting } from '@codemirror/language';
 import { searchKeymap } from '@codemirror/search';
@@ -19,6 +20,7 @@ import {
   createSearchExtension,
   markdownHighlightExtension,
 } from './extensions';
+import { createBlockCodeExtension } from './extensions/renderBlockCode';
 import { createBlockImageExtension } from './extensions/renderBlockImages';
 import { createBlockTableExtension } from './extensions/renderBlockTables';
 import { createCtrlClickLinksExtension } from './extensions/links/ctrlClickLinksExtension';
@@ -47,6 +49,7 @@ export function createEditor(
 
   const settingsRuntime = createEditorSettingsExtension(settings);
   const markdownExtensions = [
+    ...GFM,
     ...(settings.features.markdownHighlight ? [markdownHighlightExtension] : []),
     ...(settings.features.mathRendering ? [markdownMathExtension] : []),
     markdownFrontMatterExtension,
@@ -75,6 +78,9 @@ export function createEditor(
       : []),
     ...(settings.features.blockImageRendering
       ? [createBlockImageExtension(), createBlockTableExtension()]
+      : []),
+    ...(settings.features.codeBlockWidget
+      ? [createBlockCodeExtension()]
       : []),
     ...(onEvent
       ? [

@@ -39,6 +39,7 @@ export interface EditorFeatureToggles {
   markdownDecorations: boolean;
   inlineRendering: boolean;
   blockImageRendering: boolean;
+  codeBlockWidget: boolean;
   mathRendering: boolean;
   search: boolean;
   collaboration: boolean;
@@ -198,6 +199,7 @@ export const DEFAULT_SETTINGS: EditorSettings = {
     markdownDecorations: true,
     inlineRendering: true,
     blockImageRendering: true,
+    codeBlockWidget: true,
     mathRendering: true,
     search: true,
     collaboration: true,
