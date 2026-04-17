@@ -129,9 +129,282 @@ extern "C" {
     uint64_t callback_data, 
     UniffiForeignFutureResultVoid result
     );
-    RustBuffer uniffi_mobile_core_fn_func_greet(
+    typedef void
+    (*UniffiCallbackInterfaceForeignEventBusMethod0)(
+    uint64_t uniffi_handle, 
+    RustBuffer event, 
+    void * uniffi_out_return, RustCallStatus* rust_call_status
+    );
+    typedef void
+    (*UniffiCallbackInterfaceForeignKeychainProviderMethod0)(
+    uint64_t uniffi_handle, 
+    UniffiForeignFutureCompleteRustBuffer uniffi_future_callback, 
+    uint64_t uniffi_callback_data, 
+    UniffiForeignFutureDroppedCallbackStruct * uniffi_out_dropped_callback
+    );typedef struct UniffiVTableCallbackInterfaceForeignEventBus {
+        UniffiCallbackInterfaceFree uniffi_free;
+        UniffiCallbackInterfaceClone uniffi_clone;
+        UniffiCallbackInterfaceForeignEventBusMethod0 emit;
+    } UniffiVTableCallbackInterfaceForeignEventBus;typedef struct UniffiVTableCallbackInterfaceForeignKeychainProvider {
+        UniffiCallbackInterfaceFree uniffi_free;
+        UniffiCallbackInterfaceClone uniffi_clone;
+        UniffiCallbackInterfaceForeignKeychainProviderMethod0 get_or_create_keypair;
+    } UniffiVTableCallbackInterfaceForeignKeychainProvider;
+    /*handle*/ uint64_t uniffi_mobile_core_fn_clone_uniffiappcore(
+        /*handle*/ uint64_t handle, 
+        RustCallStatus *uniffi_out_err
+    );
+    void uniffi_mobile_core_fn_free_uniffiappcore(
+        /*handle*/ uint64_t handle, 
+        RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_constructor_uniffiappcore_new(
+        /*handle*/ uint64_t keychain, 
+        /*handle*/ uint64_t event_bus, 
+        RustBuffer app_data_dir
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_close_workspace(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer workspace_id
+    );
+    RustBuffer uniffi_mobile_core_fn_method_uniffiappcore_device_info(
+        /*handle*/ uint64_t ptr, 
+        RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces(
+        /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_network_status(
+        /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer path
+    );
+    RustBuffer uniffi_mobile_core_fn_method_uniffiappcore_peer_id(
+        /*handle*/ uint64_t ptr, 
+        RustCallStatus *uniffi_out_err
+    );
+    void uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(
+        /*handle*/ uint64_t ptr, 
         RustBuffer name, 
         RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_start_network(
+        /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_stop_network(
+        /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_workspace_info(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer workspace_id
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_list_devices(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer filter
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code(
+        /*handle*/ uint64_t ptr, 
+        uint64_t expires_in_secs
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_list_paired_devices(
+        /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_lookup_device_by_code(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer code
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_request_pairing(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer peer_id, 
+        RustBuffer method, 
+        RustBuffer remote_os_info
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_respond_pairing_request(
+        /*handle*/ uint64_t ptr, 
+        uint64_t pending_id, 
+        int8_t accept
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_unpair_device(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer peer_id
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_clone_foreigneventbus(
+        /*handle*/ uint64_t handle, 
+        RustCallStatus *uniffi_out_err
+    );
+    void uniffi_mobile_core_fn_free_foreigneventbus(
+        /*handle*/ uint64_t handle, 
+        RustCallStatus *uniffi_out_err
+    );
+    void uniffi_mobile_core_fn_init_callback_vtable_foreigneventbus(
+        UniffiVTableCallbackInterfaceForeignEventBus * vtable
+    );
+    void uniffi_mobile_core_fn_method_foreigneventbus_emit(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer event, 
+        RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_clone_foreignkeychainprovider(
+        /*handle*/ uint64_t handle, 
+        RustCallStatus *uniffi_out_err
+    );
+    void uniffi_mobile_core_fn_free_foreignkeychainprovider(
+        /*handle*/ uint64_t handle, 
+        RustCallStatus *uniffi_out_err
+    );
+    void uniffi_mobile_core_fn_init_callback_vtable_foreignkeychainprovider(
+        UniffiVTableCallbackInterfaceForeignKeychainProvider * vtable
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_foreignkeychainprovider_get_or_create_keypair(
+        /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_clone_uniffiworkspacecore(
+        /*handle*/ uint64_t handle, 
+        RustCallStatus *uniffi_out_err
+    );
+    void uniffi_mobile_core_fn_free_uniffiworkspacecore(
+        /*handle*/ uint64_t handle, 
+        RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer doc_uuid, 
+        RustBuffer update
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_close(
+        /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer doc_uuid
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_create_folder(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer input
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_document_by_rel_path(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_documents_by_prefix(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer prefix
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer folder_id
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer doc_uuid
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    RustBuffer uniffi_mobile_core_fn_method_uniffiworkspacecore_id(
+        /*handle*/ uint64_t ptr, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_mobile_core_fn_method_uniffiworkspacecore_info(
+        /*handle*/ uint64_t ptr, 
+        RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    int8_t uniffi_mobile_core_fn_method_uniffiworkspacecore_is_doc_open(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer doc_uuid, 
+        RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_list_documents(
+        /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_list_folders(
+        /*handle*/ uint64_t ptr
+    );
+    RustBuffer uniffi_mobile_core_fn_method_uniffiworkspacecore_list_open_doc_uuids(
+        /*handle*/ uint64_t ptr, 
+        RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_move_node(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer from_rel_path, 
+        RustBuffer to_rel_path, 
+        int8_t is_dir
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_open_doc(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_read_bytes(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_read_text(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_reload_confirmed(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer doc_uuid
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_dir(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_file(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_rename(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer from, 
+        RustBuffer to
+    );
+    void uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_doc(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer doc_uuid, 
+        RustBuffer new_rel_path, 
+        RustCallStatus *uniffi_out_err
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_document(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer old_rel_path, 
+        RustBuffer new_rel_path, 
+        RustBuffer new_title
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_save_media(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer note_rel, 
+        RustBuffer file_name, 
+        RustBuffer data
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_scan_tree(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_upsert_document(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer input
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_write_bytes(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path, 
+        RustBuffer data
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer rel_path, 
+        RustBuffer content
     );
     RustBuffer ffi_mobile_core_rustbuffer_alloc(
         uint64_t size, 
@@ -330,7 +603,109 @@ extern "C" {
         /*handle*/ uint64_t handle, 
         RustCallStatus *uniffi_out_err
     );
-    uint16_t uniffi_mobile_core_checksum_func_greet(
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_device_info(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_network_status(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_peer_id(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_start_network(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_list_devices(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_list_paired_devices(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_lookup_device_by_code(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_request_pairing(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_respond_pairing_request(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_unpair_device(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_foreigneventbus_emit(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_close(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_folder(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_document_by_rel_path(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_documents_by_prefix(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_id(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_info(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_doc_open(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_documents(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_folders(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_open_doc_uuids(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_move_node(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_open_doc(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_bytes(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_text(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_reload_confirmed(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_dir(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_file(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_doc(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_document(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_save_media(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_scan_tree(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_upsert_document(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_bytes(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_text(
+    );
+    uint16_t uniffi_mobile_core_checksum_constructor_uniffiappcore_new(
     );
     uint32_t ffi_mobile_core_uniffi_contract_version(
     );
@@ -791,6 +1166,236 @@ namespace uniffi::mobile_core::cb::foreignfuturedroppedcallback {
 } // namespace uniffi::mobile_core::cb::foreignfuturedroppedcallback
     // Implementation of free callback function CallbackInterfaceFree
 
+
+// Callback function: uniffi::mobile_core::st::vtablecallbackinterfaceforeigneventbus::vtablecallbackinterfaceforeigneventbus::free::UniffiCallbackInterfaceFree
+//
+// We have the following constraints:
+// - we need to pass a function pointer to Rust.
+// - we need a jsi::Runtime and jsi::Function to call into JS.
+// - function pointers can't store state, so we can't use a lamda.
+//
+// For this, we store a lambda as a global, as `rsLambda`. The `callback` function calls
+// the lambda, which itself calls the `body` which then calls into JS.
+//
+// We then give the `callback` function pointer to Rust which will call the lambda sometime in the
+// future.
+namespace uniffi::mobile_core::st::vtablecallbackinterfaceforeigneventbus::vtablecallbackinterfaceforeigneventbus::free {
+    using namespace facebook;
+
+    // We need to store a lambda in a global so we can call it from
+    // a function pointer. The function pointer is passed to Rust.
+    static std::function<void(uint64_t)> rsLambda = nullptr;
+
+    // This is the main body of the callback. It's called from the lambda,
+    // which itself is called from the callback function which is passed to Rust.
+    static void body(jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     std::shared_ptr<jsi::Value> callbackValue
+            ,uint64_t rs_handle) {
+
+        // Convert the arguments from Rust, into jsi::Values.
+        // We'll use the Bridging class to do this…
+        auto js_handle = uniffi_jsi::Bridging<uint64_t>::toJs(rt, callInvoker, rs_handle);
+
+        // Now we are ready to call the callback.
+        // We are already on the JS thread, because this `body` function was
+        // invoked from the CallInvoker.
+        try {
+            // Getting the callback function
+            auto cb = callbackValue->asObject(rt).asFunction(rt);
+            auto uniffiResult = cb.call(rt, js_handle
+            );
+
+            
+
+            
+        } catch (const jsi::JSError &error) {
+            std::cout << "Error in callback UniffiCallbackInterfaceFree: "
+                    << error.what() << std::endl;
+            throw error;
+        }
+    }
+
+    static void callback(uint64_t rs_handle) {
+        // If the runtime has shutdown, then there is no point in trying to
+        // call into Javascript. BUT how do we tell if the runtime has shutdown?
+        //
+        // Answer: the module destructor calls into callback `cleanup` method,
+        // which nulls out the rsLamda.
+        //
+        // If rsLamda is null, then there is no runtime to call into.
+        if (rsLambda == nullptr) {
+            // This only occurs when destructors are calling into Rust free/drop,
+            // which causes the JS callback to be dropped.
+            return;
+        }
+
+        // The runtime, the actual callback jsi::funtion, and the callInvoker
+        // are all in the lambda.
+        rsLambda(
+            rs_handle);
+    }
+
+    [[maybe_unused]] static UniffiCallbackInterfaceFree
+    makeCallbackFunction( // uniffi::mobile_core::st::vtablecallbackinterfaceforeigneventbus::vtablecallbackinterfaceforeigneventbus::free
+                    jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     const jsi::Value &value) {
+        if (rsLambda != nullptr) {
+            // `makeCallbackFunction` is called in two circumstances:
+            //
+            // 1. at startup, when initializing callback interface vtables.
+            // 2. when polling futures. This happens at least once per future that is
+            //    exposed to Javascript. We know that this is always the same function,
+            //    `uniffiFutureContinuationCallback` in `async-rust-calls.ts`.
+            //
+            // We can therefore return the callback function without making anything
+            // new if we've been initialized already.
+            return callback;
+        }
+        auto callbackFunction = value.asObject(rt).asFunction(rt);
+        auto callbackValue = std::make_shared<jsi::Value>(rt, callbackFunction);
+        rsLambda = [&rt, callInvoker, callbackValue](uint64_t rs_handle) {
+                // We immediately make a lambda which will do the work of transforming the
+                // arguments into JSI values and calling the callback.
+                uniffi_runtime::UniffiCallFunc jsLambda = [
+                    callInvoker,
+                    callbackValue
+                    , rs_handle](jsi::Runtime &rt) mutable {
+                    body(rt, callInvoker, callbackValue
+                        , rs_handle);
+                };
+                // We'll then call that lambda from the callInvoker which will
+                // look after calling it on the correct thread.
+                
+                callInvoker->invokeNonBlocking(rt, jsLambda);
+        };
+        return callback;
+    }
+
+    // This method is called from the destructor of NativeMobileCore, which only happens
+    // when the jsi::Runtime is being destroyed.
+    static void cleanup() {
+        // The lambda holds a reference to the the Runtime, so when this is nulled out,
+        // then the pointer will no longer be left dangling.
+        rsLambda = nullptr;
+    }
+} // namespace uniffi::mobile_core::st::vtablecallbackinterfaceforeigneventbus::vtablecallbackinterfaceforeigneventbus::free
+
+// Callback function: uniffi::mobile_core::st::vtablecallbackinterfaceforeignkeychainprovider::vtablecallbackinterfaceforeignkeychainprovider::free::UniffiCallbackInterfaceFree
+//
+// We have the following constraints:
+// - we need to pass a function pointer to Rust.
+// - we need a jsi::Runtime and jsi::Function to call into JS.
+// - function pointers can't store state, so we can't use a lamda.
+//
+// For this, we store a lambda as a global, as `rsLambda`. The `callback` function calls
+// the lambda, which itself calls the `body` which then calls into JS.
+//
+// We then give the `callback` function pointer to Rust which will call the lambda sometime in the
+// future.
+namespace uniffi::mobile_core::st::vtablecallbackinterfaceforeignkeychainprovider::vtablecallbackinterfaceforeignkeychainprovider::free {
+    using namespace facebook;
+
+    // We need to store a lambda in a global so we can call it from
+    // a function pointer. The function pointer is passed to Rust.
+    static std::function<void(uint64_t)> rsLambda = nullptr;
+
+    // This is the main body of the callback. It's called from the lambda,
+    // which itself is called from the callback function which is passed to Rust.
+    static void body(jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     std::shared_ptr<jsi::Value> callbackValue
+            ,uint64_t rs_handle) {
+
+        // Convert the arguments from Rust, into jsi::Values.
+        // We'll use the Bridging class to do this…
+        auto js_handle = uniffi_jsi::Bridging<uint64_t>::toJs(rt, callInvoker, rs_handle);
+
+        // Now we are ready to call the callback.
+        // We are already on the JS thread, because this `body` function was
+        // invoked from the CallInvoker.
+        try {
+            // Getting the callback function
+            auto cb = callbackValue->asObject(rt).asFunction(rt);
+            auto uniffiResult = cb.call(rt, js_handle
+            );
+
+            
+
+            
+        } catch (const jsi::JSError &error) {
+            std::cout << "Error in callback UniffiCallbackInterfaceFree: "
+                    << error.what() << std::endl;
+            throw error;
+        }
+    }
+
+    static void callback(uint64_t rs_handle) {
+        // If the runtime has shutdown, then there is no point in trying to
+        // call into Javascript. BUT how do we tell if the runtime has shutdown?
+        //
+        // Answer: the module destructor calls into callback `cleanup` method,
+        // which nulls out the rsLamda.
+        //
+        // If rsLamda is null, then there is no runtime to call into.
+        if (rsLambda == nullptr) {
+            // This only occurs when destructors are calling into Rust free/drop,
+            // which causes the JS callback to be dropped.
+            return;
+        }
+
+        // The runtime, the actual callback jsi::funtion, and the callInvoker
+        // are all in the lambda.
+        rsLambda(
+            rs_handle);
+    }
+
+    [[maybe_unused]] static UniffiCallbackInterfaceFree
+    makeCallbackFunction( // uniffi::mobile_core::st::vtablecallbackinterfaceforeignkeychainprovider::vtablecallbackinterfaceforeignkeychainprovider::free
+                    jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     const jsi::Value &value) {
+        if (rsLambda != nullptr) {
+            // `makeCallbackFunction` is called in two circumstances:
+            //
+            // 1. at startup, when initializing callback interface vtables.
+            // 2. when polling futures. This happens at least once per future that is
+            //    exposed to Javascript. We know that this is always the same function,
+            //    `uniffiFutureContinuationCallback` in `async-rust-calls.ts`.
+            //
+            // We can therefore return the callback function without making anything
+            // new if we've been initialized already.
+            return callback;
+        }
+        auto callbackFunction = value.asObject(rt).asFunction(rt);
+        auto callbackValue = std::make_shared<jsi::Value>(rt, callbackFunction);
+        rsLambda = [&rt, callInvoker, callbackValue](uint64_t rs_handle) {
+                // We immediately make a lambda which will do the work of transforming the
+                // arguments into JSI values and calling the callback.
+                uniffi_runtime::UniffiCallFunc jsLambda = [
+                    callInvoker,
+                    callbackValue
+                    , rs_handle](jsi::Runtime &rt) mutable {
+                    body(rt, callInvoker, callbackValue
+                        , rs_handle);
+                };
+                // We'll then call that lambda from the callInvoker which will
+                // look after calling it on the correct thread.
+                
+                callInvoker->invokeNonBlocking(rt, jsLambda);
+        };
+        return callback;
+    }
+
+    // This method is called from the destructor of NativeMobileCore, which only happens
+    // when the jsi::Runtime is being destroyed.
+    static void cleanup() {
+        // The lambda holds a reference to the the Runtime, so when this is nulled out,
+        // then the pointer will no longer be left dangling.
+        rsLambda = nullptr;
+    }
+} // namespace uniffi::mobile_core::st::vtablecallbackinterfaceforeignkeychainprovider::vtablecallbackinterfaceforeignkeychainprovider::free
 namespace uniffi::mobile_core {
 using namespace facebook;
 using CallInvoker = uniffi_runtime::UniffiCallInvoker;
@@ -1709,6 +2314,599 @@ template <> struct Bridging<UniffiForeignFutureCompleteVoid> {
   }
 };
 } // namespace uniffi::mobile_core
+    // Implementation of CallbackInterfaceClone for vtable field uniffi_clone in VTableCallbackInterfaceForeignEventBus
+
+
+// Callback function: uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeigneventbus::UniffiCallbackInterfaceClone
+//
+// We have the following constraints:
+// - we need to pass a function pointer to Rust.
+// - we need a jsi::Runtime and jsi::Function to call into JS.
+// - function pointers can't store state, so we can't use a lamda.
+//
+// For this, we store a lambda as a global, as `rsLambda`. The `callback` function calls
+// the lambda, which itself calls the `body` which then calls into JS.
+//
+// We then give the `callback` function pointer to Rust which will call the lambda sometime in the
+// future.
+namespace uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeigneventbus {
+    using namespace facebook;
+
+    // We need to store a lambda in a global so we can call it from
+    // a function pointer. The function pointer is passed to Rust.
+    static std::function<void(uint64_t, uint64_t*)> rsLambda = nullptr;
+
+    // This is the main body of the callback. It's called from the lambda,
+    // which itself is called from the callback function which is passed to Rust.
+    static void body(jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     std::shared_ptr<jsi::Value> callbackValue
+            ,uint64_t rs_handle
+            , uint64_t* uniffi_direct_return) {
+
+        // Convert the arguments from Rust, into jsi::Values.
+        // We'll use the Bridging class to do this…
+        auto js_handle = uniffi_jsi::Bridging<uint64_t>::toJs(rt, callInvoker, rs_handle);
+
+        // Now we are ready to call the callback.
+        // We are already on the JS thread, because this `body` function was
+        // invoked from the CallInvoker.
+        try {
+            // Getting the callback function
+            auto cb = callbackValue->asObject(rt).asFunction(rt);
+            auto uniffiResult = cb.call(rt, js_handle
+            );
+
+            
+
+            
+            // Write the direct return value back to the caller.
+            if (uniffi_direct_return != nullptr) {
+                *uniffi_direct_return = uniffi_jsi::Bridging<uint64_t>::fromJs(
+                    rt, callInvoker, uniffiResult
+                );
+            }
+        } catch (const jsi::JSError &error) {
+            std::cout << "Error in callback UniffiCallbackInterfaceClone: "
+                    << error.what() << std::endl;
+            throw error;
+        }
+    }
+
+    static uint64_t callback(uint64_t rs_handle) {
+        // If the runtime has shutdown, then there is no point in trying to
+        // call into Javascript. BUT how do we tell if the runtime has shutdown?
+        //
+        // Answer: the module destructor calls into callback `cleanup` method,
+        // which nulls out the rsLamda.
+        //
+        // If rsLamda is null, then there is no runtime to call into.
+        if (rsLambda == nullptr) {
+            // This only occurs when destructors are calling into Rust free/drop,
+            // which causes the JS callback to be dropped.
+            return 0;
+        }
+        uint64_t uniffi_result = 0;
+
+        // The runtime, the actual callback jsi::funtion, and the callInvoker
+        // are all in the lambda.
+        rsLambda(
+            rs_handle, 
+            &uniffi_result);
+        return uniffi_result;
+    }
+
+    [[maybe_unused]] static UniffiCallbackInterfaceClone
+    makeCallbackFunction( // uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeigneventbus
+                    jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     const jsi::Value &value) {
+        if (rsLambda != nullptr) {
+            // `makeCallbackFunction` is called in two circumstances:
+            //
+            // 1. at startup, when initializing callback interface vtables.
+            // 2. when polling futures. This happens at least once per future that is
+            //    exposed to Javascript. We know that this is always the same function,
+            //    `uniffiFutureContinuationCallback` in `async-rust-calls.ts`.
+            //
+            // We can therefore return the callback function without making anything
+            // new if we've been initialized already.
+            return callback;
+        }
+        auto callbackFunction = value.asObject(rt).asFunction(rt);
+        auto callbackValue = std::make_shared<jsi::Value>(rt, callbackFunction);
+        rsLambda = [&rt, callInvoker, callbackValue](uint64_t rs_handle, uint64_t* uniffi_direct_return) {
+                // We immediately make a lambda which will do the work of transforming the
+                // arguments into JSI values and calling the callback.
+                uniffi_runtime::UniffiCallFunc jsLambda = [
+                    callInvoker,
+                    callbackValue
+                    , rs_handle, uniffi_direct_return](jsi::Runtime &rt) mutable {
+                    body(rt, callInvoker, callbackValue
+                        , rs_handle, uniffi_direct_return);
+                };
+                // We'll then call that lambda from the callInvoker which will
+                // look after calling it on the correct thread.
+                callInvoker->invokeBlocking(rt, jsLambda);
+        };
+        return callback;
+    }
+
+    // This method is called from the destructor of NativeMobileCore, which only happens
+    // when the jsi::Runtime is being destroyed.
+    static void cleanup() {
+        // The lambda holds a reference to the the Runtime, so when this is nulled out,
+        // then the pointer will no longer be left dangling.
+        rsLambda = nullptr;
+    }
+} // namespace uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeigneventbus
+    // Implementation of CallbackInterfaceForeignEventBusMethod0 for vtable field emit in VTableCallbackInterfaceForeignEventBus
+
+
+// Callback function: uniffi::mobile_core::cb::callbackinterfaceforeigneventbusmethod0::vtablecallbackinterfaceforeigneventbus::UniffiCallbackInterfaceForeignEventBusMethod0
+//
+// We have the following constraints:
+// - we need to pass a function pointer to Rust.
+// - we need a jsi::Runtime and jsi::Function to call into JS.
+// - function pointers can't store state, so we can't use a lamda.
+//
+// For this, we store a lambda as a global, as `rsLambda`. The `callback` function calls
+// the lambda, which itself calls the `body` which then calls into JS.
+//
+// We then give the `callback` function pointer to Rust which will call the lambda sometime in the
+// future.
+namespace uniffi::mobile_core::cb::callbackinterfaceforeigneventbusmethod0::vtablecallbackinterfaceforeigneventbus {
+    using namespace facebook;
+
+    // We need to store a lambda in a global so we can call it from
+    // a function pointer. The function pointer is passed to Rust.
+    static std::function<void(uint64_t, RustBuffer, void *, RustCallStatus*)> rsLambda = nullptr;
+
+    // This is the main body of the callback. It's called from the lambda,
+    // which itself is called from the callback function which is passed to Rust.
+    static void body(jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     std::shared_ptr<jsi::Value> callbackValue
+            ,uint64_t rs_uniffiHandle
+            ,RustBuffer rs_event
+            ,void * rs_uniffiOutReturn, RustCallStatus* uniffi_call_status) {
+
+        // Convert the arguments from Rust, into jsi::Values.
+        // We'll use the Bridging class to do this…
+        auto js_uniffiHandle = uniffi_jsi::Bridging<uint64_t>::toJs(rt, callInvoker, rs_uniffiHandle);
+        auto js_event = uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, rs_event);
+
+        // Now we are ready to call the callback.
+        // We are already on the JS thread, because this `body` function was
+        // invoked from the CallInvoker.
+        try {
+            // Getting the callback function
+            auto cb = callbackValue->asObject(rt).asFunction(rt);
+            auto uniffiResult = cb.call(rt, js_uniffiHandle, js_event
+            );
+
+            // Now copy the result back from JS into the RustCallStatus object.
+            uniffi::mobile_core::Bridging<RustCallStatus>::copyFromJs(rt, callInvoker, uniffiResult, uniffi_call_status);
+
+            if (uniffi_call_status->code != UNIFFI_CALL_STATUS_OK) {
+                // The JS callback finished abnormally, so we cannot retrieve the return value.
+                return;
+            }
+
+            
+        } catch (const jsi::JSError &error) {
+            std::cout << "Error in callback UniffiCallbackInterfaceForeignEventBusMethod0: "
+                    << error.what() << std::endl;
+            throw error;
+        }
+    }
+
+    static void callback(uint64_t rs_uniffiHandle, RustBuffer rs_event, void * rs_uniffiOutReturn, RustCallStatus* uniffi_call_status) {
+        // If the runtime has shutdown, then there is no point in trying to
+        // call into Javascript. BUT how do we tell if the runtime has shutdown?
+        //
+        // Answer: the module destructor calls into callback `cleanup` method,
+        // which nulls out the rsLamda.
+        //
+        // If rsLamda is null, then there is no runtime to call into.
+        if (rsLambda == nullptr) {
+            // This only occurs when destructors are calling into Rust free/drop,
+            // which causes the JS callback to be dropped.
+            return;
+        }
+
+        // The runtime, the actual callback jsi::funtion, and the callInvoker
+        // are all in the lambda.
+        rsLambda(
+            rs_uniffiHandle, 
+            rs_event, 
+            rs_uniffiOutReturn, uniffi_call_status);
+    }
+
+    [[maybe_unused]] static UniffiCallbackInterfaceForeignEventBusMethod0
+    makeCallbackFunction( // uniffi::mobile_core::cb::callbackinterfaceforeigneventbusmethod0::vtablecallbackinterfaceforeigneventbus
+                    jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     const jsi::Value &value) {
+        if (rsLambda != nullptr) {
+            // `makeCallbackFunction` is called in two circumstances:
+            //
+            // 1. at startup, when initializing callback interface vtables.
+            // 2. when polling futures. This happens at least once per future that is
+            //    exposed to Javascript. We know that this is always the same function,
+            //    `uniffiFutureContinuationCallback` in `async-rust-calls.ts`.
+            //
+            // We can therefore return the callback function without making anything
+            // new if we've been initialized already.
+            return callback;
+        }
+        auto callbackFunction = value.asObject(rt).asFunction(rt);
+        auto callbackValue = std::make_shared<jsi::Value>(rt, callbackFunction);
+        rsLambda = [&rt, callInvoker, callbackValue](uint64_t rs_uniffiHandle, RustBuffer rs_event, void * rs_uniffiOutReturn, RustCallStatus* uniffi_call_status) {
+                // We immediately make a lambda which will do the work of transforming the
+                // arguments into JSI values and calling the callback.
+                uniffi_runtime::UniffiCallFunc jsLambda = [
+                    callInvoker,
+                    callbackValue
+                    , rs_uniffiHandle
+                    , rs_event
+                    , rs_uniffiOutReturn, uniffi_call_status](jsi::Runtime &rt) mutable {
+                    body(rt, callInvoker, callbackValue
+                        , rs_uniffiHandle
+                        , rs_event
+                        , rs_uniffiOutReturn, uniffi_call_status);
+                };
+                // We'll then call that lambda from the callInvoker which will
+                // look after calling it on the correct thread.
+                callInvoker->invokeBlocking(rt, jsLambda);
+        };
+        return callback;
+    }
+
+    // This method is called from the destructor of NativeMobileCore, which only happens
+    // when the jsi::Runtime is being destroyed.
+    static void cleanup() {
+        // The lambda holds a reference to the the Runtime, so when this is nulled out,
+        // then the pointer will no longer be left dangling.
+        rsLambda = nullptr;
+    }
+} // namespace uniffi::mobile_core::cb::callbackinterfaceforeigneventbusmethod0::vtablecallbackinterfaceforeigneventbus
+namespace uniffi::mobile_core {
+using namespace facebook;
+using CallInvoker = uniffi_runtime::UniffiCallInvoker;
+
+template <> struct Bridging<UniffiVTableCallbackInterfaceForeignEventBus> {
+  static UniffiVTableCallbackInterfaceForeignEventBus fromJs(jsi::Runtime &rt,
+    std::shared_ptr<CallInvoker> callInvoker,
+    const jsi::Value &jsValue
+  ) {
+    // Check if the input is an object
+    if (!jsValue.isObject()) {
+      throw jsi::JSError(rt, "Expected an object for UniffiVTableCallbackInterfaceForeignEventBus");
+    }
+
+    // Get the object from the jsi::Value
+    auto jsObject = jsValue.getObject(rt);
+
+    // Create the vtable struct
+    UniffiVTableCallbackInterfaceForeignEventBus rsObject;
+
+    // Create the vtable from the js callbacks.
+    rsObject.uniffi_free = uniffi::mobile_core::st::vtablecallbackinterfaceforeigneventbus::vtablecallbackinterfaceforeigneventbus::free::makeCallbackFunction(
+          rt, callInvoker, jsObject.getProperty(rt, "uniffiFree")
+        );
+    rsObject.uniffi_clone = uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeigneventbus::makeCallbackFunction(
+          rt, callInvoker, jsObject.getProperty(rt, "uniffiClone")
+        );
+    rsObject.emit = uniffi::mobile_core::cb::callbackinterfaceforeigneventbusmethod0::vtablecallbackinterfaceforeigneventbus::makeCallbackFunction(
+          rt, callInvoker, jsObject.getProperty(rt, "emit")
+        );
+
+    return rsObject;
+  }
+};
+
+} // namespace uniffi::mobile_core
+    // Implementation of CallbackInterfaceClone for vtable field uniffi_clone in VTableCallbackInterfaceForeignKeychainProvider
+
+
+// Callback function: uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeignkeychainprovider::UniffiCallbackInterfaceClone
+//
+// We have the following constraints:
+// - we need to pass a function pointer to Rust.
+// - we need a jsi::Runtime and jsi::Function to call into JS.
+// - function pointers can't store state, so we can't use a lamda.
+//
+// For this, we store a lambda as a global, as `rsLambda`. The `callback` function calls
+// the lambda, which itself calls the `body` which then calls into JS.
+//
+// We then give the `callback` function pointer to Rust which will call the lambda sometime in the
+// future.
+namespace uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeignkeychainprovider {
+    using namespace facebook;
+
+    // We need to store a lambda in a global so we can call it from
+    // a function pointer. The function pointer is passed to Rust.
+    static std::function<void(uint64_t, uint64_t*)> rsLambda = nullptr;
+
+    // This is the main body of the callback. It's called from the lambda,
+    // which itself is called from the callback function which is passed to Rust.
+    static void body(jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     std::shared_ptr<jsi::Value> callbackValue
+            ,uint64_t rs_handle
+            , uint64_t* uniffi_direct_return) {
+
+        // Convert the arguments from Rust, into jsi::Values.
+        // We'll use the Bridging class to do this…
+        auto js_handle = uniffi_jsi::Bridging<uint64_t>::toJs(rt, callInvoker, rs_handle);
+
+        // Now we are ready to call the callback.
+        // We are already on the JS thread, because this `body` function was
+        // invoked from the CallInvoker.
+        try {
+            // Getting the callback function
+            auto cb = callbackValue->asObject(rt).asFunction(rt);
+            auto uniffiResult = cb.call(rt, js_handle
+            );
+
+            
+
+            
+            // Write the direct return value back to the caller.
+            if (uniffi_direct_return != nullptr) {
+                *uniffi_direct_return = uniffi_jsi::Bridging<uint64_t>::fromJs(
+                    rt, callInvoker, uniffiResult
+                );
+            }
+        } catch (const jsi::JSError &error) {
+            std::cout << "Error in callback UniffiCallbackInterfaceClone: "
+                    << error.what() << std::endl;
+            throw error;
+        }
+    }
+
+    static uint64_t callback(uint64_t rs_handle) {
+        // If the runtime has shutdown, then there is no point in trying to
+        // call into Javascript. BUT how do we tell if the runtime has shutdown?
+        //
+        // Answer: the module destructor calls into callback `cleanup` method,
+        // which nulls out the rsLamda.
+        //
+        // If rsLamda is null, then there is no runtime to call into.
+        if (rsLambda == nullptr) {
+            // This only occurs when destructors are calling into Rust free/drop,
+            // which causes the JS callback to be dropped.
+            return 0;
+        }
+        uint64_t uniffi_result = 0;
+
+        // The runtime, the actual callback jsi::funtion, and the callInvoker
+        // are all in the lambda.
+        rsLambda(
+            rs_handle, 
+            &uniffi_result);
+        return uniffi_result;
+    }
+
+    [[maybe_unused]] static UniffiCallbackInterfaceClone
+    makeCallbackFunction( // uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeignkeychainprovider
+                    jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     const jsi::Value &value) {
+        if (rsLambda != nullptr) {
+            // `makeCallbackFunction` is called in two circumstances:
+            //
+            // 1. at startup, when initializing callback interface vtables.
+            // 2. when polling futures. This happens at least once per future that is
+            //    exposed to Javascript. We know that this is always the same function,
+            //    `uniffiFutureContinuationCallback` in `async-rust-calls.ts`.
+            //
+            // We can therefore return the callback function without making anything
+            // new if we've been initialized already.
+            return callback;
+        }
+        auto callbackFunction = value.asObject(rt).asFunction(rt);
+        auto callbackValue = std::make_shared<jsi::Value>(rt, callbackFunction);
+        rsLambda = [&rt, callInvoker, callbackValue](uint64_t rs_handle, uint64_t* uniffi_direct_return) {
+                // We immediately make a lambda which will do the work of transforming the
+                // arguments into JSI values and calling the callback.
+                uniffi_runtime::UniffiCallFunc jsLambda = [
+                    callInvoker,
+                    callbackValue
+                    , rs_handle, uniffi_direct_return](jsi::Runtime &rt) mutable {
+                    body(rt, callInvoker, callbackValue
+                        , rs_handle, uniffi_direct_return);
+                };
+                // We'll then call that lambda from the callInvoker which will
+                // look after calling it on the correct thread.
+                callInvoker->invokeBlocking(rt, jsLambda);
+        };
+        return callback;
+    }
+
+    // This method is called from the destructor of NativeMobileCore, which only happens
+    // when the jsi::Runtime is being destroyed.
+    static void cleanup() {
+        // The lambda holds a reference to the the Runtime, so when this is nulled out,
+        // then the pointer will no longer be left dangling.
+        rsLambda = nullptr;
+    }
+} // namespace uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeignkeychainprovider
+    // Implementation of CallbackInterfaceForeignKeychainProviderMethod0 for vtable field get_or_create_keypair in VTableCallbackInterfaceForeignKeychainProvider
+
+
+// Callback function: uniffi::mobile_core::cb::callbackinterfaceforeignkeychainprovidermethod0::vtablecallbackinterfaceforeignkeychainprovider::UniffiCallbackInterfaceForeignKeychainProviderMethod0
+//
+// We have the following constraints:
+// - we need to pass a function pointer to Rust.
+// - we need a jsi::Runtime and jsi::Function to call into JS.
+// - function pointers can't store state, so we can't use a lamda.
+//
+// For this, we store a lambda as a global, as `rsLambda`. The `callback` function calls
+// the lambda, which itself calls the `body` which then calls into JS.
+//
+// We then give the `callback` function pointer to Rust which will call the lambda sometime in the
+// future.
+namespace uniffi::mobile_core::cb::callbackinterfaceforeignkeychainprovidermethod0::vtablecallbackinterfaceforeignkeychainprovider {
+    using namespace facebook;
+
+    // We need to store a lambda in a global so we can call it from
+    // a function pointer. The function pointer is passed to Rust.
+    static std::function<void(uint64_t, UniffiForeignFutureCompleteRustBuffer, uint64_t, UniffiForeignFutureDroppedCallbackStruct *)> rsLambda = nullptr;
+
+    // This is the main body of the callback. It's called from the lambda,
+    // which itself is called from the callback function which is passed to Rust.
+    static void body(jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     std::shared_ptr<jsi::Value> callbackValue
+            ,uint64_t rs_uniffiHandle
+            ,UniffiForeignFutureCompleteRustBuffer rs_uniffiFutureCallback
+            ,uint64_t rs_uniffiCallbackData
+            ,UniffiForeignFutureDroppedCallbackStruct * rs_uniffiOutDroppedCallback) {
+
+        // Convert the arguments from Rust, into jsi::Values.
+        // We'll use the Bridging class to do this…
+        auto js_uniffiHandle = uniffi_jsi::Bridging<uint64_t>::toJs(rt, callInvoker, rs_uniffiHandle);
+        auto js_uniffiFutureCallback = uniffi::mobile_core::Bridging<UniffiForeignFutureCompleteRustBuffer>::toJs(rt, callInvoker, rs_uniffiFutureCallback);
+        auto js_uniffiCallbackData = uniffi_jsi::Bridging<uint64_t>::toJs(rt, callInvoker, rs_uniffiCallbackData);
+
+        // Now we are ready to call the callback.
+        // We are already on the JS thread, because this `body` function was
+        // invoked from the CallInvoker.
+        try {
+            // Getting the callback function
+            auto cb = callbackValue->asObject(rt).asFunction(rt);
+            auto uniffiResult = cb.call(rt, js_uniffiHandle, js_uniffiFutureCallback, js_uniffiCallbackData
+            );
+
+            
+
+            
+            // return type is Struct("ForeignFutureDroppedCallbackStruct")
+            // Finally, we need to copy the return value back into the Rust pointer.
+            *rs_uniffiOutDroppedCallback =
+                uniffi::mobile_core::Bridging<
+                    UniffiForeignFutureDroppedCallbackStruct
+                >::fromJs(
+                    rt, callInvoker, uniffiResult
+                );
+        } catch (const jsi::JSError &error) {
+            std::cout << "Error in callback UniffiCallbackInterfaceForeignKeychainProviderMethod0: "
+                    << error.what() << std::endl;
+            throw error;
+        }
+    }
+
+    static void callback(uint64_t rs_uniffiHandle, UniffiForeignFutureCompleteRustBuffer rs_uniffiFutureCallback, uint64_t rs_uniffiCallbackData, UniffiForeignFutureDroppedCallbackStruct * rs_uniffiOutDroppedCallback) {
+        // If the runtime has shutdown, then there is no point in trying to
+        // call into Javascript. BUT how do we tell if the runtime has shutdown?
+        //
+        // Answer: the module destructor calls into callback `cleanup` method,
+        // which nulls out the rsLamda.
+        //
+        // If rsLamda is null, then there is no runtime to call into.
+        if (rsLambda == nullptr) {
+            // This only occurs when destructors are calling into Rust free/drop,
+            // which causes the JS callback to be dropped.
+            return;
+        }
+
+        // The runtime, the actual callback jsi::funtion, and the callInvoker
+        // are all in the lambda.
+        rsLambda(
+            rs_uniffiHandle, 
+            rs_uniffiFutureCallback, 
+            rs_uniffiCallbackData, 
+            rs_uniffiOutDroppedCallback);
+    }
+
+    [[maybe_unused]] static UniffiCallbackInterfaceForeignKeychainProviderMethod0
+    makeCallbackFunction( // uniffi::mobile_core::cb::callbackinterfaceforeignkeychainprovidermethod0::vtablecallbackinterfaceforeignkeychainprovider
+                    jsi::Runtime &rt,
+                     std::shared_ptr<uniffi_runtime::UniffiCallInvoker> callInvoker,
+                     const jsi::Value &value) {
+        if (rsLambda != nullptr) {
+            // `makeCallbackFunction` is called in two circumstances:
+            //
+            // 1. at startup, when initializing callback interface vtables.
+            // 2. when polling futures. This happens at least once per future that is
+            //    exposed to Javascript. We know that this is always the same function,
+            //    `uniffiFutureContinuationCallback` in `async-rust-calls.ts`.
+            //
+            // We can therefore return the callback function without making anything
+            // new if we've been initialized already.
+            return callback;
+        }
+        auto callbackFunction = value.asObject(rt).asFunction(rt);
+        auto callbackValue = std::make_shared<jsi::Value>(rt, callbackFunction);
+        rsLambda = [&rt, callInvoker, callbackValue](uint64_t rs_uniffiHandle, UniffiForeignFutureCompleteRustBuffer rs_uniffiFutureCallback, uint64_t rs_uniffiCallbackData, UniffiForeignFutureDroppedCallbackStruct * rs_uniffiOutDroppedCallback) {
+                // We immediately make a lambda which will do the work of transforming the
+                // arguments into JSI values and calling the callback.
+                uniffi_runtime::UniffiCallFunc jsLambda = [
+                    callInvoker,
+                    callbackValue
+                    , rs_uniffiHandle
+                    , rs_uniffiFutureCallback
+                    , rs_uniffiCallbackData
+                    , rs_uniffiOutDroppedCallback](jsi::Runtime &rt) mutable {
+                    body(rt, callInvoker, callbackValue
+                        , rs_uniffiHandle
+                        , rs_uniffiFutureCallback
+                        , rs_uniffiCallbackData
+                        , rs_uniffiOutDroppedCallback);
+                };
+                // We'll then call that lambda from the callInvoker which will
+                // look after calling it on the correct thread.
+                callInvoker->invokeBlocking(rt, jsLambda);
+        };
+        return callback;
+    }
+
+    // This method is called from the destructor of NativeMobileCore, which only happens
+    // when the jsi::Runtime is being destroyed.
+    static void cleanup() {
+        // The lambda holds a reference to the the Runtime, so when this is nulled out,
+        // then the pointer will no longer be left dangling.
+        rsLambda = nullptr;
+    }
+} // namespace uniffi::mobile_core::cb::callbackinterfaceforeignkeychainprovidermethod0::vtablecallbackinterfaceforeignkeychainprovider
+namespace uniffi::mobile_core {
+using namespace facebook;
+using CallInvoker = uniffi_runtime::UniffiCallInvoker;
+
+template <> struct Bridging<UniffiVTableCallbackInterfaceForeignKeychainProvider> {
+  static UniffiVTableCallbackInterfaceForeignKeychainProvider fromJs(jsi::Runtime &rt,
+    std::shared_ptr<CallInvoker> callInvoker,
+    const jsi::Value &jsValue
+  ) {
+    // Check if the input is an object
+    if (!jsValue.isObject()) {
+      throw jsi::JSError(rt, "Expected an object for UniffiVTableCallbackInterfaceForeignKeychainProvider");
+    }
+
+    // Get the object from the jsi::Value
+    auto jsObject = jsValue.getObject(rt);
+
+    // Create the vtable struct
+    UniffiVTableCallbackInterfaceForeignKeychainProvider rsObject;
+
+    // Create the vtable from the js callbacks.
+    rsObject.uniffi_free = uniffi::mobile_core::st::vtablecallbackinterfaceforeignkeychainprovider::vtablecallbackinterfaceforeignkeychainprovider::free::makeCallbackFunction(
+          rt, callInvoker, jsObject.getProperty(rt, "uniffiFree")
+        );
+    rsObject.uniffi_clone = uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeignkeychainprovider::makeCallbackFunction(
+          rt, callInvoker, jsObject.getProperty(rt, "uniffiClone")
+        );
+    rsObject.get_or_create_keypair = uniffi::mobile_core::cb::callbackinterfaceforeignkeychainprovidermethod0::vtablecallbackinterfaceforeignkeychainprovider::makeCallbackFunction(
+          rt, callInvoker, jsObject.getProperty(rt, "getOrCreateKeypair")
+        );
+
+    return rsObject;
+  }
+};
+
+} // namespace uniffi::mobile_core
 
 
 namespace uniffi::mobile_core {
@@ -1764,20 +2962,1300 @@ NativeMobileCore::NativeMobileCore(
             return this->cpp_uniffi_internal_fn_func_ffi__arraybuffer_to_string(rt, thisVal, args, count);
         }
     );
-    props["ubrn_uniffi_mobile_core_fn_func_greet"] = jsi::Function::createFromHostFunction(
+    props["ubrn_uniffi_mobile_core_fn_clone_uniffiappcore"] = jsi::Function::createFromHostFunction(
         rt,
-        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_func_greet"),
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_clone_uniffiappcore"),
         1,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
-            return this->cpp_uniffi_mobile_core_fn_func_greet(rt, thisVal, args, count);
+            return this->cpp_uniffi_mobile_core_fn_clone_uniffiappcore(rt, thisVal, args, count);
         }
     );
-    props["ubrn_uniffi_mobile_core_checksum_func_greet"] = jsi::Function::createFromHostFunction(
+    props["ubrn_uniffi_mobile_core_fn_free_uniffiappcore"] = jsi::Function::createFromHostFunction(
         rt,
-        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_func_greet"),
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_free_uniffiappcore"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_free_uniffiappcore(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_constructor_uniffiappcore_new"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_constructor_uniffiappcore_new"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_constructor_uniffiappcore_new(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_close_workspace"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_close_workspace"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_close_workspace(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_device_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_device_info"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_device_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_network_status"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_network_status"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_network_status(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_peer_id"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_peer_id"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_peer_id(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_start_network"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_start_network"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_start_network(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_stop_network"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_stop_network"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_devices"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_devices"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_list_devices(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_paired_devices"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_paired_devices"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_list_paired_devices(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_lookup_device_by_code"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_lookup_device_by_code"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_lookup_device_by_code(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_request_pairing"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_request_pairing"),
+        4,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_request_pairing(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_respond_pairing_request"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_respond_pairing_request"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_respond_pairing_request(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_unpair_device"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_unpair_device"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_unpair_device(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_clone_foreigneventbus"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_clone_foreigneventbus"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_clone_foreigneventbus(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_free_foreigneventbus"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_free_foreigneventbus"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_free_foreigneventbus(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_init_callback_vtable_foreigneventbus"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_init_callback_vtable_foreigneventbus"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_init_callback_vtable_foreigneventbus(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_foreigneventbus_emit"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_foreigneventbus_emit"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_foreigneventbus_emit(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_clone_foreignkeychainprovider"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_clone_foreignkeychainprovider"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_clone_foreignkeychainprovider(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_free_foreignkeychainprovider"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_free_foreignkeychainprovider"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_free_foreignkeychainprovider(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_init_callback_vtable_foreignkeychainprovider"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_init_callback_vtable_foreignkeychainprovider"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_init_callback_vtable_foreignkeychainprovider(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_foreignkeychainprovider_get_or_create_keypair"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_foreignkeychainprovider_get_or_create_keypair"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_foreignkeychainprovider_get_or_create_keypair(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_clone_uniffiworkspacecore"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_clone_uniffiworkspacecore"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_clone_uniffiworkspacecore(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_free_uniffiworkspacecore"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_free_uniffiworkspacecore"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_free_uniffiworkspacecore(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_close(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_folder"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_folder"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_folder(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_document_by_rel_path"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_document_by_rel_path"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_document_by_rel_path(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_documents_by_prefix"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_documents_by_prefix"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_documents_by_prefix(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_id"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_id"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_id(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_info"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_doc_open"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_doc_open"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_doc_open(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_documents"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_documents"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_documents(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_folders"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_folders"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_folders(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_open_doc_uuids"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_open_doc_uuids"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_open_doc_uuids(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_move_node"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_move_node"),
+        4,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_move_node(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_open_doc"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_open_doc"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_open_doc(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_bytes"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_bytes"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_bytes(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_text"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_text"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_text(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_reload_confirmed"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_reload_confirmed"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_reload_confirmed(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_dir"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_dir"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_dir(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_file"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_file"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_file(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_doc"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_doc"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_doc(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_document"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_document"),
+        4,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_document(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_save_media"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_save_media"),
+        4,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_save_media(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_scan_tree"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_scan_tree"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_scan_tree(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_upsert_document"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_upsert_document"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_upsert_document(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_bytes"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_bytes"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_bytes(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_u8"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_u8"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_u8(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_u8"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_u8"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_u8(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_u8"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_u8"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_u8(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_u8"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_u8"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_u8(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_i8"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_i8"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_i8(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_i8"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_i8"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_i8(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_i8"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_i8"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_i8(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_i8"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_i8"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_i8(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_u16"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_u16"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_u16(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_u16"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_u16"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_u16(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_u16"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_u16"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_u16(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_u16"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_u16"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_u16(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_i16"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_i16"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_i16(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_i16"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_i16"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_i16(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_i16"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_i16"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_i16(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_i16"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_i16"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_i16(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_u32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_u32"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_u32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_u32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_u32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_u32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_u32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_u32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_u32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_u32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_u32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_u32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_i32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_i32"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_i32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_i32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_i32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_i32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_i32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_i32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_i32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_i32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_i32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_i32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_u64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_u64"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_u64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_u64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_u64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_u64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_u64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_u64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_u64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_u64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_u64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_u64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_i64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_i64"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_i64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_i64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_i64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_i64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_i64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_i64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_i64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_i64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_i64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_i64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_f32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_f32"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_f32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_f32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_f32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_f32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_f32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_f32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_f32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_f32"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_f32"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_f32(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_f64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_f64"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_f64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_f64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_f64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_f64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_f64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_f64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_f64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_f64"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_f64"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_f64(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_rust_buffer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_rust_buffer"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_rust_buffer(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_rust_buffer(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_rust_buffer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_rust_buffer"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_rust_buffer(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_rust_buffer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_rust_buffer"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_rust_buffer(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_poll_void"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_void"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_poll_void(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_cancel_void"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_cancel_void"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_cancel_void(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_free_void"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_free_void"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_free_void(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_ffi_mobile_core_rust_future_complete_void"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_complete_void"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_ffi_mobile_core_rust_future_complete_void(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace"),
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
-            return this->cpp_uniffi_mobile_core_checksum_func_greet(rt, thisVal, args, count);
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_device_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_device_info"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_device_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_network_status"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_network_status"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_network_status(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_start_network"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_start_network"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_start_network(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_devices"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_devices"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_list_devices(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_paired_devices"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_paired_devices"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_list_paired_devices(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_lookup_device_by_code"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_lookup_device_by_code"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_lookup_device_by_code(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_request_pairing"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_request_pairing"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_request_pairing(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_respond_pairing_request"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_respond_pairing_request"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_respond_pairing_request(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_unpair_device"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_unpair_device"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_unpair_device(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_foreigneventbus_emit"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_foreigneventbus_emit"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_foreigneventbus_emit(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_folder"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_folder"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_folder(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_document_by_rel_path"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_document_by_rel_path"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_document_by_rel_path(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_documents_by_prefix"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_documents_by_prefix"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_documents_by_prefix(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_info"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_doc_open"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_doc_open"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_doc_open(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_documents"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_documents"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_documents(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_folders"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_folders"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_folders(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_open_doc_uuids"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_open_doc_uuids"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_open_doc_uuids(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_move_node"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_move_node"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_move_node(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_open_doc"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_open_doc"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_open_doc(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_bytes"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_bytes"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_bytes(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_text"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_text"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_text(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_reload_confirmed"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_reload_confirmed"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_reload_confirmed(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_dir"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_dir"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_dir(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_file"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_file"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_file(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_doc"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_doc"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_doc(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_document"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_document"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_document(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_save_media"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_save_media"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_save_media(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_scan_tree"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_scan_tree"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_scan_tree(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_upsert_document"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_upsert_document"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_upsert_document(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_bytes"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_bytes"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_bytes(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_text"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_text"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_text(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_constructor_uniffiappcore_new"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_constructor_uniffiappcore_new"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_constructor_uniffiappcore_new(rt, thisVal, args, count);
         }
     );
     props["ubrn_ffi_mobile_core_uniffi_contract_version"] = jsi::Function::createFromHostFunction(
@@ -1786,6 +4264,38 @@ NativeMobileCore::NativeMobileCore(
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_ffi_mobile_core_uniffi_contract_version(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_internal_fn_method_uniffiappcore_ffi__bless_pointer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_internal_fn_method_uniffiappcore_ffi__bless_pointer"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_internal_fn_method_uniffiappcore_ffi__bless_pointer(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_internal_fn_method_foreigneventbus_ffi__bless_pointer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_internal_fn_method_foreigneventbus_ffi__bless_pointer"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_internal_fn_method_foreigneventbus_ffi__bless_pointer(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_internal_fn_method_foreignkeychainprovider_ffi__bless_pointer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_internal_fn_method_foreignkeychainprovider_ffi__bless_pointer"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_internal_fn_method_foreignkeychainprovider_ffi__bless_pointer(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_internal_fn_method_uniffiworkspacecore_ffi__bless_pointer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_internal_fn_method_uniffiworkspacecore_ffi__bless_pointer"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_internal_fn_method_uniffiworkspacecore_ffi__bless_pointer(rt, thisVal, args, count);
         }
     );
 }
@@ -1828,7 +4338,11 @@ uniffi::mobile_core::cb::rustfuturecontinuationcallback::cleanup();
     // Cleanup for callback function ForeignFutureDroppedCallback
 uniffi::mobile_core::cb::foreignfuturedroppedcallback::cleanup();
     // Cleanup for "free" callback function CallbackInterfaceFree
-
+uniffi::mobile_core::st::vtablecallbackinterfaceforeigneventbus::vtablecallbackinterfaceforeigneventbus::free::cleanup();uniffi::mobile_core::st::vtablecallbackinterfaceforeignkeychainprovider::vtablecallbackinterfaceforeignkeychainprovider::free::cleanup();
+uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeigneventbus::cleanup();
+uniffi::mobile_core::cb::callbackinterfaceforeigneventbusmethod0::vtablecallbackinterfaceforeigneventbus::cleanup();
+uniffi::mobile_core::cb::callbackinterfaceclone::vtablecallbackinterfaceforeignkeychainprovider::cleanup();
+uniffi::mobile_core::cb::callbackinterfaceforeignkeychainprovidermethod0::vtablecallbackinterfaceforeignkeychainprovider::cleanup();
 }
 
 // Utility functions for serialization/deserialization of strings.
@@ -1842,12 +4356,82 @@ jsi::Value NativeMobileCore::cpp_uniffi_internal_fn_func_ffi__string_to_arraybuf
 
 jsi::Value NativeMobileCore::cpp_uniffi_internal_fn_func_ffi__arraybuffer_to_string(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
     return uniffi_jsi::Bridging<std::string>::arraybuffer_to_string(rt, args[0]);
+}jsi::Value NativeMobileCore::cpp_uniffi_internal_fn_method_uniffiappcore_ffi__bless_pointer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+    auto pointer = uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[0]);
+    auto static destructor = [](uint64_t p) {
+        RustCallStatus status = {0};
+        uniffi_mobile_core_fn_free_uniffiappcore(p, &status);
+    };
+    auto ptrObj = std::make_shared<uniffi_jsi::DestructibleObject>(pointer, destructor);
+    auto obj = jsi::Object::createFromHostObject(rt, ptrObj);
+    return jsi::Value(rt, obj);
+}jsi::Value NativeMobileCore::cpp_uniffi_internal_fn_method_foreigneventbus_ffi__bless_pointer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+    auto pointer = uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[0]);
+    auto static destructor = [](uint64_t p) {
+        RustCallStatus status = {0};
+        uniffi_mobile_core_fn_free_foreigneventbus(p, &status);
+    };
+    auto ptrObj = std::make_shared<uniffi_jsi::DestructibleObject>(pointer, destructor);
+    auto obj = jsi::Object::createFromHostObject(rt, ptrObj);
+    return jsi::Value(rt, obj);
+}jsi::Value NativeMobileCore::cpp_uniffi_internal_fn_method_foreignkeychainprovider_ffi__bless_pointer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+    auto pointer = uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[0]);
+    auto static destructor = [](uint64_t p) {
+        RustCallStatus status = {0};
+        uniffi_mobile_core_fn_free_foreignkeychainprovider(p, &status);
+    };
+    auto ptrObj = std::make_shared<uniffi_jsi::DestructibleObject>(pointer, destructor);
+    auto obj = jsi::Object::createFromHostObject(rt, ptrObj);
+    return jsi::Value(rt, obj);
+}jsi::Value NativeMobileCore::cpp_uniffi_internal_fn_method_uniffiworkspacecore_ffi__bless_pointer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+    auto pointer = uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[0]);
+    auto static destructor = [](uint64_t p) {
+        RustCallStatus status = {0};
+        uniffi_mobile_core_fn_free_uniffiworkspacecore(p, &status);
+    };
+    auto ptrObj = std::make_shared<uniffi_jsi::DestructibleObject>(pointer, destructor);
+    auto obj = jsi::Object::createFromHostObject(rt, ptrObj);
+    return jsi::Value(rt, obj);
 }
 
 // Methods calling directly into the uniffi generated C API of the Rust crate.
-jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_func_greet(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_clone_uniffiappcore(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
-        auto value = uniffi_mobile_core_fn_func_greet(uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), 
+        auto value = uniffi_mobile_core_fn_clone_uniffiappcore(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_free_uniffiappcore(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        uniffi_mobile_core_fn_free_uniffiappcore(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_constructor_uniffiappcore_new(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_constructor_uniffiappcore_new(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_close_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_close_workspace(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_device_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_device_info(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
             &status
         );
         uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
@@ -1855,8 +4439,1198 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_func_greet(jsi::Runtime& 
         
         return uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
 }
-jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_func_greet(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-        auto value = uniffi_mobile_core_checksum_func_greet(
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_network_status(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_network_status(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_peer_id(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_peer_id(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_start_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_start_network(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_stop_network(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_workspace_info(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_list_devices(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_list_devices(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_list_paired_devices(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_list_paired_devices(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_lookup_device_by_code(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_lookup_device_by_code(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_request_pairing(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_request_pairing(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_respond_pairing_request(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_respond_pairing_request(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging<int8_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_unpair_device(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_unpair_device(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_clone_foreigneventbus(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_clone_foreigneventbus(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_free_foreigneventbus(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        uniffi_mobile_core_fn_free_foreigneventbus(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_init_callback_vtable_foreigneventbus(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+    auto vtableInstance =
+        uniffi::mobile_core::Bridging<UniffiVTableCallbackInterfaceForeignEventBus>::fromJs(
+            rt,
+            callInvoker,
+            args[0]
+        );
+
+    std::lock_guard<std::mutex> lock(uniffi::mobile_core::registry::vtableMutex);
+    uniffi_mobile_core_fn_init_callback_vtable_foreigneventbus(
+        uniffi::mobile_core::registry::putTable(
+            "UniffiVTableCallbackInterfaceForeignEventBus",
+            vtableInstance
+        )
+    );
+    return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_foreigneventbus_emit(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        uniffi_mobile_core_fn_method_foreigneventbus_emit(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_clone_foreignkeychainprovider(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_clone_foreignkeychainprovider(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_free_foreignkeychainprovider(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        uniffi_mobile_core_fn_free_foreignkeychainprovider(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_init_callback_vtable_foreignkeychainprovider(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+    auto vtableInstance =
+        uniffi::mobile_core::Bridging<UniffiVTableCallbackInterfaceForeignKeychainProvider>::fromJs(
+            rt,
+            callInvoker,
+            args[0]
+        );
+
+    std::lock_guard<std::mutex> lock(uniffi::mobile_core::registry::vtableMutex);
+    uniffi_mobile_core_fn_init_callback_vtable_foreignkeychainprovider(
+        uniffi::mobile_core::registry::putTable(
+            "UniffiVTableCallbackInterfaceForeignKeychainProvider",
+            vtableInstance
+        )
+    );
+    return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_foreignkeychainprovider_get_or_create_keypair(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_foreignkeychainprovider_get_or_create_keypair(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_clone_uniffiworkspacecore(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_clone_uniffiworkspacecore(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_free_uniffiworkspacecore(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        uniffi_mobile_core_fn_free_uniffiworkspacecore(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_close(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_close(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_folder(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_create_folder(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_document_by_rel_path(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_document_by_rel_path(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_documents_by_prefix(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_documents_by_prefix(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_id(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_id(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_info(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_doc_open(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_is_doc_open(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<int8_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_documents(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_list_documents(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_folders(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_list_folders(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_open_doc_uuids(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_list_open_doc_uuids(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_move_node(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_move_node(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi_jsi::Bridging<int8_t>::fromJs(rt, callInvoker, args[3])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_open_doc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_open_doc(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_bytes(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_read_bytes(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_text(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_read_text(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_reload_confirmed(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_reload_confirmed(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_dir(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_file(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_file(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_rename(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_doc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_doc(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_document(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_document(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_save_media(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_save_media(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_scan_tree(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_scan_tree(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_upsert_document(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_upsert_document(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_bytes(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_write_bytes(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_u8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_u8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_u8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_u8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_u8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_u8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_u8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_u8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<uint8_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_i8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_i8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_i8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_i8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_i8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_i8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_i8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_i8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<int8_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_u16(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_u16(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_u16(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_u16(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_u16(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_u16(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_u16(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_u16(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_i16(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_i16(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_i16(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_i16(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_i16(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_i16(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_i16(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_i16(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<int16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_u32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_u32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_u32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_u32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_u32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_u32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_u32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_u32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<uint32_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_i32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_i32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_i32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_i32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_i32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_i32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_i32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_i32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<int32_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_u64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_u64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_u64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_u64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_u64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_u64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_u64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_u64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_i64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_i64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_i64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_i64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_i64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_i64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_i64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_i64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<int64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_f32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_f32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_f32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_f32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_f32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_f32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_f32(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_f32(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<float>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_f64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_f64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_f64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_f64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_f64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_f64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_f64(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_f64(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<double>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_rust_buffer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_rust_buffer(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_rust_buffer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_rust_buffer(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_rust_buffer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_rust_buffer(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_rust_buffer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = ffi_mobile_core_rust_future_complete_rust_buffer(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_void(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_poll_void(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_cancel_void(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_cancel_void(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_free_void(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        ffi_mobile_core_rust_future_free_void(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_void(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        ffi_mobile_core_rust_future_complete_void(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_device_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_device_info(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_network_status(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_network_status(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_peer_id(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_start_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_start_network(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_list_devices(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_list_devices(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_list_paired_devices(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_list_paired_devices(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_lookup_device_by_code(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_lookup_device_by_code(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_request_pairing(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_request_pairing(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_respond_pairing_request(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_respond_pairing_request(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_unpair_device(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_unpair_device(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_foreigneventbus_emit(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_foreigneventbus_emit(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_close(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_folder(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_folder(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_document_by_rel_path(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_document_by_rel_path(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_documents_by_prefix(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_documents_by_prefix(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_id(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_info(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_doc_open(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_doc_open(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_documents(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_documents(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_folders(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_folders(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_open_doc_uuids(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_open_doc_uuids(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_move_node(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_move_node(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_open_doc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_open_doc(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_bytes(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_bytes(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_text(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_text(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_reload_confirmed(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_reload_confirmed(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_dir(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_file(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_file(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_doc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_doc(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_document(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_document(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_save_media(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_save_media(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_scan_tree(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_scan_tree(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_upsert_document(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_upsert_document(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_bytes(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_bytes(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_text(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_text(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_constructor_uniffiappcore_new(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_constructor_uniffiappcore_new(
         );
 
         

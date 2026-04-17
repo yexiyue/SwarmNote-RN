@@ -32,13 +32,45 @@ import nativeModule, {
   type UniffiForeignFutureCompleteRustBuffer,
   type UniffiForeignFutureResultVoid,
   type UniffiForeignFutureCompleteVoid,
+  type UniffiVTableCallbackInterfaceForeignEventBus,
+  type UniffiVTableCallbackInterfaceForeignKeychainProvider,
 } from "./mobile_core-ffi";
 import {
+  type FfiConverter, 
   type UniffiByteArray, 
+  type UniffiGcObject, 
+  type UniffiHandle, 
+  type UniffiObjectFactory, 
+  type UniffiReferenceHolder, 
+  type UniffiRustCallStatus, 
+  type UniffiTimestamp, 
+  AbstractFfiConverterByteArray, 
+  FfiConverterArray, 
+  FfiConverterArrayBuffer, 
+  FfiConverterBool, 
+  FfiConverterInt32, 
+  FfiConverterObject, 
+  FfiConverterObjectWithCallbacks, 
+  FfiConverterOptional, 
+  FfiConverterTimestamp, 
+  FfiConverterUInt32, 
+  FfiConverterUInt64, 
   RustBuffer, 
+  UniffiAbstractObject, 
+  UniffiEnum, 
+  UniffiError, 
   UniffiInternalError, 
+  UniffiResult, 
   UniffiRustCaller, 
-  uniffiCreateFfiConverterString } from "uniffi-bindgen-react-native";
+  destructorGuardSymbol, 
+  pointerLiteralSymbol, 
+  uniffiCreateFfiConverterString, 
+  uniffiCreateRecord, 
+  uniffiRustCallAsync, 
+  uniffiTraitInterfaceCall, 
+  uniffiTraitInterfaceCallAsyncWithError, 
+  uniffiTypeNameSymbol, 
+  variantOrdinalSymbol } from "uniffi-bindgen-react-native";
 
 // Get converters from the other files, if any.
 const uniffiCaller = new UniffiRustCaller(() => ({ code: 0 }));
@@ -51,16 +83,923 @@ const uniffiIsDebug =
   false;
 // Public interface members begin here.
 
-export function greet(name: string): string {
-    return FfiConverterString.lift(uniffiCaller.rustCall(
-            /*caller:*/ (callStatus) => {
-                return nativeModule().ubrn_uniffi_mobile_core_fn_func_greet(
-        FfiConverterString.lower(name),
-                callStatus);
-            },
-            /*liftString:*/ FfiConverterString.lift,
-    ));
-    }
+
+
+
+
+
+
+
+
+export type CreateFolderInput = {
+    parentFolderId?: string,
+    name: string,
+    relPath: string
+}
+
+/**
+ * Generated factory for {@link CreateFolderInput} record objects.
+ */
+export const CreateFolderInput = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<CreateFolderInput, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<CreateFolderInput>,
+
+    });
+})();
+
+const FfiConverterTypeCreateFolderInput = (() => {
+    type TypeName = CreateFolderInput;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                parentFolderId: FfiConverterOptionalString.read(from), 
+                name: FfiConverterString.read(from), 
+                relPath: FfiConverterString.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterOptionalString.write(value.parentFolderId, into);
+            FfiConverterString.write(value.name, into);
+            FfiConverterString.write(value.relPath, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterOptionalString.allocationSize(value.parentFolderId) + 
+            FfiConverterString.allocationSize(value.name) + 
+            FfiConverterString.allocationSize(value.relPath);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+/**
+ * Per-document persistence failure inside `WorkspaceCloseFailed`. Mirrors
+ * the `(Uuid, String)` pairs the core returns, with UUIDs stringified for
+ * the FFI boundary.
+ */
+export type DocFlushFailure = {
+    docId: string,
+    reason: string
+}
+
+/**
+ * Generated factory for {@link DocFlushFailure} record objects.
+ */
+export const DocFlushFailure = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<DocFlushFailure, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<DocFlushFailure>,
+
+    });
+})();
+
+const FfiConverterTypeDocFlushFailure = (() => {
+    type TypeName = DocFlushFailure;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                docId: FfiConverterString.read(from), 
+                reason: FfiConverterString.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.docId, into);
+            FfiConverterString.write(value.reason, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.docId) + 
+            FfiConverterString.allocationSize(value.reason);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+/**
+ * Result returned by `UniffiWorkspaceCore::move_node` — the destination
+ * path after the atomic move (echoed back) and whether the moved entity
+ * was a directory.
+ */
+export type MoveNodeResult = {
+    newRelPath: string,
+    isDir: boolean
+}
+
+/**
+ * Generated factory for {@link MoveNodeResult} record objects.
+ */
+export const MoveNodeResult = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<MoveNodeResult, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<MoveNodeResult>,
+
+    });
+})();
+
+const FfiConverterTypeMoveNodeResult = (() => {
+    type TypeName = MoveNodeResult;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                newRelPath: FfiConverterString.read(from), 
+                isDir: FfiConverterBool.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.newRelPath, into);
+            FfiConverterBool.write(value.isDir, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.newRelPath) + 
+            FfiConverterBool.allocationSize(value.isDir);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+export type UniffiDevice = {
+    peerId: string,
+    name?: string,
+    hostname: string,
+    os: string,
+    platform: string,
+    arch: string,
+    status: UniffiDeviceStatus,
+    connection?: UniffiConnectionType,
+    /**
+     * Round-trip latency in milliseconds. `None` if no ping has succeeded
+     * yet or the peer is offline.
+     */
+    latency?: /*u64*/bigint,
+    isPaired: boolean,
+    pairedAt?: UniffiTimestamp,
+    lastSeen?: UniffiTimestamp
+}
+
+/**
+ * Generated factory for {@link UniffiDevice} record objects.
+ */
+export const UniffiDevice = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiDevice, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiDevice>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiDevice = (() => {
+    type TypeName = UniffiDevice;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                peerId: FfiConverterString.read(from), 
+                name: FfiConverterOptionalString.read(from), 
+                hostname: FfiConverterString.read(from), 
+                os: FfiConverterString.read(from), 
+                platform: FfiConverterString.read(from), 
+                arch: FfiConverterString.read(from), 
+                status: FfiConverterTypeUniffiDeviceStatus.read(from), 
+                connection: FfiConverterOptionalTypeUniffiConnectionType.read(from), 
+                latency: FfiConverterOptionalUInt64.read(from), 
+                isPaired: FfiConverterBool.read(from), 
+                pairedAt: FfiConverterOptionalTimestamp.read(from), 
+                lastSeen: FfiConverterOptionalTimestamp.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.peerId, into);
+            FfiConverterOptionalString.write(value.name, into);
+            FfiConverterString.write(value.hostname, into);
+            FfiConverterString.write(value.os, into);
+            FfiConverterString.write(value.platform, into);
+            FfiConverterString.write(value.arch, into);
+            FfiConverterTypeUniffiDeviceStatus.write(value.status, into);
+            FfiConverterOptionalTypeUniffiConnectionType.write(value.connection, into);
+            FfiConverterOptionalUInt64.write(value.latency, into);
+            FfiConverterBool.write(value.isPaired, into);
+            FfiConverterOptionalTimestamp.write(value.pairedAt, into);
+            FfiConverterOptionalTimestamp.write(value.lastSeen, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.peerId) + 
+            FfiConverterOptionalString.allocationSize(value.name) + 
+            FfiConverterString.allocationSize(value.hostname) + 
+            FfiConverterString.allocationSize(value.os) + 
+            FfiConverterString.allocationSize(value.platform) + 
+            FfiConverterString.allocationSize(value.arch) + 
+            FfiConverterTypeUniffiDeviceStatus.allocationSize(value.status) + 
+            FfiConverterOptionalTypeUniffiConnectionType.allocationSize(value.connection) + 
+            FfiConverterOptionalUInt64.allocationSize(value.latency) + 
+            FfiConverterBool.allocationSize(value.isPaired) + 
+            FfiConverterOptionalTimestamp.allocationSize(value.pairedAt) + 
+            FfiConverterOptionalTimestamp.allocationSize(value.lastSeen);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+/**
+ * Result of resolving a pairing code against the DHT: the publisher's peer
+ * id + the OS info they embedded in the record. `listen_addrs` are NOT
+ * surfaced to RN — the core already registered them with the libp2p swarm
+ * as a side effect, so the subsequent `request_pairing` call can dial
+ * directly.
+ */
+export type UniffiDeviceByCodeResult = {
+    peerId: string,
+    osInfo: UniffiOsInfo
+}
+
+/**
+ * Generated factory for {@link UniffiDeviceByCodeResult} record objects.
+ */
+export const UniffiDeviceByCodeResult = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiDeviceByCodeResult, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiDeviceByCodeResult>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiDeviceByCodeResult = (() => {
+    type TypeName = UniffiDeviceByCodeResult;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                peerId: FfiConverterString.read(from), 
+                osInfo: FfiConverterTypeUniffiOsInfo.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.peerId, into);
+            FfiConverterTypeUniffiOsInfo.write(value.osInfo, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.peerId) + 
+            FfiConverterTypeUniffiOsInfo.allocationSize(value.osInfo);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+export type UniffiDeviceInfo = {
+    peerId: string,
+    deviceName: string,
+    hostname: string,
+    os: string,
+    platform: string,
+    arch: string,
+    /**
+     * Opaque ISO-8601 string set by the core's GlobalConfig. Kept as string
+     * because `DeviceInfo::created_at` is typed as `String` in core (not a
+     * parsed DateTime).
+     */
+    createdAt: string
+}
+
+/**
+ * Generated factory for {@link UniffiDeviceInfo} record objects.
+ */
+export const UniffiDeviceInfo = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiDeviceInfo, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiDeviceInfo>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiDeviceInfo = (() => {
+    type TypeName = UniffiDeviceInfo;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                peerId: FfiConverterString.read(from), 
+                deviceName: FfiConverterString.read(from), 
+                hostname: FfiConverterString.read(from), 
+                os: FfiConverterString.read(from), 
+                platform: FfiConverterString.read(from), 
+                arch: FfiConverterString.read(from), 
+                createdAt: FfiConverterString.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.peerId, into);
+            FfiConverterString.write(value.deviceName, into);
+            FfiConverterString.write(value.hostname, into);
+            FfiConverterString.write(value.os, into);
+            FfiConverterString.write(value.platform, into);
+            FfiConverterString.write(value.arch, into);
+            FfiConverterString.write(value.createdAt, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.peerId) + 
+            FfiConverterString.allocationSize(value.deviceName) + 
+            FfiConverterString.allocationSize(value.hostname) + 
+            FfiConverterString.allocationSize(value.os) + 
+            FfiConverterString.allocationSize(value.platform) + 
+            FfiConverterString.allocationSize(value.arch) + 
+            FfiConverterString.allocationSize(value.createdAt);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+/**
+ * UI-facing document row. Drops `yjs_state` / `state_vector` / `file_hash` /
+ * `lamport_clock` — those are storage internals, never read by RN.
+ * `workspace_id` is implicit via the owning `UniffiWorkspaceCore` handle.
+ */
+export type UniffiDocument = {
+    id: string,
+    folderId?: string,
+    title: string,
+    relPath: string,
+    createdBy: string,
+    createdAt: UniffiTimestamp,
+    updatedAt: UniffiTimestamp
+}
+
+/**
+ * Generated factory for {@link UniffiDocument} record objects.
+ */
+export const UniffiDocument = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiDocument, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiDocument>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiDocument = (() => {
+    type TypeName = UniffiDocument;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                id: FfiConverterString.read(from), 
+                folderId: FfiConverterOptionalString.read(from), 
+                title: FfiConverterString.read(from), 
+                relPath: FfiConverterString.read(from), 
+                createdBy: FfiConverterString.read(from), 
+                createdAt: FfiConverterTimestamp.read(from), 
+                updatedAt: FfiConverterTimestamp.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.id, into);
+            FfiConverterOptionalString.write(value.folderId, into);
+            FfiConverterString.write(value.title, into);
+            FfiConverterString.write(value.relPath, into);
+            FfiConverterString.write(value.createdBy, into);
+            FfiConverterTimestamp.write(value.createdAt, into);
+            FfiConverterTimestamp.write(value.updatedAt, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.id) + 
+            FfiConverterOptionalString.allocationSize(value.folderId) + 
+            FfiConverterString.allocationSize(value.title) + 
+            FfiConverterString.allocationSize(value.relPath) + 
+            FfiConverterString.allocationSize(value.createdBy) + 
+            FfiConverterTimestamp.allocationSize(value.createdAt) + 
+            FfiConverterTimestamp.allocationSize(value.updatedAt);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+/**
+ * Recursive file-tree node mirroring [`FileTreeNode`]. `children` is `None`
+ * for files, `Some(vec)` for directories.
+ */
+export type UniffiFileTreeNode = {
+    id: string,
+    name: string,
+    children?: Array<UniffiFileTreeNode>
+}
+
+/**
+ * Generated factory for {@link UniffiFileTreeNode} record objects.
+ */
+export const UniffiFileTreeNode = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiFileTreeNode, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiFileTreeNode>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiFileTreeNode = (() => {
+    type TypeName = UniffiFileTreeNode;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                id: FfiConverterString.read(from), 
+                name: FfiConverterString.read(from), 
+                children: FfiConverterOptionalArrayTypeUniffiFileTreeNode.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.id, into);
+            FfiConverterString.write(value.name, into);
+            FfiConverterOptionalArrayTypeUniffiFileTreeNode.write(value.children, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.id) + 
+            FfiConverterString.allocationSize(value.name) + 
+            FfiConverterOptionalArrayTypeUniffiFileTreeNode.allocationSize(value.children);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+export type UniffiFolder = {
+    id: string,
+    parentFolderId?: string,
+    name: string,
+    relPath: string,
+    createdBy: string,
+    createdAt: UniffiTimestamp,
+    updatedAt: UniffiTimestamp
+}
+
+/**
+ * Generated factory for {@link UniffiFolder} record objects.
+ */
+export const UniffiFolder = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiFolder, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiFolder>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiFolder = (() => {
+    type TypeName = UniffiFolder;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                id: FfiConverterString.read(from), 
+                parentFolderId: FfiConverterOptionalString.read(from), 
+                name: FfiConverterString.read(from), 
+                relPath: FfiConverterString.read(from), 
+                createdBy: FfiConverterString.read(from), 
+                createdAt: FfiConverterTimestamp.read(from), 
+                updatedAt: FfiConverterTimestamp.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.id, into);
+            FfiConverterOptionalString.write(value.parentFolderId, into);
+            FfiConverterString.write(value.name, into);
+            FfiConverterString.write(value.relPath, into);
+            FfiConverterString.write(value.createdBy, into);
+            FfiConverterTimestamp.write(value.createdAt, into);
+            FfiConverterTimestamp.write(value.updatedAt, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.id) + 
+            FfiConverterOptionalString.allocationSize(value.parentFolderId) + 
+            FfiConverterString.allocationSize(value.name) + 
+            FfiConverterString.allocationSize(value.relPath) + 
+            FfiConverterString.allocationSize(value.createdBy) + 
+            FfiConverterTimestamp.allocationSize(value.createdAt) + 
+            FfiConverterTimestamp.allocationSize(value.updatedAt);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+export type UniffiOpenDocResult = {
+    docUuid: string,
+    /**
+     * Full Y.Doc state encoded as a v1 update. RN forwards this to the
+     * WebView-hosted CodeMirror via Comlink to seed the editor.
+     */
+    yjsState: ArrayBuffer
+}
+
+/**
+ * Generated factory for {@link UniffiOpenDocResult} record objects.
+ */
+export const UniffiOpenDocResult = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiOpenDocResult, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiOpenDocResult>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiOpenDocResult = (() => {
+    type TypeName = UniffiOpenDocResult;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                docUuid: FfiConverterString.read(from), 
+                yjsState: FfiConverterArrayBuffer.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.docUuid, into);
+            FfiConverterArrayBuffer.write(value.yjsState, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.docUuid) + 
+            FfiConverterArrayBuffer.allocationSize(value.yjsState);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+export type UniffiOsInfo = {
+    name?: string,
+    hostname: string,
+    os: string,
+    platform: string,
+    arch: string
+}
+
+/**
+ * Generated factory for {@link UniffiOsInfo} record objects.
+ */
+export const UniffiOsInfo = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiOsInfo, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiOsInfo>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiOsInfo = (() => {
+    type TypeName = UniffiOsInfo;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                name: FfiConverterOptionalString.read(from), 
+                hostname: FfiConverterString.read(from), 
+                os: FfiConverterString.read(from), 
+                platform: FfiConverterString.read(from), 
+                arch: FfiConverterString.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterOptionalString.write(value.name, into);
+            FfiConverterString.write(value.hostname, into);
+            FfiConverterString.write(value.os, into);
+            FfiConverterString.write(value.platform, into);
+            FfiConverterString.write(value.arch, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterOptionalString.allocationSize(value.name) + 
+            FfiConverterString.allocationSize(value.hostname) + 
+            FfiConverterString.allocationSize(value.os) + 
+            FfiConverterString.allocationSize(value.platform) + 
+            FfiConverterString.allocationSize(value.arch);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+export type UniffiPairedDeviceInfo = {
+    peerId: string,
+    name?: string,
+    hostname: string,
+    os: string,
+    platform: string,
+    arch: string,
+    pairedAt: UniffiTimestamp,
+    lastSeen?: UniffiTimestamp,
+    isOnline?: boolean,
+    rttMs?: /*u64*/bigint
+}
+
+/**
+ * Generated factory for {@link UniffiPairedDeviceInfo} record objects.
+ */
+export const UniffiPairedDeviceInfo = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiPairedDeviceInfo, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiPairedDeviceInfo>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiPairedDeviceInfo = (() => {
+    type TypeName = UniffiPairedDeviceInfo;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                peerId: FfiConverterString.read(from), 
+                name: FfiConverterOptionalString.read(from), 
+                hostname: FfiConverterString.read(from), 
+                os: FfiConverterString.read(from), 
+                platform: FfiConverterString.read(from), 
+                arch: FfiConverterString.read(from), 
+                pairedAt: FfiConverterTimestamp.read(from), 
+                lastSeen: FfiConverterOptionalTimestamp.read(from), 
+                isOnline: FfiConverterOptionalBool.read(from), 
+                rttMs: FfiConverterOptionalUInt64.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.peerId, into);
+            FfiConverterOptionalString.write(value.name, into);
+            FfiConverterString.write(value.hostname, into);
+            FfiConverterString.write(value.os, into);
+            FfiConverterString.write(value.platform, into);
+            FfiConverterString.write(value.arch, into);
+            FfiConverterTimestamp.write(value.pairedAt, into);
+            FfiConverterOptionalTimestamp.write(value.lastSeen, into);
+            FfiConverterOptionalBool.write(value.isOnline, into);
+            FfiConverterOptionalUInt64.write(value.rttMs, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.peerId) + 
+            FfiConverterOptionalString.allocationSize(value.name) + 
+            FfiConverterString.allocationSize(value.hostname) + 
+            FfiConverterString.allocationSize(value.os) + 
+            FfiConverterString.allocationSize(value.platform) + 
+            FfiConverterString.allocationSize(value.arch) + 
+            FfiConverterTimestamp.allocationSize(value.pairedAt) + 
+            FfiConverterOptionalTimestamp.allocationSize(value.lastSeen) + 
+            FfiConverterOptionalBool.allocationSize(value.isOnline) + 
+            FfiConverterOptionalUInt64.allocationSize(value.rttMs);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+export type UniffiPairingCodeInfo = {
+    /**
+     * 6-digit code the remote side types in.
+     */
+    code: string,
+    createdAt: UniffiTimestamp,
+    expiresAt: UniffiTimestamp
+}
+
+/**
+ * Generated factory for {@link UniffiPairingCodeInfo} record objects.
+ */
+export const UniffiPairingCodeInfo = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiPairingCodeInfo, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiPairingCodeInfo>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiPairingCodeInfo = (() => {
+    type TypeName = UniffiPairingCodeInfo;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                code: FfiConverterString.read(from), 
+                createdAt: FfiConverterTimestamp.read(from), 
+                expiresAt: FfiConverterTimestamp.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.code, into);
+            FfiConverterTimestamp.write(value.createdAt, into);
+            FfiConverterTimestamp.write(value.expiresAt, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.code) + 
+            FfiConverterTimestamp.allocationSize(value.createdAt) + 
+            FfiConverterTimestamp.allocationSize(value.expiresAt);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+export type UniffiWorkspaceInfo = {
+    id: string,
+    name: string,
+    path: string,
+    createdBy: string,
+    createdAt: UniffiTimestamp,
+    updatedAt: UniffiTimestamp
+}
+
+/**
+ * Generated factory for {@link UniffiWorkspaceInfo} record objects.
+ */
+export const UniffiWorkspaceInfo = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiWorkspaceInfo, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiWorkspaceInfo>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiWorkspaceInfo = (() => {
+    type TypeName = UniffiWorkspaceInfo;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                id: FfiConverterString.read(from), 
+                name: FfiConverterString.read(from), 
+                path: FfiConverterString.read(from), 
+                createdBy: FfiConverterString.read(from), 
+                createdAt: FfiConverterTimestamp.read(from), 
+                updatedAt: FfiConverterTimestamp.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.id, into);
+            FfiConverterString.write(value.name, into);
+            FfiConverterString.write(value.path, into);
+            FfiConverterString.write(value.createdBy, into);
+            FfiConverterTimestamp.write(value.createdAt, into);
+            FfiConverterTimestamp.write(value.updatedAt, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.id) + 
+            FfiConverterString.allocationSize(value.name) + 
+            FfiConverterString.allocationSize(value.path) + 
+            FfiConverterString.allocationSize(value.createdBy) + 
+            FfiConverterTimestamp.allocationSize(value.createdAt) + 
+            FfiConverterTimestamp.allocationSize(value.updatedAt);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
+/**
+ * Insert or update a document row. On create, `id` is `None` (server assigns
+ * a v7 UUID) and the returned [`UniffiDocument`] carries the generated id.
+ * On update, `id` is the existing document's UUID.
+ */
+export type UpsertDocInput = {
+    id?: string,
+    folderId?: string,
+    title: string,
+    relPath: string,
+    /**
+     * Optional content hash (blake3 hex) — populated by the core's own
+     * writeback path; RN typically leaves this `None` on user-initiated
+     * creates.
+     */
+    fileHash?: string
+}
+
+/**
+ * Generated factory for {@link UpsertDocInput} record objects.
+ */
+export const UpsertDocInput = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UpsertDocInput, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UpsertDocInput>,
+
+    });
+})();
+
+const FfiConverterTypeUpsertDocInput = (() => {
+    type TypeName = UpsertDocInput;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                id: FfiConverterOptionalString.read(from), 
+                folderId: FfiConverterOptionalString.read(from), 
+                title: FfiConverterString.read(from), 
+                relPath: FfiConverterString.read(from), 
+                fileHash: FfiConverterOptionalString.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterOptionalString.write(value.id, into);
+            FfiConverterOptionalString.write(value.folderId, into);
+            FfiConverterString.write(value.title, into);
+            FfiConverterString.write(value.relPath, into);
+            FfiConverterOptionalString.write(value.fileHash, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterOptionalString.allocationSize(value.id) + 
+            FfiConverterOptionalString.allocationSize(value.folderId) + 
+            FfiConverterString.allocationSize(value.title) + 
+            FfiConverterString.allocationSize(value.relPath) + 
+            FfiConverterOptionalString.allocationSize(value.fileHash);
+            
+        }
+    };
+    return new FFIConverter();
+})();
 
 
 const stringConverter = {
@@ -72,6 +1011,5239 @@ const stringConverter = {
         uniffiCaller.rustCall((status) => nativeModule().ubrn_uniffi_internal_fn_func_ffi__string_to_byte_length(s, status)),
 };
 const FfiConverterString = uniffiCreateFfiConverterString(stringConverter);
+
+
+
+
+
+
+
+
+// Error type: FfiError
+
+// Enum: FfiError
+export enum FfiError_Tags {
+    Database = "Database",
+    Io = "Io",
+    KeypairDecode = "KeypairDecode",
+    KeypairEncode = "KeypairEncode",
+    KeychainUnavailable = "KeychainUnavailable",
+    ConfigParse = "ConfigParse",
+    YjsDecode = "YjsDecode",
+    YjsApply = "YjsApply",
+    DocRowMissing = "DocRowMissing",
+    DocNotOpen = "DocNotOpen",
+    NetworkNotRunning = "NetworkNotRunning",
+    NetworkAlreadyRunning = "NetworkAlreadyRunning",
+    SwarmIo = "SwarmIo",
+    PairingCodeExpired = "PairingCodeExpired",
+    PairingCodeInvalid = "PairingCodeInvalid",
+    PairingPendingNotFound = "PairingPendingNotFound",
+    PairingOther = "PairingOther",
+    NoWorkspaceDb = "NoWorkspaceDb",
+    NoAppDataDir = "NoAppDataDir",
+    FolderNotEmpty = "FolderNotEmpty",
+    InvalidPath = "InvalidPath",
+    PathTraversal = "PathTraversal",
+    NameConflict = "NameConflict",
+    NoWorkspaceOpen = "NoWorkspaceOpen",
+    WorkspaceCloseFailed = "WorkspaceCloseFailed",
+    Window = "Window",
+    InvalidInput = "InvalidInput"
+}
+/**
+ * Wrap-layer error type exposed to RN. Every `Result<T, FfiError>` on a
+ * `#[uniffi::export]` fn becomes `Promise<T>` on the TS side; rejections
+ * are typed instances that RN matches via `FfiError.<Variant>.instanceOf(e)`.
+ */
+export const FfiError = (() => {
+    
+
+    type Database__interface = {
+        tag: FfiError_Tags.Database;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class Database_ extends UniffiError implements Database__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.Database;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "Database");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): Database_ {
+            return new Database_(v0);
+        }
+
+        static instanceOf(obj: any): obj is Database_ {
+            return obj.tag === FfiError_Tags.Database;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is Database_ {
+            return Database_.instanceOf(obj);
+        }
+
+        static getInner(obj: Database_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type Io__interface = {
+        tag: FfiError_Tags.Io;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class Io_ extends UniffiError implements Io__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.Io;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "Io");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): Io_ {
+            return new Io_(v0);
+        }
+
+        static instanceOf(obj: any): obj is Io_ {
+            return obj.tag === FfiError_Tags.Io;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is Io_ {
+            return Io_.instanceOf(obj);
+        }
+
+        static getInner(obj: Io_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type KeypairDecode__interface = {
+        tag: FfiError_Tags.KeypairDecode;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class KeypairDecode_ extends UniffiError implements KeypairDecode__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.KeypairDecode;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "KeypairDecode");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): KeypairDecode_ {
+            return new KeypairDecode_(v0);
+        }
+
+        static instanceOf(obj: any): obj is KeypairDecode_ {
+            return obj.tag === FfiError_Tags.KeypairDecode;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is KeypairDecode_ {
+            return KeypairDecode_.instanceOf(obj);
+        }
+
+        static getInner(obj: KeypairDecode_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type KeypairEncode__interface = {
+        tag: FfiError_Tags.KeypairEncode;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class KeypairEncode_ extends UniffiError implements KeypairEncode__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.KeypairEncode;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "KeypairEncode");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): KeypairEncode_ {
+            return new KeypairEncode_(v0);
+        }
+
+        static instanceOf(obj: any): obj is KeypairEncode_ {
+            return obj.tag === FfiError_Tags.KeypairEncode;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is KeypairEncode_ {
+            return KeypairEncode_.instanceOf(obj);
+        }
+
+        static getInner(obj: KeypairEncode_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type KeychainUnavailable__interface = {
+        tag: FfiError_Tags.KeychainUnavailable;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class KeychainUnavailable_ extends UniffiError implements KeychainUnavailable__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.KeychainUnavailable;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "KeychainUnavailable");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): KeychainUnavailable_ {
+            return new KeychainUnavailable_(v0);
+        }
+
+        static instanceOf(obj: any): obj is KeychainUnavailable_ {
+            return obj.tag === FfiError_Tags.KeychainUnavailable;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is KeychainUnavailable_ {
+            return KeychainUnavailable_.instanceOf(obj);
+        }
+
+        static getInner(obj: KeychainUnavailable_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type ConfigParse__interface = {
+        tag: FfiError_Tags.ConfigParse;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class ConfigParse_ extends UniffiError implements ConfigParse__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.ConfigParse;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "ConfigParse");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): ConfigParse_ {
+            return new ConfigParse_(v0);
+        }
+
+        static instanceOf(obj: any): obj is ConfigParse_ {
+            return obj.tag === FfiError_Tags.ConfigParse;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is ConfigParse_ {
+            return ConfigParse_.instanceOf(obj);
+        }
+
+        static getInner(obj: ConfigParse_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type YjsDecode__interface = {
+        tag: FfiError_Tags.YjsDecode;
+        inner: Readonly<{context: string; reason: string}>
+    };
+
+    
+    class YjsDecode_ extends UniffiError implements YjsDecode__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.YjsDecode;
+        readonly inner: Readonly<{context: string; reason: string}>;
+        constructor(inner: { context: string, reason: string }) {
+            super("FfiError", "YjsDecode");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { context: string, reason: string }): YjsDecode_ {
+            return new YjsDecode_(inner);
+        }
+
+        static instanceOf(obj: any): obj is YjsDecode_ {
+            return obj.tag === FfiError_Tags.YjsDecode;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is YjsDecode_ {
+            return YjsDecode_.instanceOf(obj);
+        }
+
+        static getInner(obj: YjsDecode_): Readonly<{context: string; reason: string}> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type YjsApply__interface = {
+        tag: FfiError_Tags.YjsApply;
+        inner: Readonly<{context: string; reason: string}>
+    };
+
+    
+    class YjsApply_ extends UniffiError implements YjsApply__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.YjsApply;
+        readonly inner: Readonly<{context: string; reason: string}>;
+        constructor(inner: { context: string, reason: string }) {
+            super("FfiError", "YjsApply");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { context: string, reason: string }): YjsApply_ {
+            return new YjsApply_(inner);
+        }
+
+        static instanceOf(obj: any): obj is YjsApply_ {
+            return obj.tag === FfiError_Tags.YjsApply;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is YjsApply_ {
+            return YjsApply_.instanceOf(obj);
+        }
+
+        static getInner(obj: YjsApply_): Readonly<{context: string; reason: string}> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type DocRowMissing__interface = {
+        tag: FfiError_Tags.DocRowMissing;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class DocRowMissing_ extends UniffiError implements DocRowMissing__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.DocRowMissing;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "DocRowMissing");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): DocRowMissing_ {
+            return new DocRowMissing_(v0);
+        }
+
+        static instanceOf(obj: any): obj is DocRowMissing_ {
+            return obj.tag === FfiError_Tags.DocRowMissing;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is DocRowMissing_ {
+            return DocRowMissing_.instanceOf(obj);
+        }
+
+        static getInner(obj: DocRowMissing_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type DocNotOpen__interface = {
+        tag: FfiError_Tags.DocNotOpen;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class DocNotOpen_ extends UniffiError implements DocNotOpen__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.DocNotOpen;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "DocNotOpen");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): DocNotOpen_ {
+            return new DocNotOpen_(v0);
+        }
+
+        static instanceOf(obj: any): obj is DocNotOpen_ {
+            return obj.tag === FfiError_Tags.DocNotOpen;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is DocNotOpen_ {
+            return DocNotOpen_.instanceOf(obj);
+        }
+
+        static getInner(obj: DocNotOpen_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type NetworkNotRunning__interface = {
+        tag: FfiError_Tags.NetworkNotRunning
+    };
+
+    
+    class NetworkNotRunning_ extends UniffiError implements NetworkNotRunning__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.NetworkNotRunning;
+        constructor() {
+            super("FfiError", "NetworkNotRunning");
+        }
+
+        static new(): NetworkNotRunning_ {
+            return new NetworkNotRunning_();
+        }
+
+        static instanceOf(obj: any): obj is NetworkNotRunning_ {
+            return obj.tag === FfiError_Tags.NetworkNotRunning;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is NetworkNotRunning_ {
+            return false;
+        }
+
+    }
+    
+
+    type NetworkAlreadyRunning__interface = {
+        tag: FfiError_Tags.NetworkAlreadyRunning
+    };
+
+    
+    class NetworkAlreadyRunning_ extends UniffiError implements NetworkAlreadyRunning__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.NetworkAlreadyRunning;
+        constructor() {
+            super("FfiError", "NetworkAlreadyRunning");
+        }
+
+        static new(): NetworkAlreadyRunning_ {
+            return new NetworkAlreadyRunning_();
+        }
+
+        static instanceOf(obj: any): obj is NetworkAlreadyRunning_ {
+            return obj.tag === FfiError_Tags.NetworkAlreadyRunning;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is NetworkAlreadyRunning_ {
+            return false;
+        }
+
+    }
+    
+
+    type SwarmIo__interface = {
+        tag: FfiError_Tags.SwarmIo;
+        inner: Readonly<{context: string; reason: string}>
+    };
+
+    
+    class SwarmIo_ extends UniffiError implements SwarmIo__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.SwarmIo;
+        readonly inner: Readonly<{context: string; reason: string}>;
+        constructor(inner: { context: string, reason: string }) {
+            super("FfiError", "SwarmIo");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { context: string, reason: string }): SwarmIo_ {
+            return new SwarmIo_(inner);
+        }
+
+        static instanceOf(obj: any): obj is SwarmIo_ {
+            return obj.tag === FfiError_Tags.SwarmIo;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is SwarmIo_ {
+            return SwarmIo_.instanceOf(obj);
+        }
+
+        static getInner(obj: SwarmIo_): Readonly<{context: string; reason: string}> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type PairingCodeExpired__interface = {
+        tag: FfiError_Tags.PairingCodeExpired
+    };
+
+    
+    class PairingCodeExpired_ extends UniffiError implements PairingCodeExpired__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.PairingCodeExpired;
+        constructor() {
+            super("FfiError", "PairingCodeExpired");
+        }
+
+        static new(): PairingCodeExpired_ {
+            return new PairingCodeExpired_();
+        }
+
+        static instanceOf(obj: any): obj is PairingCodeExpired_ {
+            return obj.tag === FfiError_Tags.PairingCodeExpired;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is PairingCodeExpired_ {
+            return false;
+        }
+
+    }
+    
+
+    type PairingCodeInvalid__interface = {
+        tag: FfiError_Tags.PairingCodeInvalid
+    };
+
+    
+    class PairingCodeInvalid_ extends UniffiError implements PairingCodeInvalid__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.PairingCodeInvalid;
+        constructor() {
+            super("FfiError", "PairingCodeInvalid");
+        }
+
+        static new(): PairingCodeInvalid_ {
+            return new PairingCodeInvalid_();
+        }
+
+        static instanceOf(obj: any): obj is PairingCodeInvalid_ {
+            return obj.tag === FfiError_Tags.PairingCodeInvalid;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is PairingCodeInvalid_ {
+            return false;
+        }
+
+    }
+    
+
+    type PairingPendingNotFound__interface = {
+        tag: FfiError_Tags.PairingPendingNotFound;
+        inner: Readonly<
+[/*u64*/bigint
+]>
+    };
+
+    
+    class PairingPendingNotFound_ extends UniffiError implements PairingPendingNotFound__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.PairingPendingNotFound;
+        readonly inner: Readonly<
+[/*u64*/bigint
+]>;
+        constructor(v0: /*u64*/bigint) {
+            super("FfiError", "PairingPendingNotFound");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: /*u64*/bigint): PairingPendingNotFound_ {
+            return new PairingPendingNotFound_(v0);
+        }
+
+        static instanceOf(obj: any): obj is PairingPendingNotFound_ {
+            return obj.tag === FfiError_Tags.PairingPendingNotFound;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is PairingPendingNotFound_ {
+            return PairingPendingNotFound_.instanceOf(obj);
+        }
+
+        static getInner(obj: PairingPendingNotFound_): Readonly<
+[/*u64*/bigint
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type PairingOther__interface = {
+        tag: FfiError_Tags.PairingOther;
+        inner: Readonly<{context: string; reason: string}>
+    };
+
+    
+    class PairingOther_ extends UniffiError implements PairingOther__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.PairingOther;
+        readonly inner: Readonly<{context: string; reason: string}>;
+        constructor(inner: { context: string, reason: string }) {
+            super("FfiError", "PairingOther");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { context: string, reason: string }): PairingOther_ {
+            return new PairingOther_(inner);
+        }
+
+        static instanceOf(obj: any): obj is PairingOther_ {
+            return obj.tag === FfiError_Tags.PairingOther;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is PairingOther_ {
+            return PairingOther_.instanceOf(obj);
+        }
+
+        static getInner(obj: PairingOther_): Readonly<{context: string; reason: string}> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type NoWorkspaceDb__interface = {
+        tag: FfiError_Tags.NoWorkspaceDb
+    };
+
+    
+    class NoWorkspaceDb_ extends UniffiError implements NoWorkspaceDb__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.NoWorkspaceDb;
+        constructor() {
+            super("FfiError", "NoWorkspaceDb");
+        }
+
+        static new(): NoWorkspaceDb_ {
+            return new NoWorkspaceDb_();
+        }
+
+        static instanceOf(obj: any): obj is NoWorkspaceDb_ {
+            return obj.tag === FfiError_Tags.NoWorkspaceDb;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is NoWorkspaceDb_ {
+            return false;
+        }
+
+    }
+    
+
+    type NoAppDataDir__interface = {
+        tag: FfiError_Tags.NoAppDataDir
+    };
+
+    
+    class NoAppDataDir_ extends UniffiError implements NoAppDataDir__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.NoAppDataDir;
+        constructor() {
+            super("FfiError", "NoAppDataDir");
+        }
+
+        static new(): NoAppDataDir_ {
+            return new NoAppDataDir_();
+        }
+
+        static instanceOf(obj: any): obj is NoAppDataDir_ {
+            return obj.tag === FfiError_Tags.NoAppDataDir;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is NoAppDataDir_ {
+            return false;
+        }
+
+    }
+    
+
+    type FolderNotEmpty__interface = {
+        tag: FfiError_Tags.FolderNotEmpty;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class FolderNotEmpty_ extends UniffiError implements FolderNotEmpty__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.FolderNotEmpty;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "FolderNotEmpty");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): FolderNotEmpty_ {
+            return new FolderNotEmpty_(v0);
+        }
+
+        static instanceOf(obj: any): obj is FolderNotEmpty_ {
+            return obj.tag === FfiError_Tags.FolderNotEmpty;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is FolderNotEmpty_ {
+            return FolderNotEmpty_.instanceOf(obj);
+        }
+
+        static getInner(obj: FolderNotEmpty_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type InvalidPath__interface = {
+        tag: FfiError_Tags.InvalidPath;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class InvalidPath_ extends UniffiError implements InvalidPath__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.InvalidPath;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "InvalidPath");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): InvalidPath_ {
+            return new InvalidPath_(v0);
+        }
+
+        static instanceOf(obj: any): obj is InvalidPath_ {
+            return obj.tag === FfiError_Tags.InvalidPath;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is InvalidPath_ {
+            return InvalidPath_.instanceOf(obj);
+        }
+
+        static getInner(obj: InvalidPath_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type PathTraversal__interface = {
+        tag: FfiError_Tags.PathTraversal;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class PathTraversal_ extends UniffiError implements PathTraversal__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.PathTraversal;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "PathTraversal");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): PathTraversal_ {
+            return new PathTraversal_(v0);
+        }
+
+        static instanceOf(obj: any): obj is PathTraversal_ {
+            return obj.tag === FfiError_Tags.PathTraversal;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is PathTraversal_ {
+            return PathTraversal_.instanceOf(obj);
+        }
+
+        static getInner(obj: PathTraversal_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type NameConflict__interface = {
+        tag: FfiError_Tags.NameConflict;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class NameConflict_ extends UniffiError implements NameConflict__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.NameConflict;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "NameConflict");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): NameConflict_ {
+            return new NameConflict_(v0);
+        }
+
+        static instanceOf(obj: any): obj is NameConflict_ {
+            return obj.tag === FfiError_Tags.NameConflict;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is NameConflict_ {
+            return NameConflict_.instanceOf(obj);
+        }
+
+        static getInner(obj: NameConflict_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type NoWorkspaceOpen__interface = {
+        tag: FfiError_Tags.NoWorkspaceOpen
+    };
+
+    
+    class NoWorkspaceOpen_ extends UniffiError implements NoWorkspaceOpen__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.NoWorkspaceOpen;
+        constructor() {
+            super("FfiError", "NoWorkspaceOpen");
+        }
+
+        static new(): NoWorkspaceOpen_ {
+            return new NoWorkspaceOpen_();
+        }
+
+        static instanceOf(obj: any): obj is NoWorkspaceOpen_ {
+            return obj.tag === FfiError_Tags.NoWorkspaceOpen;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is NoWorkspaceOpen_ {
+            return false;
+        }
+
+    }
+    
+
+    type WorkspaceCloseFailed__interface = {
+        tag: FfiError_Tags.WorkspaceCloseFailed;
+        inner: Readonly<{workspaceId: string; failureCount: /*u32*/number; failures: Array<DocFlushFailure>}>
+    };
+
+    
+    class WorkspaceCloseFailed_ extends UniffiError implements WorkspaceCloseFailed__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.WorkspaceCloseFailed;
+        readonly inner: Readonly<{workspaceId: string; failureCount: /*u32*/number; failures: Array<DocFlushFailure>}>;
+        constructor(inner: { workspaceId: string, failureCount: /*u32*/number, failures: Array<DocFlushFailure> }) {
+            super("FfiError", "WorkspaceCloseFailed");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { workspaceId: string, failureCount: /*u32*/number, failures: Array<DocFlushFailure> }): WorkspaceCloseFailed_ {
+            return new WorkspaceCloseFailed_(inner);
+        }
+
+        static instanceOf(obj: any): obj is WorkspaceCloseFailed_ {
+            return obj.tag === FfiError_Tags.WorkspaceCloseFailed;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is WorkspaceCloseFailed_ {
+            return WorkspaceCloseFailed_.instanceOf(obj);
+        }
+
+        static getInner(obj: WorkspaceCloseFailed_): Readonly<{workspaceId: string; failureCount: /*u32*/number; failures: Array<DocFlushFailure>}> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type Window__interface = {
+        tag: FfiError_Tags.Window;
+        inner: Readonly<
+[string
+]>
+    };
+
+    
+    class Window_ extends UniffiError implements Window__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.Window;
+        readonly inner: Readonly<
+[string
+]>;
+        constructor(v0: string) {
+            super("FfiError", "Window");
+            this.inner = Object.freeze([v0]);
+        }
+
+        static new(v0: string): Window_ {
+            return new Window_(v0);
+        }
+
+        static instanceOf(obj: any): obj is Window_ {
+            return obj.tag === FfiError_Tags.Window;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is Window_ {
+            return Window_.instanceOf(obj);
+        }
+
+        static getInner(obj: Window_): Readonly<
+[string
+]> {
+            return obj.inner;
+        }
+
+    }
+    
+
+    type InvalidInput__interface = {
+        tag: FfiError_Tags.InvalidInput;
+        inner: Readonly<{field: string; reason: string}>
+    };
+
+    
+    /**
+     * Input from the RN host could not be parsed into the shape `swarmnote-core`
+     * expects (e.g. malformed UUID string). Indicates a caller bug, not a
+     * runtime failure in the core.
+     */
+    class InvalidInput_ extends UniffiError implements InvalidInput__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "FfiError";
+        readonly tag = FfiError_Tags.InvalidInput;
+        readonly inner: Readonly<{field: string; reason: string}>;
+        constructor(inner: { field: string, reason: string }) {
+            super("FfiError", "InvalidInput");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { field: string, reason: string }): InvalidInput_ {
+            return new InvalidInput_(inner);
+        }
+
+        static instanceOf(obj: any): obj is InvalidInput_ {
+            return obj.tag === FfiError_Tags.InvalidInput;
+        }
+        
+
+        
+        static hasInner(obj: any): obj is InvalidInput_ {
+            return InvalidInput_.instanceOf(obj);
+        }
+
+        static getInner(obj: InvalidInput_): Readonly<{field: string; reason: string}> {
+            return obj.inner;
+        }
+
+    }
+
+    function instanceOf(obj: any): obj is FfiError {
+        return obj[uniffiTypeNameSymbol] === "FfiError";
+    }
+
+    return Object.freeze({
+        instanceOf,
+  Database: Database_, 
+  Io: Io_, 
+  KeypairDecode: KeypairDecode_, 
+  KeypairEncode: KeypairEncode_, 
+  KeychainUnavailable: KeychainUnavailable_, 
+  ConfigParse: ConfigParse_, 
+  YjsDecode: YjsDecode_, 
+  YjsApply: YjsApply_, 
+  DocRowMissing: DocRowMissing_, 
+  DocNotOpen: DocNotOpen_, 
+  NetworkNotRunning: NetworkNotRunning_, 
+  NetworkAlreadyRunning: NetworkAlreadyRunning_, 
+  SwarmIo: SwarmIo_, 
+  PairingCodeExpired: PairingCodeExpired_, 
+  PairingCodeInvalid: PairingCodeInvalid_, 
+  PairingPendingNotFound: PairingPendingNotFound_, 
+  PairingOther: PairingOther_, 
+  NoWorkspaceDb: NoWorkspaceDb_, 
+  NoAppDataDir: NoAppDataDir_, 
+  FolderNotEmpty: FolderNotEmpty_, 
+  InvalidPath: InvalidPath_, 
+  PathTraversal: PathTraversal_, 
+  NameConflict: NameConflict_, 
+  NoWorkspaceOpen: NoWorkspaceOpen_, 
+  WorkspaceCloseFailed: WorkspaceCloseFailed_, 
+  Window: Window_, 
+  InvalidInput: InvalidInput_
+    });
+
+})();
+
+
+/**
+ * Wrap-layer error type exposed to RN. Every `Result<T, FfiError>` on a
+ * `#[uniffi::export]` fn becomes `Promise<T>` on the TS side; rejections
+ * are typed instances that RN matches via `FfiError.<Variant>.instanceOf(e)`.
+ */
+
+export type FfiError = InstanceType<
+    typeof FfiError[keyof Omit<typeof FfiError, 'instanceOf'>]
+>;
+
+// FfiConverter for enum FfiError
+const FfiConverterTypeFfiError = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = FfiError;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return new FfiError.Database(FfiConverterString.read(from));
+                case 2: return new FfiError.Io(FfiConverterString.read(from));
+                case 3: return new FfiError.KeypairDecode(FfiConverterString.read(from));
+                case 4: return new FfiError.KeypairEncode(FfiConverterString.read(from));
+                case 5: return new FfiError.KeychainUnavailable(FfiConverterString.read(from));
+                case 6: return new FfiError.ConfigParse(FfiConverterString.read(from));
+                case 7: return new FfiError.YjsDecode({context: FfiConverterString.read(from), reason: FfiConverterString.read(from) });
+                case 8: return new FfiError.YjsApply({context: FfiConverterString.read(from), reason: FfiConverterString.read(from) });
+                case 9: return new FfiError.DocRowMissing(FfiConverterString.read(from));
+                case 10: return new FfiError.DocNotOpen(FfiConverterString.read(from));
+                case 11: return new FfiError.NetworkNotRunning();
+                case 12: return new FfiError.NetworkAlreadyRunning();
+                case 13: return new FfiError.SwarmIo({context: FfiConverterString.read(from), reason: FfiConverterString.read(from) });
+                case 14: return new FfiError.PairingCodeExpired();
+                case 15: return new FfiError.PairingCodeInvalid();
+                case 16: return new FfiError.PairingPendingNotFound(FfiConverterUInt64.read(from));
+                case 17: return new FfiError.PairingOther({context: FfiConverterString.read(from), reason: FfiConverterString.read(from) });
+                case 18: return new FfiError.NoWorkspaceDb();
+                case 19: return new FfiError.NoAppDataDir();
+                case 20: return new FfiError.FolderNotEmpty(FfiConverterString.read(from));
+                case 21: return new FfiError.InvalidPath(FfiConverterString.read(from));
+                case 22: return new FfiError.PathTraversal(FfiConverterString.read(from));
+                case 23: return new FfiError.NameConflict(FfiConverterString.read(from));
+                case 24: return new FfiError.NoWorkspaceOpen();
+                case 25: return new FfiError.WorkspaceCloseFailed({workspaceId: FfiConverterString.read(from), failureCount: FfiConverterUInt32.read(from), failures: FfiConverterArrayTypeDocFlushFailure.read(from) });
+                case 26: return new FfiError.Window(FfiConverterString.read(from));
+                case 27: return new FfiError.InvalidInput({field: FfiConverterString.read(from), reason: FfiConverterString.read(from) });
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value.tag) {
+                case FfiError_Tags.Database: {
+                    ordinalConverter.write(1, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.Io: {
+                    ordinalConverter.write(2, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.KeypairDecode: {
+                    ordinalConverter.write(3, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.KeypairEncode: {
+                    ordinalConverter.write(4, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.KeychainUnavailable: {
+                    ordinalConverter.write(5, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.ConfigParse: {
+                    ordinalConverter.write(6, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.YjsDecode: {
+                    ordinalConverter.write(7, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.context, into);
+                    FfiConverterString.write(inner.reason, into);
+                    return;
+                }
+                case FfiError_Tags.YjsApply: {
+                    ordinalConverter.write(8, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.context, into);
+                    FfiConverterString.write(inner.reason, into);
+                    return;
+                }
+                case FfiError_Tags.DocRowMissing: {
+                    ordinalConverter.write(9, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.DocNotOpen: {
+                    ordinalConverter.write(10, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.NetworkNotRunning: {
+                    ordinalConverter.write(11, into);
+                    return;
+                }
+                case FfiError_Tags.NetworkAlreadyRunning: {
+                    ordinalConverter.write(12, into);
+                    return;
+                }
+                case FfiError_Tags.SwarmIo: {
+                    ordinalConverter.write(13, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.context, into);
+                    FfiConverterString.write(inner.reason, into);
+                    return;
+                }
+                case FfiError_Tags.PairingCodeExpired: {
+                    ordinalConverter.write(14, into);
+                    return;
+                }
+                case FfiError_Tags.PairingCodeInvalid: {
+                    ordinalConverter.write(15, into);
+                    return;
+                }
+                case FfiError_Tags.PairingPendingNotFound: {
+                    ordinalConverter.write(16, into);
+                    const inner = value.inner;
+                    FfiConverterUInt64.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.PairingOther: {
+                    ordinalConverter.write(17, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.context, into);
+                    FfiConverterString.write(inner.reason, into);
+                    return;
+                }
+                case FfiError_Tags.NoWorkspaceDb: {
+                    ordinalConverter.write(18, into);
+                    return;
+                }
+                case FfiError_Tags.NoAppDataDir: {
+                    ordinalConverter.write(19, into);
+                    return;
+                }
+                case FfiError_Tags.FolderNotEmpty: {
+                    ordinalConverter.write(20, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.InvalidPath: {
+                    ordinalConverter.write(21, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.PathTraversal: {
+                    ordinalConverter.write(22, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.NameConflict: {
+                    ordinalConverter.write(23, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.NoWorkspaceOpen: {
+                    ordinalConverter.write(24, into);
+                    return;
+                }
+                case FfiError_Tags.WorkspaceCloseFailed: {
+                    ordinalConverter.write(25, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.workspaceId, into);
+                    FfiConverterUInt32.write(inner.failureCount, into);
+                    FfiConverterArrayTypeDocFlushFailure.write(inner.failures, into);
+                    return;
+                }
+                case FfiError_Tags.Window: {
+                    ordinalConverter.write(26, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner[0], into);
+                    return;
+                }
+                case FfiError_Tags.InvalidInput: {
+                    ordinalConverter.write(27, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.field, into);
+                    FfiConverterString.write(inner.reason, into);
+                    return;
+                }
+                default:
+                    // Throwing from here means that FfiError_Tags hasn't matched an ordinal.
+                    throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        allocationSize(value: TypeName): number {
+            switch (value.tag) {
+                case FfiError_Tags.Database: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(1);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.Io: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(2);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.KeypairDecode: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(3);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.KeypairEncode: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(4);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.KeychainUnavailable: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(5);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.ConfigParse: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(6);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.YjsDecode: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(7);
+                    size += FfiConverterString.allocationSize(inner.context);
+                    size += FfiConverterString.allocationSize(inner.reason);
+                    return size;
+                }
+                case FfiError_Tags.YjsApply: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(8);
+                    size += FfiConverterString.allocationSize(inner.context);
+                    size += FfiConverterString.allocationSize(inner.reason);
+                    return size;
+                }
+                case FfiError_Tags.DocRowMissing: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(9);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.DocNotOpen: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(10);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.NetworkNotRunning: {
+                    return ordinalConverter.allocationSize(11);
+                }
+                case FfiError_Tags.NetworkAlreadyRunning: {
+                    return ordinalConverter.allocationSize(12);
+                }
+                case FfiError_Tags.SwarmIo: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(13);
+                    size += FfiConverterString.allocationSize(inner.context);
+                    size += FfiConverterString.allocationSize(inner.reason);
+                    return size;
+                }
+                case FfiError_Tags.PairingCodeExpired: {
+                    return ordinalConverter.allocationSize(14);
+                }
+                case FfiError_Tags.PairingCodeInvalid: {
+                    return ordinalConverter.allocationSize(15);
+                }
+                case FfiError_Tags.PairingPendingNotFound: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(16);
+                    size += FfiConverterUInt64.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.PairingOther: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(17);
+                    size += FfiConverterString.allocationSize(inner.context);
+                    size += FfiConverterString.allocationSize(inner.reason);
+                    return size;
+                }
+                case FfiError_Tags.NoWorkspaceDb: {
+                    return ordinalConverter.allocationSize(18);
+                }
+                case FfiError_Tags.NoAppDataDir: {
+                    return ordinalConverter.allocationSize(19);
+                }
+                case FfiError_Tags.FolderNotEmpty: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(20);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.InvalidPath: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(21);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.PathTraversal: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(22);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.NameConflict: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(23);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.NoWorkspaceOpen: {
+                    return ordinalConverter.allocationSize(24);
+                }
+                case FfiError_Tags.WorkspaceCloseFailed: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(25);
+                    size += FfiConverterString.allocationSize(inner.workspaceId);
+                    size += FfiConverterUInt32.allocationSize(inner.failureCount);
+                    size += FfiConverterArrayTypeDocFlushFailure.allocationSize(inner.failures);
+                    return size;
+                }
+                case FfiError_Tags.Window: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(26);
+                    size += FfiConverterString.allocationSize(inner[0]);
+                    return size;
+                }
+                case FfiError_Tags.InvalidInput: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(27);
+                    size += FfiConverterString.allocationSize(inner.field);
+                    size += FfiConverterString.allocationSize(inner.reason);
+                    return size;
+                }
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+// Enum: UniffiAppEvent
+export enum UniffiAppEvent_Tags {
+    DocFlushed = "DocFlushed",
+    ExternalUpdate = "ExternalUpdate",
+    ExternalConflict = "ExternalConflict",
+    FileTreeChanged = "FileTreeChanged",
+    DevicesChanged = "DevicesChanged",
+    PairingRequestReceived = "PairingRequestReceived",
+    PairedDeviceAdded = "PairedDeviceAdded",
+    PairedDeviceRemoved = "PairedDeviceRemoved",
+    NetworkStatusChanged = "NetworkStatusChanged",
+    NodeStarted = "NodeStarted",
+    NodeStopped = "NodeStopped",
+    SyncStarted = "SyncStarted",
+    SyncProgress = "SyncProgress",
+    SyncCompleted = "SyncCompleted"
+}
+/**
+ * Every event emitted to RN. RN code typically dispatches on the variant
+ * tag (`externalUpdate`, `nodeStarted`, …) to update stores or trigger
+ * side effects (e.g. forward Y.Doc updates to the WebView editor).
+ */
+export const UniffiAppEvent = (() => {
+    
+
+    type DocFlushed__interface = {
+        tag: UniffiAppEvent_Tags.DocFlushed;
+        inner: Readonly<{docId: string}>
+    };
+
+    
+    /**
+     * A dirty Y.Doc was flushed to disk + DB (post-writeback).
+     */
+    class DocFlushed_ extends UniffiEnum implements DocFlushed__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.DocFlushed;
+        readonly inner: Readonly<{docId: string}>;
+        constructor(inner: { docId: string }) {
+            super("UniffiAppEvent", "DocFlushed");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { docId: string }): DocFlushed_ {
+            return new DocFlushed_(inner);
+        }
+
+        static instanceOf(obj: any): obj is DocFlushed_ {
+            return obj.tag === UniffiAppEvent_Tags.DocFlushed;
+        }
+        
+
+        
+
+    }
+    
+
+    type ExternalUpdate__interface = {
+        tag: UniffiAppEvent_Tags.ExternalUpdate;
+        inner: Readonly<{docId: string; update: ArrayBuffer}>
+    };
+
+    
+    /**
+     * Remote update applied to an open document — the editor should
+     * integrate the update bytes immediately.
+     */
+    class ExternalUpdate_ extends UniffiEnum implements ExternalUpdate__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.ExternalUpdate;
+        readonly inner: Readonly<{docId: string; update: ArrayBuffer}>;
+        constructor(inner: { docId: string, update: ArrayBuffer }) {
+            super("UniffiAppEvent", "ExternalUpdate");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { docId: string, update: ArrayBuffer }): ExternalUpdate_ {
+            return new ExternalUpdate_(inner);
+        }
+
+        static instanceOf(obj: any): obj is ExternalUpdate_ {
+            return obj.tag === UniffiAppEvent_Tags.ExternalUpdate;
+        }
+        
+
+        
+
+    }
+    
+
+    type ExternalConflict__interface = {
+        tag: UniffiAppEvent_Tags.ExternalConflict;
+        inner: Readonly<{docId: string; relPath: string}>
+    };
+
+    
+    /**
+     * External `.md` edit while unsaved edits existed — RN must prompt
+     * user to reload or keep.
+     */
+    class ExternalConflict_ extends UniffiEnum implements ExternalConflict__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.ExternalConflict;
+        readonly inner: Readonly<{docId: string; relPath: string}>;
+        constructor(inner: { docId: string, relPath: string }) {
+            super("UniffiAppEvent", "ExternalConflict");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { docId: string, relPath: string }): ExternalConflict_ {
+            return new ExternalConflict_(inner);
+        }
+
+        static instanceOf(obj: any): obj is ExternalConflict_ {
+            return obj.tag === UniffiAppEvent_Tags.ExternalConflict;
+        }
+        
+
+        
+
+    }
+    
+
+    type FileTreeChanged__interface = {
+        tag: UniffiAppEvent_Tags.FileTreeChanged;
+        inner: Readonly<{workspaceId: string}>
+    };
+
+    
+    /**
+     * Workspace file tree changed externally; re-scan.
+     */
+    class FileTreeChanged_ extends UniffiEnum implements FileTreeChanged__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.FileTreeChanged;
+        readonly inner: Readonly<{workspaceId: string}>;
+        constructor(inner: { workspaceId: string }) {
+            super("UniffiAppEvent", "FileTreeChanged");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { workspaceId: string }): FileTreeChanged_ {
+            return new FileTreeChanged_(inner);
+        }
+
+        static instanceOf(obj: any): obj is FileTreeChanged_ {
+            return obj.tag === UniffiAppEvent_Tags.FileTreeChanged;
+        }
+        
+
+        
+
+    }
+    
+
+    type DevicesChanged__interface = {
+        tag: UniffiAppEvent_Tags.DevicesChanged;
+        inner: Readonly<{devices: Array<UniffiDevice>}>
+    };
+
+    
+    /**
+     * Full device snapshot — RN should atomically replace its list.
+     */
+    class DevicesChanged_ extends UniffiEnum implements DevicesChanged__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.DevicesChanged;
+        readonly inner: Readonly<{devices: Array<UniffiDevice>}>;
+        constructor(inner: { devices: Array<UniffiDevice> }) {
+            super("UniffiAppEvent", "DevicesChanged");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { devices: Array<UniffiDevice> }): DevicesChanged_ {
+            return new DevicesChanged_(inner);
+        }
+
+        static instanceOf(obj: any): obj is DevicesChanged_ {
+            return obj.tag === UniffiAppEvent_Tags.DevicesChanged;
+        }
+        
+
+        
+
+    }
+    
+
+    type PairingRequestReceived__interface = {
+        tag: UniffiAppEvent_Tags.PairingRequestReceived;
+        inner: Readonly<{pendingId: /*u64*/bigint; peerId: string; osInfo: UniffiOsInfo; method: UniffiPairingMethod; expiresAt: UniffiTimestamp}>
+    };
+
+    
+    /**
+     * Inbound pairing request awaiting user confirmation. RN prompts the
+     * user, then calls `respond_pairing_request(pending_id, accept)`.
+     */
+    class PairingRequestReceived_ extends UniffiEnum implements PairingRequestReceived__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.PairingRequestReceived;
+        readonly inner: Readonly<{pendingId: /*u64*/bigint; peerId: string; osInfo: UniffiOsInfo; method: UniffiPairingMethod; expiresAt: UniffiTimestamp}>;
+        constructor(inner: { pendingId: /*u64*/bigint, peerId: string, osInfo: UniffiOsInfo, method: UniffiPairingMethod, expiresAt: UniffiTimestamp }) {
+            super("UniffiAppEvent", "PairingRequestReceived");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { pendingId: /*u64*/bigint, peerId: string, osInfo: UniffiOsInfo, method: UniffiPairingMethod, expiresAt: UniffiTimestamp }): PairingRequestReceived_ {
+            return new PairingRequestReceived_(inner);
+        }
+
+        static instanceOf(obj: any): obj is PairingRequestReceived_ {
+            return obj.tag === UniffiAppEvent_Tags.PairingRequestReceived;
+        }
+        
+
+        
+
+    }
+    
+
+    type PairedDeviceAdded__interface = {
+        tag: UniffiAppEvent_Tags.PairedDeviceAdded;
+        inner: Readonly<{info: UniffiPairedDeviceInfo | undefined}>
+    };
+
+    
+    /**
+     * A device was paired (outbound or inbound). `info` is `None` for the
+     * outbound-success case where the peer's full info arrives later via
+     * Identify.
+     */
+    class PairedDeviceAdded_ extends UniffiEnum implements PairedDeviceAdded__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.PairedDeviceAdded;
+        readonly inner: Readonly<{info: UniffiPairedDeviceInfo | undefined}>;
+        constructor(inner: { info: UniffiPairedDeviceInfo | undefined }) {
+            super("UniffiAppEvent", "PairedDeviceAdded");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { info: UniffiPairedDeviceInfo | undefined }): PairedDeviceAdded_ {
+            return new PairedDeviceAdded_(inner);
+        }
+
+        static instanceOf(obj: any): obj is PairedDeviceAdded_ {
+            return obj.tag === UniffiAppEvent_Tags.PairedDeviceAdded;
+        }
+        
+
+        
+
+    }
+    
+
+    type PairedDeviceRemoved__interface = {
+        tag: UniffiAppEvent_Tags.PairedDeviceRemoved;
+        inner: Readonly<{peerId: string}>
+    };
+
+    
+    class PairedDeviceRemoved_ extends UniffiEnum implements PairedDeviceRemoved__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.PairedDeviceRemoved;
+        readonly inner: Readonly<{peerId: string}>;
+        constructor(inner: { peerId: string }) {
+            super("UniffiAppEvent", "PairedDeviceRemoved");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { peerId: string }): PairedDeviceRemoved_ {
+            return new PairedDeviceRemoved_(inner);
+        }
+
+        static instanceOf(obj: any): obj is PairedDeviceRemoved_ {
+            return obj.tag === UniffiAppEvent_Tags.PairedDeviceRemoved;
+        }
+        
+
+        
+
+    }
+    
+
+    type NetworkStatusChanged__interface = {
+        tag: UniffiAppEvent_Tags.NetworkStatusChanged;
+        inner: Readonly<{natStatus: string; publicAddr: string | undefined}>
+    };
+
+    
+    /**
+     * NAT status changed (public reachable, symmetric-NAT, etc.).
+     */
+    class NetworkStatusChanged_ extends UniffiEnum implements NetworkStatusChanged__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.NetworkStatusChanged;
+        readonly inner: Readonly<{natStatus: string; publicAddr: string | undefined}>;
+        constructor(inner: { natStatus: string, publicAddr: string | undefined }) {
+            super("UniffiAppEvent", "NetworkStatusChanged");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { natStatus: string, publicAddr: string | undefined }): NetworkStatusChanged_ {
+            return new NetworkStatusChanged_(inner);
+        }
+
+        static instanceOf(obj: any): obj is NetworkStatusChanged_ {
+            return obj.tag === UniffiAppEvent_Tags.NetworkStatusChanged;
+        }
+        
+
+        
+
+    }
+    
+
+    type NodeStarted__interface = {
+        tag: UniffiAppEvent_Tags.NodeStarted
+    };
+
+    
+    class NodeStarted_ extends UniffiEnum implements NodeStarted__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.NodeStarted;
+        constructor() {
+            super("UniffiAppEvent", "NodeStarted");
+        }
+
+        static new(): NodeStarted_ {
+            return new NodeStarted_();
+        }
+
+        static instanceOf(obj: any): obj is NodeStarted_ {
+            return obj.tag === UniffiAppEvent_Tags.NodeStarted;
+        }
+        
+
+        
+
+    }
+    
+
+    type NodeStopped__interface = {
+        tag: UniffiAppEvent_Tags.NodeStopped
+    };
+
+    
+    class NodeStopped_ extends UniffiEnum implements NodeStopped__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.NodeStopped;
+        constructor() {
+            super("UniffiAppEvent", "NodeStopped");
+        }
+
+        static new(): NodeStopped_ {
+            return new NodeStopped_();
+        }
+
+        static instanceOf(obj: any): obj is NodeStopped_ {
+            return obj.tag === UniffiAppEvent_Tags.NodeStopped;
+        }
+        
+
+        
+
+    }
+    
+
+    type SyncStarted__interface = {
+        tag: UniffiAppEvent_Tags.SyncStarted;
+        inner: Readonly<{workspaceId: string; peerId: string}>
+    };
+
+    
+    class SyncStarted_ extends UniffiEnum implements SyncStarted__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.SyncStarted;
+        readonly inner: Readonly<{workspaceId: string; peerId: string}>;
+        constructor(inner: { workspaceId: string, peerId: string }) {
+            super("UniffiAppEvent", "SyncStarted");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { workspaceId: string, peerId: string }): SyncStarted_ {
+            return new SyncStarted_(inner);
+        }
+
+        static instanceOf(obj: any): obj is SyncStarted_ {
+            return obj.tag === UniffiAppEvent_Tags.SyncStarted;
+        }
+        
+
+        
+
+    }
+    
+
+    type SyncProgress__interface = {
+        tag: UniffiAppEvent_Tags.SyncProgress;
+        inner: Readonly<{workspaceId: string; peerId: string; completed: /*u32*/number; total: /*u32*/number}>
+    };
+
+    
+    class SyncProgress_ extends UniffiEnum implements SyncProgress__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.SyncProgress;
+        readonly inner: Readonly<{workspaceId: string; peerId: string; completed: /*u32*/number; total: /*u32*/number}>;
+        constructor(inner: { workspaceId: string, peerId: string, completed: /*u32*/number, total: /*u32*/number }) {
+            super("UniffiAppEvent", "SyncProgress");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { workspaceId: string, peerId: string, completed: /*u32*/number, total: /*u32*/number }): SyncProgress_ {
+            return new SyncProgress_(inner);
+        }
+
+        static instanceOf(obj: any): obj is SyncProgress_ {
+            return obj.tag === UniffiAppEvent_Tags.SyncProgress;
+        }
+        
+
+        
+
+    }
+    
+
+    type SyncCompleted__interface = {
+        tag: UniffiAppEvent_Tags.SyncCompleted;
+        inner: Readonly<{workspaceId: string; peerId: string; cancelled: boolean}>
+    };
+
+    
+    class SyncCompleted_ extends UniffiEnum implements SyncCompleted__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.SyncCompleted;
+        readonly inner: Readonly<{workspaceId: string; peerId: string; cancelled: boolean}>;
+        constructor(inner: { workspaceId: string, peerId: string, 
+        /**
+         * `true` if the session was cancelled mid-run; `false` = normal
+         * finish.
+         */cancelled: boolean }) {
+            super("UniffiAppEvent", "SyncCompleted");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { workspaceId: string, peerId: string, 
+        /**
+         * `true` if the session was cancelled mid-run; `false` = normal
+         * finish.
+         */cancelled: boolean }): SyncCompleted_ {
+            return new SyncCompleted_(inner);
+        }
+
+        static instanceOf(obj: any): obj is SyncCompleted_ {
+            return obj.tag === UniffiAppEvent_Tags.SyncCompleted;
+        }
+        
+
+        
+
+    }
+
+    function instanceOf(obj: any): obj is UniffiAppEvent {
+        return obj[uniffiTypeNameSymbol] === "UniffiAppEvent";
+    }
+
+    return Object.freeze({
+        instanceOf,
+  DocFlushed: DocFlushed_, 
+  ExternalUpdate: ExternalUpdate_, 
+  ExternalConflict: ExternalConflict_, 
+  FileTreeChanged: FileTreeChanged_, 
+  DevicesChanged: DevicesChanged_, 
+  PairingRequestReceived: PairingRequestReceived_, 
+  PairedDeviceAdded: PairedDeviceAdded_, 
+  PairedDeviceRemoved: PairedDeviceRemoved_, 
+  NetworkStatusChanged: NetworkStatusChanged_, 
+  NodeStarted: NodeStarted_, 
+  NodeStopped: NodeStopped_, 
+  SyncStarted: SyncStarted_, 
+  SyncProgress: SyncProgress_, 
+  SyncCompleted: SyncCompleted_
+    });
+
+})();
+
+
+/**
+ * Every event emitted to RN. RN code typically dispatches on the variant
+ * tag (`externalUpdate`, `nodeStarted`, …) to update stores or trigger
+ * side effects (e.g. forward Y.Doc updates to the WebView editor).
+ */
+
+export type UniffiAppEvent = InstanceType<
+    typeof UniffiAppEvent[keyof Omit<typeof UniffiAppEvent, 'instanceOf'>]
+>;
+
+// FfiConverter for enum UniffiAppEvent
+const FfiConverterTypeUniffiAppEvent = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = UniffiAppEvent;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return new UniffiAppEvent.DocFlushed({docId: FfiConverterString.read(from) });
+                case 2: return new UniffiAppEvent.ExternalUpdate({docId: FfiConverterString.read(from), update: FfiConverterArrayBuffer.read(from) });
+                case 3: return new UniffiAppEvent.ExternalConflict({docId: FfiConverterString.read(from), relPath: FfiConverterString.read(from) });
+                case 4: return new UniffiAppEvent.FileTreeChanged({workspaceId: FfiConverterString.read(from) });
+                case 5: return new UniffiAppEvent.DevicesChanged({devices: FfiConverterArrayTypeUniffiDevice.read(from) });
+                case 6: return new UniffiAppEvent.PairingRequestReceived({pendingId: FfiConverterUInt64.read(from), peerId: FfiConverterString.read(from), osInfo: FfiConverterTypeUniffiOsInfo.read(from), method: FfiConverterTypeUniffiPairingMethod.read(from), expiresAt: FfiConverterTimestamp.read(from) });
+                case 7: return new UniffiAppEvent.PairedDeviceAdded({info: FfiConverterOptionalTypeUniffiPairedDeviceInfo.read(from) });
+                case 8: return new UniffiAppEvent.PairedDeviceRemoved({peerId: FfiConverterString.read(from) });
+                case 9: return new UniffiAppEvent.NetworkStatusChanged({natStatus: FfiConverterString.read(from), publicAddr: FfiConverterOptionalString.read(from) });
+                case 10: return new UniffiAppEvent.NodeStarted();
+                case 11: return new UniffiAppEvent.NodeStopped();
+                case 12: return new UniffiAppEvent.SyncStarted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from) });
+                case 13: return new UniffiAppEvent.SyncProgress({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), completed: FfiConverterUInt32.read(from), total: FfiConverterUInt32.read(from) });
+                case 14: return new UniffiAppEvent.SyncCompleted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), cancelled: FfiConverterBool.read(from) });
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value.tag) {
+                case UniffiAppEvent_Tags.DocFlushed: {
+                    ordinalConverter.write(1, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.docId, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.ExternalUpdate: {
+                    ordinalConverter.write(2, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.docId, into);
+                    FfiConverterArrayBuffer.write(inner.update, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.ExternalConflict: {
+                    ordinalConverter.write(3, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.docId, into);
+                    FfiConverterString.write(inner.relPath, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.FileTreeChanged: {
+                    ordinalConverter.write(4, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.workspaceId, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.DevicesChanged: {
+                    ordinalConverter.write(5, into);
+                    const inner = value.inner;
+                    FfiConverterArrayTypeUniffiDevice.write(inner.devices, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.PairingRequestReceived: {
+                    ordinalConverter.write(6, into);
+                    const inner = value.inner;
+                    FfiConverterUInt64.write(inner.pendingId, into);
+                    FfiConverterString.write(inner.peerId, into);
+                    FfiConverterTypeUniffiOsInfo.write(inner.osInfo, into);
+                    FfiConverterTypeUniffiPairingMethod.write(inner.method, into);
+                    FfiConverterTimestamp.write(inner.expiresAt, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.PairedDeviceAdded: {
+                    ordinalConverter.write(7, into);
+                    const inner = value.inner;
+                    FfiConverterOptionalTypeUniffiPairedDeviceInfo.write(inner.info, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.PairedDeviceRemoved: {
+                    ordinalConverter.write(8, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.peerId, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.NetworkStatusChanged: {
+                    ordinalConverter.write(9, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.natStatus, into);
+                    FfiConverterOptionalString.write(inner.publicAddr, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.NodeStarted: {
+                    ordinalConverter.write(10, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.NodeStopped: {
+                    ordinalConverter.write(11, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.SyncStarted: {
+                    ordinalConverter.write(12, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.workspaceId, into);
+                    FfiConverterString.write(inner.peerId, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.SyncProgress: {
+                    ordinalConverter.write(13, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.workspaceId, into);
+                    FfiConverterString.write(inner.peerId, into);
+                    FfiConverterUInt32.write(inner.completed, into);
+                    FfiConverterUInt32.write(inner.total, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.SyncCompleted: {
+                    ordinalConverter.write(14, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.workspaceId, into);
+                    FfiConverterString.write(inner.peerId, into);
+                    FfiConverterBool.write(inner.cancelled, into);
+                    return;
+                }
+                default:
+                    // Throwing from here means that UniffiAppEvent_Tags hasn't matched an ordinal.
+                    throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        allocationSize(value: TypeName): number {
+            switch (value.tag) {
+                case UniffiAppEvent_Tags.DocFlushed: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(1);
+                    size += FfiConverterString.allocationSize(inner.docId);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.ExternalUpdate: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(2);
+                    size += FfiConverterString.allocationSize(inner.docId);
+                    size += FfiConverterArrayBuffer.allocationSize(inner.update);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.ExternalConflict: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(3);
+                    size += FfiConverterString.allocationSize(inner.docId);
+                    size += FfiConverterString.allocationSize(inner.relPath);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.FileTreeChanged: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(4);
+                    size += FfiConverterString.allocationSize(inner.workspaceId);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.DevicesChanged: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(5);
+                    size += FfiConverterArrayTypeUniffiDevice.allocationSize(inner.devices);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.PairingRequestReceived: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(6);
+                    size += FfiConverterUInt64.allocationSize(inner.pendingId);
+                    size += FfiConverterString.allocationSize(inner.peerId);
+                    size += FfiConverterTypeUniffiOsInfo.allocationSize(inner.osInfo);
+                    size += FfiConverterTypeUniffiPairingMethod.allocationSize(inner.method);
+                    size += FfiConverterTimestamp.allocationSize(inner.expiresAt);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.PairedDeviceAdded: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(7);
+                    size += FfiConverterOptionalTypeUniffiPairedDeviceInfo.allocationSize(inner.info);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.PairedDeviceRemoved: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(8);
+                    size += FfiConverterString.allocationSize(inner.peerId);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.NetworkStatusChanged: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(9);
+                    size += FfiConverterString.allocationSize(inner.natStatus);
+                    size += FfiConverterOptionalString.allocationSize(inner.publicAddr);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.NodeStarted: {
+                    return ordinalConverter.allocationSize(10);
+                }
+                case UniffiAppEvent_Tags.NodeStopped: {
+                    return ordinalConverter.allocationSize(11);
+                }
+                case UniffiAppEvent_Tags.SyncStarted: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(12);
+                    size += FfiConverterString.allocationSize(inner.workspaceId);
+                    size += FfiConverterString.allocationSize(inner.peerId);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.SyncProgress: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(13);
+                    size += FfiConverterString.allocationSize(inner.workspaceId);
+                    size += FfiConverterString.allocationSize(inner.peerId);
+                    size += FfiConverterUInt32.allocationSize(inner.completed);
+                    size += FfiConverterUInt32.allocationSize(inner.total);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.SyncCompleted: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(14);
+                    size += FfiConverterString.allocationSize(inner.workspaceId);
+                    size += FfiConverterString.allocationSize(inner.peerId);
+                    size += FfiConverterBool.allocationSize(inner.cancelled);
+                    return size;
+                }
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+
+export enum UniffiConnectionType {
+    /**
+     * Local-area connection (mDNS / direct dial).
+     */
+    Lan,
+    /**
+     * NAT hole-punched via DCUtR.
+     */
+    Dcutr,
+    /**
+     * Relayed through a relay server.
+     */
+    Relay
+}
+
+const FfiConverterTypeUniffiConnectionType = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = UniffiConnectionType;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return UniffiConnectionType.Lan;
+                case 2: return UniffiConnectionType.Dcutr;
+                case 3: return UniffiConnectionType.Relay;
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value) {
+                case UniffiConnectionType.Lan: return ordinalConverter.write(1, into);
+                case UniffiConnectionType.Dcutr: return ordinalConverter.write(2, into);
+                case UniffiConnectionType.Relay: return ordinalConverter.write(3, into);
+            }
+        }
+        allocationSize(value: TypeName): number {
+            return ordinalConverter.allocationSize(0);
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+
+
+
+/**
+ * Filter applied to `list_devices`. Default is `All` on the RN side.
+ */
+export enum UniffiDeviceFilter {
+    All,
+    /**
+     * Currently connected peers only.
+     */
+    Connected,
+    /**
+     * Persistently-paired peers (online or offline).
+     */
+    Paired
+}
+
+const FfiConverterTypeUniffiDeviceFilter = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = UniffiDeviceFilter;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return UniffiDeviceFilter.All;
+                case 2: return UniffiDeviceFilter.Connected;
+                case 3: return UniffiDeviceFilter.Paired;
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value) {
+                case UniffiDeviceFilter.All: return ordinalConverter.write(1, into);
+                case UniffiDeviceFilter.Connected: return ordinalConverter.write(2, into);
+                case UniffiDeviceFilter.Paired: return ordinalConverter.write(3, into);
+            }
+        }
+        allocationSize(value: TypeName): number {
+            return ordinalConverter.allocationSize(0);
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+
+
+
+export enum UniffiDeviceStatus {
+    Online,
+    Offline
+}
+
+const FfiConverterTypeUniffiDeviceStatus = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = UniffiDeviceStatus;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return UniffiDeviceStatus.Online;
+                case 2: return UniffiDeviceStatus.Offline;
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value) {
+                case UniffiDeviceStatus.Online: return ordinalConverter.write(1, into);
+                case UniffiDeviceStatus.Offline: return ordinalConverter.write(2, into);
+            }
+        }
+        allocationSize(value: TypeName): number {
+            return ordinalConverter.allocationSize(0);
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+
+
+
+// Enum: UniffiNodeStatus
+export enum UniffiNodeStatus_Tags {
+    Stopped = "Stopped",
+    Running = "Running",
+    Error = "Error"
+}
+export const UniffiNodeStatus = (() => {
+    
+
+    type Stopped__interface = {
+        tag: UniffiNodeStatus_Tags.Stopped
+    };
+
+    
+    class Stopped_ extends UniffiEnum implements Stopped__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiNodeStatus";
+        readonly tag = UniffiNodeStatus_Tags.Stopped;
+        constructor() {
+            super("UniffiNodeStatus", "Stopped");
+        }
+
+        static new(): Stopped_ {
+            return new Stopped_();
+        }
+
+        static instanceOf(obj: any): obj is Stopped_ {
+            return obj.tag === UniffiNodeStatus_Tags.Stopped;
+        }
+        
+
+        
+
+    }
+    
+
+    type Running__interface = {
+        tag: UniffiNodeStatus_Tags.Running
+    };
+
+    
+    class Running_ extends UniffiEnum implements Running__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiNodeStatus";
+        readonly tag = UniffiNodeStatus_Tags.Running;
+        constructor() {
+            super("UniffiNodeStatus", "Running");
+        }
+
+        static new(): Running_ {
+            return new Running_();
+        }
+
+        static instanceOf(obj: any): obj is Running_ {
+            return obj.tag === UniffiNodeStatus_Tags.Running;
+        }
+        
+
+        
+
+    }
+    
+
+    type Error__interface = {
+        tag: UniffiNodeStatus_Tags.Error;
+        inner: Readonly<{message: string}>
+    };
+
+    
+    class Error_ extends UniffiEnum implements Error__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiNodeStatus";
+        readonly tag = UniffiNodeStatus_Tags.Error;
+        readonly inner: Readonly<{message: string}>;
+        constructor(inner: { message: string }) {
+            super("UniffiNodeStatus", "Error");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { message: string }): Error_ {
+            return new Error_(inner);
+        }
+
+        static instanceOf(obj: any): obj is Error_ {
+            return obj.tag === UniffiNodeStatus_Tags.Error;
+        }
+        
+
+        
+
+    }
+
+    function instanceOf(obj: any): obj is UniffiNodeStatus {
+        return obj[uniffiTypeNameSymbol] === "UniffiNodeStatus";
+    }
+
+    return Object.freeze({
+        instanceOf,
+  Stopped: Stopped_, 
+  Running: Running_, 
+  Error: Error_
+    });
+
+})();
+
+
+
+export type UniffiNodeStatus = InstanceType<
+    typeof UniffiNodeStatus[keyof Omit<typeof UniffiNodeStatus, 'instanceOf'>]
+>;
+
+// FfiConverter for enum UniffiNodeStatus
+const FfiConverterTypeUniffiNodeStatus = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = UniffiNodeStatus;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return new UniffiNodeStatus.Stopped();
+                case 2: return new UniffiNodeStatus.Running();
+                case 3: return new UniffiNodeStatus.Error({message: FfiConverterString.read(from) });
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value.tag) {
+                case UniffiNodeStatus_Tags.Stopped: {
+                    ordinalConverter.write(1, into);
+                    return;
+                }
+                case UniffiNodeStatus_Tags.Running: {
+                    ordinalConverter.write(2, into);
+                    return;
+                }
+                case UniffiNodeStatus_Tags.Error: {
+                    ordinalConverter.write(3, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.message, into);
+                    return;
+                }
+                default:
+                    // Throwing from here means that UniffiNodeStatus_Tags hasn't matched an ordinal.
+                    throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        allocationSize(value: TypeName): number {
+            switch (value.tag) {
+                case UniffiNodeStatus_Tags.Stopped: {
+                    return ordinalConverter.allocationSize(1);
+                }
+                case UniffiNodeStatus_Tags.Running: {
+                    return ordinalConverter.allocationSize(2);
+                }
+                case UniffiNodeStatus_Tags.Error: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(3);
+                    size += FfiConverterString.allocationSize(inner.message);
+                    return size;
+                }
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+
+// Enum: UniffiPairingMethod
+export enum UniffiPairingMethod_Tags {
+    Code = "Code",
+    Direct = "Direct"
+}
+export const UniffiPairingMethod = (() => {
+    
+
+    type Code__interface = {
+        tag: UniffiPairingMethod_Tags.Code;
+        inner: Readonly<{code: string}>
+    };
+
+    
+    /**
+     * Code-based pair (the pairer types a 6-digit code generated by the
+     * pairee — the normal flow).
+     */
+    class Code_ extends UniffiEnum implements Code__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiPairingMethod";
+        readonly tag = UniffiPairingMethod_Tags.Code;
+        readonly inner: Readonly<{code: string}>;
+        constructor(inner: { code: string }) {
+            super("UniffiPairingMethod", "Code");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { code: string }): Code_ {
+            return new Code_(inner);
+        }
+
+        static instanceOf(obj: any): obj is Code_ {
+            return obj.tag === UniffiPairingMethod_Tags.Code;
+        }
+        
+
+        
+
+    }
+    
+
+    type Direct__interface = {
+        tag: UniffiPairingMethod_Tags.Direct
+    };
+
+    
+    /**
+     * Implicit pair, no code step. Reserved for future "auto-pair
+     * discovered by nearby LAN scan" UX.
+     */
+    class Direct_ extends UniffiEnum implements Direct__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiPairingMethod";
+        readonly tag = UniffiPairingMethod_Tags.Direct;
+        constructor() {
+            super("UniffiPairingMethod", "Direct");
+        }
+
+        static new(): Direct_ {
+            return new Direct_();
+        }
+
+        static instanceOf(obj: any): obj is Direct_ {
+            return obj.tag === UniffiPairingMethod_Tags.Direct;
+        }
+        
+
+        
+
+    }
+
+    function instanceOf(obj: any): obj is UniffiPairingMethod {
+        return obj[uniffiTypeNameSymbol] === "UniffiPairingMethod";
+    }
+
+    return Object.freeze({
+        instanceOf,
+  Code: Code_, 
+  Direct: Direct_
+    });
+
+})();
+
+
+
+export type UniffiPairingMethod = InstanceType<
+    typeof UniffiPairingMethod[keyof Omit<typeof UniffiPairingMethod, 'instanceOf'>]
+>;
+
+// FfiConverter for enum UniffiPairingMethod
+const FfiConverterTypeUniffiPairingMethod = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = UniffiPairingMethod;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return new UniffiPairingMethod.Code({code: FfiConverterString.read(from) });
+                case 2: return new UniffiPairingMethod.Direct();
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value.tag) {
+                case UniffiPairingMethod_Tags.Code: {
+                    ordinalConverter.write(1, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.code, into);
+                    return;
+                }
+                case UniffiPairingMethod_Tags.Direct: {
+                    ordinalConverter.write(2, into);
+                    return;
+                }
+                default:
+                    // Throwing from here means that UniffiPairingMethod_Tags hasn't matched an ordinal.
+                    throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        allocationSize(value: TypeName): number {
+            switch (value.tag) {
+                case UniffiPairingMethod_Tags.Code: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(1);
+                    size += FfiConverterString.allocationSize(inner.code);
+                    return size;
+                }
+                case UniffiPairingMethod_Tags.Direct: {
+                    return ordinalConverter.allocationSize(2);
+                }
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+
+export enum UniffiPairingRefuseReason {
+    UserRejected,
+    CodeExpired,
+    CodeInvalid
+}
+
+const FfiConverterTypeUniffiPairingRefuseReason = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = UniffiPairingRefuseReason;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return UniffiPairingRefuseReason.UserRejected;
+                case 2: return UniffiPairingRefuseReason.CodeExpired;
+                case 3: return UniffiPairingRefuseReason.CodeInvalid;
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value) {
+                case UniffiPairingRefuseReason.UserRejected: return ordinalConverter.write(1, into);
+                case UniffiPairingRefuseReason.CodeExpired: return ordinalConverter.write(2, into);
+                case UniffiPairingRefuseReason.CodeInvalid: return ordinalConverter.write(3, into);
+            }
+        }
+        allocationSize(value: TypeName): number {
+            return ordinalConverter.allocationSize(0);
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+
+
+
+// Enum: UniffiPairingResponse
+export enum UniffiPairingResponse_Tags {
+    Success = "Success",
+    Refused = "Refused"
+}
+export const UniffiPairingResponse = (() => {
+    
+
+    type Success__interface = {
+        tag: UniffiPairingResponse_Tags.Success
+    };
+
+    
+    class Success_ extends UniffiEnum implements Success__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiPairingResponse";
+        readonly tag = UniffiPairingResponse_Tags.Success;
+        constructor() {
+            super("UniffiPairingResponse", "Success");
+        }
+
+        static new(): Success_ {
+            return new Success_();
+        }
+
+        static instanceOf(obj: any): obj is Success_ {
+            return obj.tag === UniffiPairingResponse_Tags.Success;
+        }
+        
+
+        
+
+    }
+    
+
+    type Refused__interface = {
+        tag: UniffiPairingResponse_Tags.Refused;
+        inner: Readonly<{reason: UniffiPairingRefuseReason}>
+    };
+
+    
+    class Refused_ extends UniffiEnum implements Refused__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiPairingResponse";
+        readonly tag = UniffiPairingResponse_Tags.Refused;
+        readonly inner: Readonly<{reason: UniffiPairingRefuseReason}>;
+        constructor(inner: { reason: UniffiPairingRefuseReason }) {
+            super("UniffiPairingResponse", "Refused");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { reason: UniffiPairingRefuseReason }): Refused_ {
+            return new Refused_(inner);
+        }
+
+        static instanceOf(obj: any): obj is Refused_ {
+            return obj.tag === UniffiPairingResponse_Tags.Refused;
+        }
+        
+
+        
+
+    }
+
+    function instanceOf(obj: any): obj is UniffiPairingResponse {
+        return obj[uniffiTypeNameSymbol] === "UniffiPairingResponse";
+    }
+
+    return Object.freeze({
+        instanceOf,
+  Success: Success_, 
+  Refused: Refused_
+    });
+
+})();
+
+
+
+export type UniffiPairingResponse = InstanceType<
+    typeof UniffiPairingResponse[keyof Omit<typeof UniffiPairingResponse, 'instanceOf'>]
+>;
+
+// FfiConverter for enum UniffiPairingResponse
+const FfiConverterTypeUniffiPairingResponse = (() => {
+    const ordinalConverter = FfiConverterInt32;
+    type TypeName = UniffiPairingResponse;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            switch (ordinalConverter.read(from)) {
+                case 1: return new UniffiPairingResponse.Success();
+                case 2: return new UniffiPairingResponse.Refused({reason: FfiConverterTypeUniffiPairingRefuseReason.read(from) });
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            switch (value.tag) {
+                case UniffiPairingResponse_Tags.Success: {
+                    ordinalConverter.write(1, into);
+                    return;
+                }
+                case UniffiPairingResponse_Tags.Refused: {
+                    ordinalConverter.write(2, into);
+                    const inner = value.inner;
+                    FfiConverterTypeUniffiPairingRefuseReason.write(inner.reason, into);
+                    return;
+                }
+                default:
+                    // Throwing from here means that UniffiPairingResponse_Tags hasn't matched an ordinal.
+                    throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+        allocationSize(value: TypeName): number {
+            switch (value.tag) {
+                case UniffiPairingResponse_Tags.Success: {
+                    return ordinalConverter.allocationSize(1);
+                }
+                case UniffiPairingResponse_Tags.Refused: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(2);
+                    size += FfiConverterTypeUniffiPairingRefuseReason.allocationSize(inner.reason);
+                    return size;
+                }
+                default: throw new UniffiInternalError.UnexpectedEnumCase();
+            }
+        }
+    }
+    return new FFIConverter();
+})();
+
+
+
+/**
+ * Trait the RN host implements. `emit` is called from the Rust runtime
+ * thread; the callback must not block on long-running work (forward to
+ * a store and return immediately).
+ */
+export interface ForeignEventBus {
+    
+    emit(event: UniffiAppEvent) : void;
+}
+
+
+/**
+ * Trait the RN host implements. `emit` is called from the Rust runtime
+ * thread; the callback must not block on long-running work (forward to
+ * a store and return immediately).
+ */
+export class ForeignEventBusImpl extends UniffiAbstractObject implements ForeignEventBus {
+
+    readonly [uniffiTypeNameSymbol] = "ForeignEventBusImpl";
+    readonly [destructorGuardSymbol]: UniffiGcObject;
+    readonly [pointerLiteralSymbol]: UniffiHandle;
+    // No primary constructor declared for this class.
+private constructor(pointer: UniffiHandle) {
+    super();
+    this[pointerLiteralSymbol] = pointer;
+    this[destructorGuardSymbol] = uniffiTypeForeignEventBusImplObjectFactory.bless(pointer);
+}
+
+    
+
+    
+ emit(event: UniffiAppEvent): void {uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => { nativeModule().ubrn_uniffi_mobile_core_fn_method_foreigneventbus_emit(uniffiTypeForeignEventBusImplObjectFactory.clonePointer(this), 
+        FfiConverterTypeUniffiAppEvent.lower(event),
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    );
+    }
+    
+
+    /**
+     * {@inheritDoc uniffi-bindgen-react-native#UniffiAbstractObject.uniffiDestroy}
+     */
+    uniffiDestroy(): void {
+        const ptr = (this as any)[destructorGuardSymbol];
+        if (ptr !== undefined) {
+            const pointer = uniffiTypeForeignEventBusImplObjectFactory.pointer(this);
+            uniffiTypeForeignEventBusImplObjectFactory.freePointer(pointer);
+            uniffiTypeForeignEventBusImplObjectFactory.unbless(ptr);
+            delete (this as any)[destructorGuardSymbol];
+        }
+    }
+
+    static instanceOf(obj: any): obj is ForeignEventBusImpl {
+        return uniffiTypeForeignEventBusImplObjectFactory.isConcreteType(obj);
+    }
+
+    
+}
+
+const uniffiTypeForeignEventBusImplObjectFactory: UniffiObjectFactory<ForeignEventBus> = (() => {
+    
+    return {
+    create(pointer: UniffiHandle): ForeignEventBus {
+        const instance = Object.create(ForeignEventBusImpl.prototype);
+        instance[pointerLiteralSymbol] = pointer;
+        instance[destructorGuardSymbol] = this.bless(pointer);
+        instance[uniffiTypeNameSymbol] = "ForeignEventBusImpl";
+        return instance;
+    },
+
+    
+    bless(p: UniffiHandle): UniffiGcObject {
+        return uniffiCaller.rustCall(
+            /*caller:*/ (status) =>
+                nativeModule().ubrn_uniffi_internal_fn_method_foreigneventbus_ffi__bless_pointer(p, status),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    unbless(ptr: UniffiGcObject) {
+        ptr.markDestroyed();
+    },
+
+    pointer(obj: ForeignEventBus): UniffiHandle {
+        if ((obj as any)[destructorGuardSymbol] === undefined) {
+            throw new UniffiInternalError.UnexpectedNullPointer();
+        }
+        return (obj as any)[pointerLiteralSymbol];
+    },
+
+    clonePointer(obj: ForeignEventBus): UniffiHandle {
+        const pointer = this.pointer(obj);
+        return uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => nativeModule().ubrn_uniffi_mobile_core_fn_clone_foreigneventbus(pointer, callStatus),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    freePointer(pointer: UniffiHandle): void {
+        uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => nativeModule().ubrn_uniffi_mobile_core_fn_free_foreigneventbus(pointer, callStatus),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    isConcreteType(obj: any): obj is ForeignEventBus {
+        return obj[destructorGuardSymbol] && obj[uniffiTypeNameSymbol] === "ForeignEventBusImpl";
+    },
+}})();
+// FfiConverter for ForeignEventBus
+const FfiConverterTypeForeignEventBus = new FfiConverterObjectWithCallbacks(uniffiTypeForeignEventBusImplObjectFactory);
+
+// Add a vtavble for the callbacks that go in ForeignEventBus.
+
+
+// Put the implementation in a struct so we don't pollute the top-level namespace
+const uniffiCallbackInterfaceForeignEventBus: { vtable: UniffiVTableCallbackInterfaceForeignEventBus; register: () => void; } = {
+    // Create the VTable using a series of closures.
+    // ts automatically converts these into C callback functions.
+    vtable: {
+        emit: (
+            uniffiHandle: bigint,
+            event: Uint8Array,) => {
+            const uniffiMakeCall = 
+            ()
+            : void => {
+                const jsCallback = FfiConverterTypeForeignEventBus.lift(uniffiHandle);
+                return jsCallback.emit(
+                    FfiConverterTypeUniffiAppEvent.lift(event)
+                )
+            };
+            const uniffiResult = UniffiResult.ready<void>();
+            const uniffiHandleSuccess = (obj: any) => {};
+            const uniffiHandleError = (code: number, errBuf: UniffiByteArray) => {
+                UniffiResult.writeError(uniffiResult, code, errBuf);
+            };
+            uniffiTraitInterfaceCall(
+                /*makeCall:*/ uniffiMakeCall,
+                /*handleSuccess:*/ uniffiHandleSuccess,
+                /*handleError:*/ uniffiHandleError,
+                /*lowerString:*/ FfiConverterString.lower
+            )
+            return uniffiResult;
+        },
+        uniffiFree: (uniffiHandle: UniffiHandle): void => {
+            // ForeignEventBus: this will throw a stale handle error if the handle isn't found.
+            FfiConverterTypeForeignEventBus.drop(uniffiHandle);
+        },
+        uniffiClone: (uniffiHandle: UniffiHandle): UniffiHandle => {
+            return FfiConverterTypeForeignEventBus.clone(uniffiHandle);
+        }
+    },
+    register: () => {
+        nativeModule().ubrn_uniffi_mobile_core_fn_init_callback_vtable_foreigneventbus(
+            uniffiCallbackInterfaceForeignEventBus.vtable
+        );
+    },
+};
+
+
+/**
+ * Trait the RN host implements. Methods are `async` so JS implementations
+ * can await native keychain APIs (which are all async).
+ */
+export interface ForeignKeychainProvider {
+    
+    /**
+     * Return the protobuf-encoded Ed25519 keypair. On first call the host
+     * MUST generate a fresh keypair and persist it so subsequent calls
+     * return the same bytes — the core's `peer_id` stability depends on
+     * this contract.
+     */
+    getOrCreateKeypair(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<ArrayBuffer>;
+}
+
+
+/**
+ * Trait the RN host implements. Methods are `async` so JS implementations
+ * can await native keychain APIs (which are all async).
+ */
+export class ForeignKeychainProviderImpl extends UniffiAbstractObject implements ForeignKeychainProvider {
+
+    readonly [uniffiTypeNameSymbol] = "ForeignKeychainProviderImpl";
+    readonly [destructorGuardSymbol]: UniffiGcObject;
+    readonly [pointerLiteralSymbol]: UniffiHandle;
+    // No primary constructor declared for this class.
+private constructor(pointer: UniffiHandle) {
+    super();
+    this[pointerLiteralSymbol] = pointer;
+    this[destructorGuardSymbol] = uniffiTypeForeignKeychainProviderImplObjectFactory.bless(pointer);
+}
+
+    
+
+    
+    /**
+     * Return the protobuf-encoded Ed25519 keypair. On first call the host
+     * MUST generate a fresh keypair and persist it so subsequent calls
+     * return the same bytes — the core's `peer_id` stability depends on
+     * this contract.
+     */
+async  getOrCreateKeypair(asyncOpts_?: { signal: AbortSignal }): Promise<ArrayBuffer> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_foreignkeychainprovider_get_or_create_keypair(
+                    uniffiTypeForeignKeychainProviderImplObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayBuffer.lift.bind(FfiConverterArrayBuffer),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+
+    /**
+     * {@inheritDoc uniffi-bindgen-react-native#UniffiAbstractObject.uniffiDestroy}
+     */
+    uniffiDestroy(): void {
+        const ptr = (this as any)[destructorGuardSymbol];
+        if (ptr !== undefined) {
+            const pointer = uniffiTypeForeignKeychainProviderImplObjectFactory.pointer(this);
+            uniffiTypeForeignKeychainProviderImplObjectFactory.freePointer(pointer);
+            uniffiTypeForeignKeychainProviderImplObjectFactory.unbless(ptr);
+            delete (this as any)[destructorGuardSymbol];
+        }
+    }
+
+    static instanceOf(obj: any): obj is ForeignKeychainProviderImpl {
+        return uniffiTypeForeignKeychainProviderImplObjectFactory.isConcreteType(obj);
+    }
+
+    
+}
+
+const uniffiTypeForeignKeychainProviderImplObjectFactory: UniffiObjectFactory<ForeignKeychainProvider> = (() => {
+    
+    return {
+    create(pointer: UniffiHandle): ForeignKeychainProvider {
+        const instance = Object.create(ForeignKeychainProviderImpl.prototype);
+        instance[pointerLiteralSymbol] = pointer;
+        instance[destructorGuardSymbol] = this.bless(pointer);
+        instance[uniffiTypeNameSymbol] = "ForeignKeychainProviderImpl";
+        return instance;
+    },
+
+    
+    bless(p: UniffiHandle): UniffiGcObject {
+        return uniffiCaller.rustCall(
+            /*caller:*/ (status) =>
+                nativeModule().ubrn_uniffi_internal_fn_method_foreignkeychainprovider_ffi__bless_pointer(p, status),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    unbless(ptr: UniffiGcObject) {
+        ptr.markDestroyed();
+    },
+
+    pointer(obj: ForeignKeychainProvider): UniffiHandle {
+        if ((obj as any)[destructorGuardSymbol] === undefined) {
+            throw new UniffiInternalError.UnexpectedNullPointer();
+        }
+        return (obj as any)[pointerLiteralSymbol];
+    },
+
+    clonePointer(obj: ForeignKeychainProvider): UniffiHandle {
+        const pointer = this.pointer(obj);
+        return uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => nativeModule().ubrn_uniffi_mobile_core_fn_clone_foreignkeychainprovider(pointer, callStatus),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    freePointer(pointer: UniffiHandle): void {
+        uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => nativeModule().ubrn_uniffi_mobile_core_fn_free_foreignkeychainprovider(pointer, callStatus),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    isConcreteType(obj: any): obj is ForeignKeychainProvider {
+        return obj[destructorGuardSymbol] && obj[uniffiTypeNameSymbol] === "ForeignKeychainProviderImpl";
+    },
+}})();
+// FfiConverter for ForeignKeychainProvider
+const FfiConverterTypeForeignKeychainProvider = new FfiConverterObjectWithCallbacks(uniffiTypeForeignKeychainProviderImplObjectFactory);
+
+// Add a vtavble for the callbacks that go in ForeignKeychainProvider.
+
+
+// Put the implementation in a struct so we don't pollute the top-level namespace
+const uniffiCallbackInterfaceForeignKeychainProvider: { vtable: UniffiVTableCallbackInterfaceForeignKeychainProvider; register: () => void; } = {
+    // Create the VTable using a series of closures.
+    // ts automatically converts these into C callback functions.
+    vtable: {
+        getOrCreateKeypair: (
+            uniffiHandle: bigint,
+            uniffiFutureCallback: UniffiForeignFutureCompleteRustBuffer,
+            uniffiCallbackData: bigint) => {
+            const uniffiMakeCall = 
+            async (signal: AbortSignal)
+            : Promise<ArrayBuffer> => {
+                const jsCallback = FfiConverterTypeForeignKeychainProvider.lift(uniffiHandle);
+                return await jsCallback.getOrCreateKeypair({ signal }
+                )
+            };
+            const uniffiHandleSuccess = (returnValue: ArrayBuffer) => {
+                uniffiFutureCallback.call(
+                    uniffiFutureCallback,
+                    uniffiCallbackData,
+                    /* UniffiForeignFutureResultRustBuffer */{
+                        returnValue: FfiConverterArrayBuffer.lower(returnValue),
+                        callStatus: uniffiCaller.createCallStatus()
+                    }
+                );
+            };
+            const uniffiHandleError = (code: number, errorBuf: UniffiByteArray) => {
+                uniffiFutureCallback.call(
+                    uniffiFutureCallback,
+                    uniffiCallbackData,
+                    /* UniffiForeignFutureResultRustBuffer */{
+                        returnValue: /*empty*/ new Uint8Array(0),
+                        // TODO create callstatus with error.
+                        callStatus: uniffiCaller.createErrorStatus(code, errorBuf),
+                    }
+                );
+            };
+            const uniffiForeignFuture = uniffiTraitInterfaceCallAsyncWithError(
+                /*makeCall:*/ uniffiMakeCall,
+                /*handleSuccess:*/ uniffiHandleSuccess,
+                /*handleError:*/ uniffiHandleError,
+                /*isErrorType:*/ FfiError.instanceOf,
+                /*lowerError:*/ FfiConverterTypeFfiError.lower.bind(FfiConverterTypeFfiError),
+                /*lowerString:*/ FfiConverterString.lower
+            );
+            return uniffiForeignFuture;
+        },
+        uniffiFree: (uniffiHandle: UniffiHandle): void => {
+            // ForeignKeychainProvider: this will throw a stale handle error if the handle isn't found.
+            FfiConverterTypeForeignKeychainProvider.drop(uniffiHandle);
+        },
+        uniffiClone: (uniffiHandle: UniffiHandle): UniffiHandle => {
+            return FfiConverterTypeForeignKeychainProvider.clone(uniffiHandle);
+        }
+    },
+    register: () => {
+        nativeModule().ubrn_uniffi_mobile_core_fn_init_callback_vtable_foreignkeychainprovider(
+            uniffiCallbackInterfaceForeignKeychainProvider.vtable
+        );
+    },
+};
+
+
+/**
+ * Device-level core, wrapping [`swarmnote_core::api::AppCore`].
+ *
+ * `fs_factory` defaults to `LocalFs` — mobile sandbox paths (Expo's
+ * `documentDirectory`) work directly. `watcher_factory` is intentionally
+ * left `None`: mobile sandboxes don't need external file-change detection.
+ */
+export interface UniffiAppCoreLike {
+    
+    /**
+     * Authoritative close for the workspace with the given UUID. Flushes
+     * dirty docs + tears down watchers / sync regardless of how many
+     * `UniffiWorkspaceCore` handles the host still holds — mirror of the
+     * desktop's "close last window" hook. No-op if not open.
+     */
+    closeWorkspace(workspaceId: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Snapshot of the device identity — peer id + user-facing metadata.
+     */
+    deviceInfo()  /*throws*/: UniffiDeviceInfo;
+    /**
+     * Snapshot of every currently-open workspace. On mobile there is at
+     * most one; exposed primarily for diagnostic / debugging surfaces.
+     */
+    listWorkspaces(asyncOpts_?: { signal: AbortSignal }) : Promise<Array<UniffiWorkspaceInfo>>;
+    /**
+     * Current P2P node status. `NodeStarted` / `NodeStopped` also fire on
+     * the event bus when lifecycle transitions.
+     */
+    networkStatus(asyncOpts_?: { signal: AbortSignal }) : Promise<UniffiNodeStatus>;
+    /**
+     * Open (or retrieve) the workspace at `path`. `path` may be a raw
+     * filesystem path or a `file://` URI (the latter is common from Expo).
+     *
+     * **Mobile contract**: keep at most one `UniffiWorkspaceCore` handle
+     * alive at a time. Before opening a new workspace, call `close()` on
+     * the old handle and drop it — this guarantees the old workspace's
+     * dirty docs flush before the new one opens.
+     */
+    openWorkspace(path: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiWorkspaceCoreLike>;
+    /**
+     * Libp2p peer id of this device. Stable across restarts.
+     */
+    peerId()  /*throws*/: string;
+    /**
+     * Update the user-facing device name in memory. Persistence is handled
+     * by the core's config writeback on next config mutation.
+     */
+    setDeviceName(name: string)  /*throws*/: void;
+    /**
+     * Start the P2P node. Fails with [`FfiError::NetworkAlreadyRunning`] if
+     * already up. RN should call this in `onAppActive`.
+     */
+    startNetwork(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Stop the P2P node. No-op if already stopped. RN should call this in
+     * `onAppBackground`.
+     */
+    stopNetwork(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Look up a workspace's info by UUID without forcing the caller to
+     * hold the `UniffiWorkspaceCore`. Returns `None` if the workspace is
+     * not currently open.
+     */
+    workspaceInfo(workspaceId: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiWorkspaceInfo | undefined>;
+    /**
+     * List devices matching the filter. Returns `Vec::new()` if P2P is not
+     * running — the RN UI should render an empty list, not an error.
+     */
+    listDevices(filter: UniffiDeviceFilter, asyncOpts_?: { signal: AbortSignal }) : Promise<Array<UniffiDevice>>;
+    /**
+     * Generate a 6-digit pairing code, publish the device's OsInfo +
+     * listen addrs under that code to the DHT, and return the code + its
+     * expiry window. Only one code is active at a time — calling this
+     * again overwrites the previous code.
+     */
+    generatePairingCode(expiresInSecs: /*u64*/bigint, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiPairingCodeInfo>;
+    /**
+     * Snapshot of every paired device. Returns `Vec::new()` if P2P is not
+     * running (since the paired-devices cache is populated on node start);
+     * that way the settings screen can render an empty list instead of
+     * surfacing an error.
+     */
+    listPairedDevices(asyncOpts_?: { signal: AbortSignal }) : Promise<Array<UniffiPairedDeviceInfo>>;
+    /**
+     * Resolve a pairing code via DHT lookup. Returns the publisher's peer
+     * id + OS info. Must be followed by `request_pairing(...)` to actually
+     * send the pairing request.
+     */
+    lookupDeviceByCode(code: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiDeviceByCodeResult>;
+    /**
+     * Send a pairing request to the given peer. On `Success`, the remote
+     * device is persisted as paired and a `PairedDeviceAdded` event fires.
+     * On `Refused`, the reason indicates whether the user rejected or the
+     * code expired/was wrong.
+     */
+    requestPairing(peerId: string, method: UniffiPairingMethod, remoteOsInfo: UniffiOsInfo | undefined, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiPairingResponse>;
+    /**
+     * Accept or reject an incoming pairing request (delivered via the
+     * `PairingRequestReceived` event). On accept, the pairing is finalized
+     * and a `PairedDeviceAdded` event fires.
+     */
+    respondPairingRequest(pendingId: /*u64*/bigint, accept: boolean, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Remove a device from the paired set. Fires `PairedDeviceRemoved` on
+     * success. Removes from both the in-memory cache and `devices.db`.
+     */
+    unpairDevice(peerId: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+}
+/**
+ * @deprecated Use `UniffiAppCoreLike` instead.
+ */
+export type UniffiAppCoreInterface = UniffiAppCoreLike;
+
+
+/**
+ * Device-level core, wrapping [`swarmnote_core::api::AppCore`].
+ *
+ * `fs_factory` defaults to `LocalFs` — mobile sandbox paths (Expo's
+ * `documentDirectory`) work directly. `watcher_factory` is intentionally
+ * left `None`: mobile sandboxes don't need external file-change detection.
+ */
+export class UniffiAppCore extends UniffiAbstractObject implements UniffiAppCoreLike {
+
+    readonly [uniffiTypeNameSymbol] = "UniffiAppCore";
+    readonly [destructorGuardSymbol]: UniffiGcObject;
+    readonly [pointerLiteralSymbol]: UniffiHandle;
+private constructor(pointer: UniffiHandle) {
+    super();
+    this[pointerLiteralSymbol] = pointer;
+    this[destructorGuardSymbol] = uniffiTypeUniffiAppCoreObjectFactory.bless(pointer);
+}
+
+    // Async primary constructor declared for this class.
+    /**
+     * Bootstrap the core: load/create config, initialize identity from the
+     * keychain, open `devices.db`. Does NOT start the P2P node — call
+     * [`start_network`](Self::start_network) separately.
+     */
+static async create(keychain: ForeignKeychainProvider, eventBus: ForeignEventBus, appDataDir: string, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiAppCoreLike> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_constructor_uniffiappcore_new(FfiConverterTypeForeignKeychainProvider.lower(keychain),FfiConverterTypeForeignEventBus.lower(eventBus),FfiConverterString.lower(appDataDir)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_u64,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_u64,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_u64,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_u64,
+            /*liftFunc:*/ FfiConverterTypeUniffiAppCore.lift.bind(FfiConverterTypeUniffiAppCore),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+
+    
+
+    
+    /**
+     * Authoritative close for the workspace with the given UUID. Flushes
+     * dirty docs + tears down watchers / sync regardless of how many
+     * `UniffiWorkspaceCore` handles the host still holds — mirror of the
+     * desktop's "close last window" hook. No-op if not open.
+     */
+async  closeWorkspace(workspaceId: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_close_workspace(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(workspaceId)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Snapshot of the device identity — peer id + user-facing metadata.
+     */
+ deviceInfo(): UniffiDeviceInfo /*throws*/ {
+    return FfiConverterTypeUniffiDeviceInfo.lift(
+        uniffiCaller.rustCallWithError(
+            /*liftError:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError),
+            /*caller:*/ (callStatus) => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_device_info(uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this), 
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    ));
+    }
+    
+    /**
+     * Snapshot of every currently-open workspace. On mobile there is at
+     * most one; exposed primarily for diagnostic / debugging surfaces.
+     */
+async  listWorkspaces(asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiWorkspaceInfo>> {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayTypeUniffiWorkspaceInfo.lift.bind(FfiConverterArrayTypeUniffiWorkspaceInfo),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Current P2P node status. `NodeStarted` / `NodeStopped` also fire on
+     * the event bus when lifecycle transitions.
+     */
+async  networkStatus(asyncOpts_?: { signal: AbortSignal }): Promise<UniffiNodeStatus> {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_network_status(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeUniffiNodeStatus.lift.bind(FfiConverterTypeUniffiNodeStatus),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Open (or retrieve) the workspace at `path`. `path` may be a raw
+     * filesystem path or a `file://` URI (the latter is common from Expo).
+     *
+     * **Mobile contract**: keep at most one `UniffiWorkspaceCore` handle
+     * alive at a time. Before opening a new workspace, call `close()` on
+     * the old handle and drop it — this guarantees the old workspace's
+     * dirty docs flush before the new one opens.
+     */
+async  openWorkspace(path: string, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiWorkspaceCoreLike> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(path)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_u64,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_u64,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_u64,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_u64,
+            /*liftFunc:*/ FfiConverterTypeUniffiWorkspaceCore.lift.bind(FfiConverterTypeUniffiWorkspaceCore),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Libp2p peer id of this device. Stable across restarts.
+     */
+ peerId(): string /*throws*/ {
+    return FfiConverterString.lift(
+        uniffiCaller.rustCallWithError(
+            /*liftError:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError),
+            /*caller:*/ (callStatus) => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_peer_id(uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this), 
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    ));
+    }
+    
+    /**
+     * Update the user-facing device name in memory. Persistence is handled
+     * by the core's config writeback on next config mutation.
+     */
+ setDeviceName(name: string): void /*throws*/ {
+        uniffiCaller.rustCallWithError(
+            /*liftError:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError),
+            /*caller:*/ (callStatus) => { nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this), 
+        FfiConverterString.lower(name),
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    );
+    }
+    
+    /**
+     * Start the P2P node. Fails with [`FfiError::NetworkAlreadyRunning`] if
+     * already up. RN should call this in `onAppActive`.
+     */
+async  startNetwork(asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_start_network(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Stop the P2P node. No-op if already stopped. RN should call this in
+     * `onAppBackground`.
+     */
+async  stopNetwork(asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Look up a workspace's info by UUID without forcing the caller to
+     * hold the `UniffiWorkspaceCore`. Returns `None` if the workspace is
+     * not currently open.
+     */
+async  workspaceInfo(workspaceId: string, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiWorkspaceInfo | undefined> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(workspaceId)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterOptionalTypeUniffiWorkspaceInfo.lift.bind(FfiConverterOptionalTypeUniffiWorkspaceInfo),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * List devices matching the filter. Returns `Vec::new()` if P2P is not
+     * running — the RN UI should render an empty list, not an error.
+     */
+async  listDevices(filter: UniffiDeviceFilter, asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiDevice>> {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_devices(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterTypeUniffiDeviceFilter.lower(filter)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayTypeUniffiDevice.lift.bind(FfiConverterArrayTypeUniffiDevice),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Generate a 6-digit pairing code, publish the device's OsInfo +
+     * listen addrs under that code to the DHT, and return the code + its
+     * expiry window. Only one code is active at a time — calling this
+     * again overwrites the previous code.
+     */
+async  generatePairingCode(expiresInSecs: /*u64*/bigint, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiPairingCodeInfo> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterUInt64.lower(expiresInSecs)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeUniffiPairingCodeInfo.lift.bind(FfiConverterTypeUniffiPairingCodeInfo),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Snapshot of every paired device. Returns `Vec::new()` if P2P is not
+     * running (since the paired-devices cache is populated on node start);
+     * that way the settings screen can render an empty list instead of
+     * surfacing an error.
+     */
+async  listPairedDevices(asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiPairedDeviceInfo>> {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_paired_devices(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayTypeUniffiPairedDeviceInfo.lift.bind(FfiConverterArrayTypeUniffiPairedDeviceInfo),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Resolve a pairing code via DHT lookup. Returns the publisher's peer
+     * id + OS info. Must be followed by `request_pairing(...)` to actually
+     * send the pairing request.
+     */
+async  lookupDeviceByCode(code: string, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiDeviceByCodeResult> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_lookup_device_by_code(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(code)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeUniffiDeviceByCodeResult.lift.bind(FfiConverterTypeUniffiDeviceByCodeResult),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Send a pairing request to the given peer. On `Success`, the remote
+     * device is persisted as paired and a `PairedDeviceAdded` event fires.
+     * On `Refused`, the reason indicates whether the user rejected or the
+     * code expired/was wrong.
+     */
+async  requestPairing(peerId: string, method: UniffiPairingMethod, remoteOsInfo: UniffiOsInfo | undefined, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiPairingResponse> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_request_pairing(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(peerId),FfiConverterTypeUniffiPairingMethod.lower(method),FfiConverterOptionalTypeUniffiOsInfo.lower(remoteOsInfo)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeUniffiPairingResponse.lift.bind(FfiConverterTypeUniffiPairingResponse),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Accept or reject an incoming pairing request (delivered via the
+     * `PairingRequestReceived` event). On accept, the pairing is finalized
+     * and a `PairedDeviceAdded` event fires.
+     */
+async  respondPairingRequest(pendingId: /*u64*/bigint, accept: boolean, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_respond_pairing_request(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterUInt64.lower(pendingId),FfiConverterBool.lower(accept)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Remove a device from the paired set. Fires `PairedDeviceRemoved` on
+     * success. Removes from both the in-memory cache and `devices.db`.
+     */
+async  unpairDevice(peerId: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_unpair_device(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(peerId)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+
+    /**
+     * {@inheritDoc uniffi-bindgen-react-native#UniffiAbstractObject.uniffiDestroy}
+     */
+    uniffiDestroy(): void {
+        const ptr = (this as any)[destructorGuardSymbol];
+        if (ptr !== undefined) {
+            const pointer = uniffiTypeUniffiAppCoreObjectFactory.pointer(this);
+            uniffiTypeUniffiAppCoreObjectFactory.freePointer(pointer);
+            uniffiTypeUniffiAppCoreObjectFactory.unbless(ptr);
+            delete (this as any)[destructorGuardSymbol];
+        }
+    }
+
+    static instanceOf(obj: any): obj is UniffiAppCore {
+        return uniffiTypeUniffiAppCoreObjectFactory.isConcreteType(obj);
+    }
+
+    
+}
+
+const uniffiTypeUniffiAppCoreObjectFactory: UniffiObjectFactory<UniffiAppCoreLike> = (() => {
+    
+    return {
+    create(pointer: UniffiHandle): UniffiAppCoreLike {
+        const instance = Object.create(UniffiAppCore.prototype);
+        instance[pointerLiteralSymbol] = pointer;
+        instance[destructorGuardSymbol] = this.bless(pointer);
+        instance[uniffiTypeNameSymbol] = "UniffiAppCore";
+        return instance;
+    },
+
+    
+    bless(p: UniffiHandle): UniffiGcObject {
+        return uniffiCaller.rustCall(
+            /*caller:*/ (status) =>
+                nativeModule().ubrn_uniffi_internal_fn_method_uniffiappcore_ffi__bless_pointer(p, status),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    unbless(ptr: UniffiGcObject) {
+        ptr.markDestroyed();
+    },
+
+    pointer(obj: UniffiAppCoreLike): UniffiHandle {
+        if ((obj as any)[destructorGuardSymbol] === undefined) {
+            throw new UniffiInternalError.UnexpectedNullPointer();
+        }
+        return (obj as any)[pointerLiteralSymbol];
+    },
+
+    clonePointer(obj: UniffiAppCoreLike): UniffiHandle {
+        const pointer = this.pointer(obj);
+        return uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => nativeModule().ubrn_uniffi_mobile_core_fn_clone_uniffiappcore(pointer, callStatus),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    freePointer(pointer: UniffiHandle): void {
+        uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => nativeModule().ubrn_uniffi_mobile_core_fn_free_uniffiappcore(pointer, callStatus),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    isConcreteType(obj: any): obj is UniffiAppCoreLike {
+        return obj[destructorGuardSymbol] && obj[uniffiTypeNameSymbol] === "UniffiAppCore";
+    },
+}})();
+// FfiConverter for UniffiAppCoreLike
+const FfiConverterTypeUniffiAppCore =  new FfiConverterObject(uniffiTypeUniffiAppCoreObjectFactory);
+
+
+export interface UniffiWorkspaceCoreLike {
+    
+    /**
+     * Apply a local Y.Doc update (originated by CodeMirror in the WebView).
+     * Triggers debounced writeback to disk + DB; flush completion fires
+     * [`UniffiAppEvent::DocFlushed`].
+     */
+    applyUpdate(docUuid: string, update: ArrayBuffer, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Flush every open Y.Doc and tear down watchers / sync. MUST be called
+     * before dropping the last reference, otherwise dirty edits may be lost.
+     * Fails with [`FfiError::WorkspaceCloseFailed`] when one or more docs
+     * failed to persist — RN should surface the failure as a toast.
+     */
+    close(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Drop the in-memory Y.Doc. Flushes dirty state first. Safe to call
+     * even when the doc isn't open.
+     */
+    closeDoc(docUuid: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    createDir(relPath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    createFolder(input: CreateFolderInput, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiFolder>;
+    deleteDocumentByRelPath(relPath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Cascade-delete every document whose `rel_path` starts with `prefix`.
+     * Used when deleting a folder subtree. Returns the number of rows
+     * deleted.
+     */
+    deleteDocumentsByPrefix(prefix: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise</*u64*/bigint>;
+    deleteFolder(folderId: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Re-encode the full Y.Doc state for the given UUID. Returns `None` if
+     * the doc isn't currently open. Used when RN needs to re-seed an editor
+     * that was force-closed or reopened in a new WebView.
+     */
+    encodeFullState(docUuid: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<ArrayBuffer | undefined>;
+    exists(relPath: string, asyncOpts_?: { signal: AbortSignal }) : Promise<boolean>;
+    id() : string;
+    info() : UniffiWorkspaceInfo;
+    isDir(relPath: string, asyncOpts_?: { signal: AbortSignal }) : Promise<boolean>;
+    isDocOpen(docUuid: string)  /*throws*/: boolean;
+    listDocuments(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<Array<UniffiDocument>>;
+    listFolders(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<Array<UniffiFolder>>;
+    listOpenDocUuids() : Array<string>;
+    /**
+     * Atomically move a document or folder subtree: physical rename on
+     * disk + DB `rel_path` rebase + live Y.Doc rename for every affected
+     * doc + `FileTreeChanged` event.
+     *
+     * `is_dir` is supplied by the caller (it's usually cheap to know:
+     * folder moves originate from a folder-tree UI affordance, document
+     * moves from a document-list affordance).
+     */
+    moveNode(fromRelPath: string, toRelPath: string, isDir: boolean, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<MoveNodeResult>;
+    /**
+     * Open a document's Y.Doc by workspace-relative `.md` path. Returns
+     * the stable doc UUID + the full Y.Doc state (v1 update bytes) which
+     * RN forwards to the WebView-hosted CodeMirror to seed the editor.
+     */
+    openDoc(relPath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiOpenDocResult>;
+    readBytes(relPath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<ArrayBuffer>;
+    readText(relPath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<string>;
+    /**
+     * Confirm a reload after an `ExternalConflict` — discards unsaved
+     * in-memory edits and reloads from disk. RN calls this from the
+     * "keep file on disk" side of the conflict prompt.
+     */
+    reloadConfirmed(docUuid: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    removeDir(relPath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    removeFile(relPath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Single-file or single-directory rename. For atomic move-with-DB-rebase
+     * use [`move_node`](Self::move_node) instead.
+     */
+    rename(from: string, to: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Update the `rel_path` tracked by an open Y.Doc (used after a file
+     * rename so writebacks target the new path). Sync — no I/O.
+     */
+    renameDoc(docUuid: string, newRelPath: string)  /*throws*/: void;
+    /**
+     * Rename a document in-place (same folder). Updates both the DB row
+     * and the open Y.Doc handle (if any). `new_title` is the display
+     * title; `new_rel_path` is the workspace-relative `.md` path.
+     */
+    renameDocument(oldRelPath: string, newRelPath: string, newTitle: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Save a media file under the note's `.assets/` sidecar. Returns the
+     * workspace-relative path of the stored file (content-addressed).
+     */
+    saveMedia(noteRel: string, fileName: string, data: ArrayBuffer, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<string>;
+    scanTree(relPath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<Array<UniffiFileTreeNode>>;
+    /**
+     * Insert or update a document row. `workspace_id` is implicit from the
+     * workspace handle — the caller only supplies folder / title / path.
+     */
+    upsertDocument(input: UpsertDocInput, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiDocument>;
+    writeBytes(relPath: string, data: ArrayBuffer, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    writeText(relPath: string, content: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+}
+/**
+ * @deprecated Use `UniffiWorkspaceCoreLike` instead.
+ */
+export type UniffiWorkspaceCoreInterface = UniffiWorkspaceCoreLike;
+
+
+export class UniffiWorkspaceCore extends UniffiAbstractObject implements UniffiWorkspaceCoreLike {
+
+    readonly [uniffiTypeNameSymbol] = "UniffiWorkspaceCore";
+    readonly [destructorGuardSymbol]: UniffiGcObject;
+    readonly [pointerLiteralSymbol]: UniffiHandle;
+    // No primary constructor declared for this class.
+private constructor(pointer: UniffiHandle) {
+    super();
+    this[pointerLiteralSymbol] = pointer;
+    this[destructorGuardSymbol] = uniffiTypeUniffiWorkspaceCoreObjectFactory.bless(pointer);
+}
+
+    
+
+    
+    /**
+     * Apply a local Y.Doc update (originated by CodeMirror in the WebView).
+     * Triggers debounced writeback to disk + DB; flush completion fires
+     * [`UniffiAppEvent::DocFlushed`].
+     */
+async  applyUpdate(docUuid: string, update: ArrayBuffer, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(docUuid),FfiConverterArrayBuffer.lower(update)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Flush every open Y.Doc and tear down watchers / sync. MUST be called
+     * before dropping the last reference, otherwise dirty edits may be lost.
+     * Fails with [`FfiError::WorkspaceCloseFailed`] when one or more docs
+     * failed to persist — RN should surface the failure as a toast.
+     */
+async  close(asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Drop the in-memory Y.Doc. Flushes dirty state first. Safe to call
+     * even when the doc isn't open.
+     */
+async  closeDoc(docUuid: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(docUuid)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  createDir(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  createFolder(input: CreateFolderInput, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiFolder> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_folder(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterTypeCreateFolderInput.lower(input)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeUniffiFolder.lift.bind(FfiConverterTypeUniffiFolder),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  deleteDocumentByRelPath(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_document_by_rel_path(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Cascade-delete every document whose `rel_path` starts with `prefix`.
+     * Used when deleting a folder subtree. Returns the number of rows
+     * deleted.
+     */
+async  deleteDocumentsByPrefix(prefix: string, asyncOpts_?: { signal: AbortSignal }): Promise</*u64*/bigint> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_documents_by_prefix(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(prefix)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_u64,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_u64,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_u64,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_u64,
+            /*liftFunc:*/ FfiConverterUInt64.lift.bind(FfiConverterUInt64),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  deleteFolder(folderId: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(folderId)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Re-encode the full Y.Doc state for the given UUID. Returns `None` if
+     * the doc isn't currently open. Used when RN needs to re-seed an editor
+     * that was force-closed or reopened in a new WebView.
+     */
+async  encodeFullState(docUuid: string, asyncOpts_?: { signal: AbortSignal }): Promise<ArrayBuffer | undefined> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(docUuid)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterOptionalArrayBuffer.lift.bind(FfiConverterOptionalArrayBuffer),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  exists(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<boolean> {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_i8,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_i8,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_i8,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_i8,
+            /*liftFunc:*/ FfiConverterBool.lift.bind(FfiConverterBool),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+ id(): string {
+    return FfiConverterString.lift(uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_id(uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this), 
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    ));
+    }
+    
+ info(): UniffiWorkspaceInfo {
+    return FfiConverterTypeUniffiWorkspaceInfo.lift(uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_info(uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this), 
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    ));
+    }
+    
+async  isDir(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<boolean> {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_i8,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_i8,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_i8,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_i8,
+            /*liftFunc:*/ FfiConverterBool.lift.bind(FfiConverterBool),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+ isDocOpen(docUuid: string): boolean /*throws*/ {
+    return FfiConverterBool.lift(
+        uniffiCaller.rustCallWithError(
+            /*liftError:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError),
+            /*caller:*/ (callStatus) => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_doc_open(uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this), 
+        FfiConverterString.lower(docUuid),
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    ));
+    }
+    
+async  listDocuments(asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiDocument>> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_documents(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayTypeUniffiDocument.lift.bind(FfiConverterArrayTypeUniffiDocument),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  listFolders(asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiFolder>> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_folders(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayTypeUniffiFolder.lift.bind(FfiConverterArrayTypeUniffiFolder),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+ listOpenDocUuids(): Array<string> {
+    return FfiConverterArrayString.lift(uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_list_open_doc_uuids(uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this), 
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    ));
+    }
+    
+    /**
+     * Atomically move a document or folder subtree: physical rename on
+     * disk + DB `rel_path` rebase + live Y.Doc rename for every affected
+     * doc + `FileTreeChanged` event.
+     *
+     * `is_dir` is supplied by the caller (it's usually cheap to know:
+     * folder moves originate from a folder-tree UI affordance, document
+     * moves from a document-list affordance).
+     */
+async  moveNode(fromRelPath: string, toRelPath: string, isDir: boolean, asyncOpts_?: { signal: AbortSignal }): Promise<MoveNodeResult> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_move_node(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(fromRelPath),FfiConverterString.lower(toRelPath),FfiConverterBool.lower(isDir)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeMoveNodeResult.lift.bind(FfiConverterTypeMoveNodeResult),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Open a document's Y.Doc by workspace-relative `.md` path. Returns
+     * the stable doc UUID + the full Y.Doc state (v1 update bytes) which
+     * RN forwards to the WebView-hosted CodeMirror to seed the editor.
+     */
+async  openDoc(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiOpenDocResult> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_open_doc(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeUniffiOpenDocResult.lift.bind(FfiConverterTypeUniffiOpenDocResult),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  readBytes(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<ArrayBuffer> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_bytes(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayBuffer.lift.bind(FfiConverterArrayBuffer),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  readText(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<string> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_read_text(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterString.lift.bind(FfiConverterString),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Confirm a reload after an `ExternalConflict` — discards unsaved
+     * in-memory edits and reloads from disk. RN calls this from the
+     * "keep file on disk" side of the conflict prompt.
+     */
+async  reloadConfirmed(docUuid: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_reload_confirmed(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(docUuid)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  removeDir(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_dir(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  removeFile(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_remove_file(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Single-file or single-directory rename. For atomic move-with-DB-rebase
+     * use [`move_node`](Self::move_node) instead.
+     */
+async  rename(from: string, to: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(from),FfiConverterString.lower(to)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Update the `rel_path` tracked by an open Y.Doc (used after a file
+     * rename so writebacks target the new path). Sync — no I/O.
+     */
+ renameDoc(docUuid: string, newRelPath: string): void /*throws*/ {
+        uniffiCaller.rustCallWithError(
+            /*liftError:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError),
+            /*caller:*/ (callStatus) => { nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_doc(uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this), 
+        FfiConverterString.lower(docUuid),
+        FfiConverterString.lower(newRelPath),
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    );
+    }
+    
+    /**
+     * Rename a document in-place (same folder). Updates both the DB row
+     * and the open Y.Doc handle (if any). `new_title` is the display
+     * title; `new_rel_path` is the workspace-relative `.md` path.
+     */
+async  renameDocument(oldRelPath: string, newRelPath: string, newTitle: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_rename_document(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(oldRelPath),FfiConverterString.lower(newRelPath),FfiConverterString.lower(newTitle)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Save a media file under the note's `.assets/` sidecar. Returns the
+     * workspace-relative path of the stored file (content-addressed).
+     */
+async  saveMedia(noteRel: string, fileName: string, data: ArrayBuffer, asyncOpts_?: { signal: AbortSignal }): Promise<string> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_save_media(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(noteRel),FfiConverterString.lower(fileName),FfiConverterArrayBuffer.lower(data)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterString.lift.bind(FfiConverterString),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  scanTree(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiFileTreeNode>> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_scan_tree(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayTypeUniffiFileTreeNode.lift.bind(FfiConverterArrayTypeUniffiFileTreeNode),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Insert or update a document row. `workspace_id` is implicit from the
+     * workspace handle — the caller only supplies folder / title / path.
+     */
+async  upsertDocument(input: UpsertDocInput, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiDocument> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_upsert_document(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterTypeUpsertDocInput.lower(input)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeUniffiDocument.lift.bind(FfiConverterTypeUniffiDocument),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  writeBytes(relPath: string, data: ArrayBuffer, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_bytes(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath),FfiConverterArrayBuffer.lower(data)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+async  writeText(relPath: string, content: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(relPath),FfiConverterString.lower(content)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+
+    /**
+     * {@inheritDoc uniffi-bindgen-react-native#UniffiAbstractObject.uniffiDestroy}
+     */
+    uniffiDestroy(): void {
+        const ptr = (this as any)[destructorGuardSymbol];
+        if (ptr !== undefined) {
+            const pointer = uniffiTypeUniffiWorkspaceCoreObjectFactory.pointer(this);
+            uniffiTypeUniffiWorkspaceCoreObjectFactory.freePointer(pointer);
+            uniffiTypeUniffiWorkspaceCoreObjectFactory.unbless(ptr);
+            delete (this as any)[destructorGuardSymbol];
+        }
+    }
+
+    static instanceOf(obj: any): obj is UniffiWorkspaceCore {
+        return uniffiTypeUniffiWorkspaceCoreObjectFactory.isConcreteType(obj);
+    }
+
+    
+}
+
+const uniffiTypeUniffiWorkspaceCoreObjectFactory: UniffiObjectFactory<UniffiWorkspaceCoreLike> = (() => {
+    
+    return {
+    create(pointer: UniffiHandle): UniffiWorkspaceCoreLike {
+        const instance = Object.create(UniffiWorkspaceCore.prototype);
+        instance[pointerLiteralSymbol] = pointer;
+        instance[destructorGuardSymbol] = this.bless(pointer);
+        instance[uniffiTypeNameSymbol] = "UniffiWorkspaceCore";
+        return instance;
+    },
+
+    
+    bless(p: UniffiHandle): UniffiGcObject {
+        return uniffiCaller.rustCall(
+            /*caller:*/ (status) =>
+                nativeModule().ubrn_uniffi_internal_fn_method_uniffiworkspacecore_ffi__bless_pointer(p, status),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    unbless(ptr: UniffiGcObject) {
+        ptr.markDestroyed();
+    },
+
+    pointer(obj: UniffiWorkspaceCoreLike): UniffiHandle {
+        if ((obj as any)[destructorGuardSymbol] === undefined) {
+            throw new UniffiInternalError.UnexpectedNullPointer();
+        }
+        return (obj as any)[pointerLiteralSymbol];
+    },
+
+    clonePointer(obj: UniffiWorkspaceCoreLike): UniffiHandle {
+        const pointer = this.pointer(obj);
+        return uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => nativeModule().ubrn_uniffi_mobile_core_fn_clone_uniffiworkspacecore(pointer, callStatus),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    freePointer(pointer: UniffiHandle): void {
+        uniffiCaller.rustCall(
+            /*caller:*/ (callStatus) => nativeModule().ubrn_uniffi_mobile_core_fn_free_uniffiworkspacecore(pointer, callStatus),
+            /*liftString:*/ FfiConverterString.lift
+        );
+    },
+
+    isConcreteType(obj: any): obj is UniffiWorkspaceCoreLike {
+        return obj[destructorGuardSymbol] && obj[uniffiTypeNameSymbol] === "UniffiWorkspaceCore";
+    },
+}})();
+// FfiConverter for UniffiWorkspaceCoreLike
+const FfiConverterTypeUniffiWorkspaceCore =  new FfiConverterObject(uniffiTypeUniffiWorkspaceCoreObjectFactory);
+
+
+// FfiConverter for boolean | undefined
+const FfiConverterOptionalBool = new FfiConverterOptional(FfiConverterBool);
+
+
+// FfiConverter for ArrayBuffer | undefined
+const FfiConverterOptionalArrayBuffer = new FfiConverterOptional(FfiConverterArrayBuffer);
+
+
+// FfiConverter for UniffiOsInfo | undefined
+const FfiConverterOptionalTypeUniffiOsInfo = new FfiConverterOptional(FfiConverterTypeUniffiOsInfo);
+
+
+// FfiConverter for UniffiPairedDeviceInfo | undefined
+const FfiConverterOptionalTypeUniffiPairedDeviceInfo = new FfiConverterOptional(FfiConverterTypeUniffiPairedDeviceInfo);
+
+
+// FfiConverter for UniffiWorkspaceInfo | undefined
+const FfiConverterOptionalTypeUniffiWorkspaceInfo = new FfiConverterOptional(FfiConverterTypeUniffiWorkspaceInfo);
+
+
+// FfiConverter for string | undefined
+const FfiConverterOptionalString = new FfiConverterOptional(FfiConverterString);
+
+
+// FfiConverter for UniffiTimestamp | undefined
+const FfiConverterOptionalTimestamp = new FfiConverterOptional(FfiConverterTimestamp);
+
+
+// FfiConverter for /*u64*/bigint | undefined
+const FfiConverterOptionalUInt64 = new FfiConverterOptional(FfiConverterUInt64);
+
+
+// FfiConverter for Array<DocFlushFailure>
+const FfiConverterArrayTypeDocFlushFailure = new FfiConverterArray(FfiConverterTypeDocFlushFailure);
+
+
+// FfiConverter for Array<UniffiDevice>
+const FfiConverterArrayTypeUniffiDevice = new FfiConverterArray(FfiConverterTypeUniffiDevice);
+
+
+// FfiConverter for Array<UniffiDocument>
+const FfiConverterArrayTypeUniffiDocument = new FfiConverterArray(FfiConverterTypeUniffiDocument);
+
+
+// FfiConverter for Array<UniffiFileTreeNode>
+const FfiConverterArrayTypeUniffiFileTreeNode = new FfiConverterArray(FfiConverterTypeUniffiFileTreeNode);
+
+
+// FfiConverter for Array<UniffiFolder>
+const FfiConverterArrayTypeUniffiFolder = new FfiConverterArray(FfiConverterTypeUniffiFolder);
+
+
+// FfiConverter for Array<UniffiPairedDeviceInfo>
+const FfiConverterArrayTypeUniffiPairedDeviceInfo = new FfiConverterArray(FfiConverterTypeUniffiPairedDeviceInfo);
+
+
+// FfiConverter for Array<UniffiWorkspaceInfo>
+const FfiConverterArrayTypeUniffiWorkspaceInfo = new FfiConverterArray(FfiConverterTypeUniffiWorkspaceInfo);
+
+
+// FfiConverter for Array<string>
+const FfiConverterArrayString = new FfiConverterArray(FfiConverterString);
+
+
+// FfiConverter for UniffiConnectionType | undefined
+const FfiConverterOptionalTypeUniffiConnectionType = new FfiConverterOptional(FfiConverterTypeUniffiConnectionType);
+
+
+// FfiConverter for Array<UniffiFileTreeNode> | undefined
+const FfiConverterOptionalArrayTypeUniffiFileTreeNode = new FfiConverterOptional(FfiConverterArrayTypeUniffiFileTreeNode);
 
 /**
  * This should be called before anything else.
@@ -91,12 +6263,197 @@ function uniffiEnsureInitialized() {
     if (bindingsContractVersion !== scaffoldingContractVersion) {
         throw new UniffiInternalError.ContractVersionMismatch(scaffoldingContractVersion, bindingsContractVersion);
     }
-    if (nativeModule().ubrn_uniffi_mobile_core_checksum_func_greet() !== 46550) {
-        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_func_greet");
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace() !== 15040) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_device_info() !== 36704) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_device_info");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces() !== 48632) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_network_status() !== 41814) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_network_status");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace() !== 28492) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id() !== 33021) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_peer_id");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name() !== 23236) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_start_network() !== 20143) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_start_network");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network() !== 6521) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_stop_network");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info() !== 6310) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_devices() !== 47353) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_list_devices");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code() !== 37036) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_paired_devices() !== 26343) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_list_paired_devices");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_lookup_device_by_code() !== 65128) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_lookup_device_by_code");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_request_pairing() !== 31060) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_request_pairing");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_respond_pairing_request() !== 3647) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_respond_pairing_request");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_unpair_device() !== 51454) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_unpair_device");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_foreigneventbus_emit() !== 44996) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_foreigneventbus_emit");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair() !== 43990) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update() !== 42247) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close() !== 15034) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_close");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc() !== 4613) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir() !== 40297) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_folder() !== 36415) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_folder");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_document_by_rel_path() !== 17075) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_document_by_rel_path");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_documents_by_prefix() !== 37439) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_documents_by_prefix");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder() !== 61663) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state() !== 51079) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists() !== 42392) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id() !== 8962) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_id");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_info() !== 35799) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_info");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir() !== 18666) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_doc_open() !== 12219) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_doc_open");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_documents() !== 45976) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_documents");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_folders() !== 36790) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_folders");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_open_doc_uuids() !== 35188) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_list_open_doc_uuids");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_move_node() !== 20094) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_move_node");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_open_doc() !== 42618) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_open_doc");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_bytes() !== 23516) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_bytes");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_text() !== 4427) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_read_text");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_reload_confirmed() !== 36293) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_reload_confirmed");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_dir() !== 42221) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_dir");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_file() !== 45351) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_remove_file");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename() !== 12754) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_doc() !== 34297) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_doc");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_document() !== 44068) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_rename_document");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_save_media() !== 64101) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_save_media");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_scan_tree() !== 57458) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_scan_tree");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_upsert_document() !== 22157) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_upsert_document");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_bytes() !== 16693) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_bytes");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_text() !== 6900) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_write_text");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_constructor_uniffiappcore_new() !== 2693) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_constructor_uniffiappcore_new");
     }
 
+    uniffiCallbackInterfaceForeignEventBus.register();
+    uniffiCallbackInterfaceForeignKeychainProvider.register();
     }
 
 export default Object.freeze({
   initialize: uniffiEnsureInitialized,
+  converters: {
+    FfiConverterTypeCreateFolderInput,
+    FfiConverterTypeDocFlushFailure,
+    FfiConverterTypeFfiError,
+    FfiConverterTypeForeignEventBus,
+    FfiConverterTypeForeignKeychainProvider,
+    FfiConverterTypeMoveNodeResult,
+    FfiConverterTypeUniffiAppCore,
+    FfiConverterTypeUniffiAppEvent,
+    FfiConverterTypeUniffiConnectionType,
+    FfiConverterTypeUniffiDevice,
+    FfiConverterTypeUniffiDeviceByCodeResult,
+    FfiConverterTypeUniffiDeviceFilter,
+    FfiConverterTypeUniffiDeviceInfo,
+    FfiConverterTypeUniffiDeviceStatus,
+    FfiConverterTypeUniffiDocument,
+    FfiConverterTypeUniffiFileTreeNode,
+    FfiConverterTypeUniffiFolder,
+    FfiConverterTypeUniffiNodeStatus,
+    FfiConverterTypeUniffiOpenDocResult,
+    FfiConverterTypeUniffiOsInfo,
+    FfiConverterTypeUniffiPairedDeviceInfo,
+    FfiConverterTypeUniffiPairingCodeInfo,
+    FfiConverterTypeUniffiPairingMethod,
+    FfiConverterTypeUniffiPairingRefuseReason,
+    FfiConverterTypeUniffiPairingResponse,
+    FfiConverterTypeUniffiWorkspaceCore,
+    FfiConverterTypeUniffiWorkspaceInfo,
+    FfiConverterTypeUpsertDocInput,
+  }
 });
