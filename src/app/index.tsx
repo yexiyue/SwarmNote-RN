@@ -1,36 +1,11 @@
-import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { greet } from "react-native-swarmnote-core";
-import { AnimatedIcon } from "@/components/animated-icon";
+import { Redirect } from "expo-router";
+import { useOnboardingStore } from "@/stores/onboarding-store";
 
-export default function HomeScreen() {
-  return (
-    <View className="flex-1 justify-center flex-row bg-background">
-      <SafeAreaView className="flex-1 px-4 items-center gap-3 max-w-150">
-        <View className="items-center justify-center flex-1 px-4 gap-4">
-          <AnimatedIcon />
-          <Text className="text-2xl font-bold text-foreground text-center">
-            Welcome to SwarmNote
-          </Text>
-        </View>
-
-        <Text className="text-sm font-mono text-muted-foreground uppercase">get started</Text>
-
-        <View className="self-stretch px-3 py-4 rounded-lg bg-muted gap-3">
-          <Text className="text-sm text-muted-foreground">
-            Edit <Text className="font-mono text-foreground">src/app/index.tsx</Text> to get started
-          </Text>
-        </View>
-
-        <Text className="text-sm font-mono text-primary">{greet("SwarmNote")}</Text>
-
-        <Link href={"/editor-test" as never} asChild>
-          <Pressable className="py-3 px-5 rounded-lg bg-primary active:opacity-80">
-            <Text className="text-primary-foreground font-medium">Open Editor Test</Text>
-          </Pressable>
-        </Link>
-      </SafeAreaView>
-    </View>
-  );
+/** Root redirect: onboarding gate. `_layout.tsx` has already awaited
+ *  `waitForOnboardingHydration()`, so `hasOnboarded` is authoritative here. */
+export default function Index() {
+  const hasOnboarded = useOnboardingStore((s) => s.hasOnboarded);
+  // `as never` sidesteps typedRoutes' type-gen which only resolves after
+  // `expo start`; routes below exist in the filesystem so runtime is fine.
+  return <Redirect href={(hasOnboarded ? "/(tabs)" : "/onboarding/welcome") as never} />;
 }

@@ -2,35 +2,62 @@ import "../global.css";
 
 import { ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { useColorScheme } from "react-native";
-import AppTabs from "@/components/app-tabs";
+import { ActivityIndicator, useColorScheme, View } from "react-native";
+import { PairingRequestHost } from "@/components/pairing-request-host";
+import { initAppCore } from "@/core/app-core";
 import { useNavTheme } from "@/hooks/useThemeColors";
 import { restoreThemePreference } from "@/lib/theme-persistence";
+import { waitForOnboardingHydration } from "@/stores/onboarding-store";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function TabLayout() {
+export default function RootLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const navTheme = useNavTheme();
-  const [themeLoaded, setThemeLoaded] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [bootError, setBootError] = useState<string | null>(null);
 
   useEffect(() => {
-    restoreThemePreference().then(() => {
-      setThemeLoaded(true);
-      SplashScreen.hideAsync();
-    });
+    (async () => {
+      try {
+        await Promise.all([restoreThemePreference(), waitForOnboardingHydration(), initAppCore()]);
+      } catch (err) {
+        console.error("[boot] initAppCore failed:", err);
+        setBootError(String(err));
+      } finally {
+        setReady(true);
+        SplashScreen.hideAsync().catch(() => {});
+      }
+    })();
   }, []);
 
-  if (!themeLoaded) return null;
+  if (!ready) return null;
+
+  if (bootError !== null) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background p-8">
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
   return (
     <ThemeProvider value={navTheme}>
       <StatusBar style={isDark ? "light" : "dark"} />
-      <AppTabs />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="pairing/input-code" options={{ presentation: "modal" }} />
+        <Stack.Screen name="editor-test" />
+        <Stack.Screen name="explore" />
+      </Stack>
+      <PairingRequestHost />
       <PortalHost />
     </ThemeProvider>
   );

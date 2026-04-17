@@ -51,6 +51,9 @@
           "a11y": {
             "useSemanticElements": "off",
             "useKeyWithClickEvents": "off"
+          },
+          "complexity": {
+            "noUselessFragments": "off"
           }
         }
       }

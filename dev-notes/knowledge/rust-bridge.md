@@ -140,6 +140,22 @@ use swarmnote_core::config::{save_config, RecentWorkspace};
 
 **不要**再写 `swarmnote_core::api::X` 或 `swarmnote_core::internal::Y`——这两个模块根本不存在，编译器会直接报 `could not find \`api\` / \`internal\` in \`swarmnote_core\``。
 
+### 给 mobile-core 加一个新 FFI API 的模板
+
+每次要给 RN 暴露一个新能力时，按这五步走，避免漏步：
+
+1. **types.rs** —— 新增 `UniffiFooResult` / `UniffiFooInput` 之类的 FFI 类型（`#[derive(uniffi::Record)]` 或 `#[derive(uniffi::Enum)]`），如果有对应的 core 类型，同时 `impl From<core::Foo> for UniffiFoo`。`usize` / `u64` / `i64` 要显式选一个（uniffi 不支持 `usize`，移动端常用 `u64`）。
+2. **events.rs** —— 如果新能力需要回传进度 / 变化，在 `UniffiAppEvent` enum 加变体（不改共享 crate 的 `AppEvent`）。在 `UniffiEventBusAdapter` 加一个 `emit_xxx()` helper 供 wrap 层调（直接 `foreign.emit(UniffiAppEvent::Xxx { ... })`），不走 `map_event`——它只映射来自 core 的原生事件。
+3. **对应 Object 方法** —— 在 `app.rs` 的 `UniffiAppCore` 或 `workspace.rs` 的 `UniffiWorkspaceCore` 的 `#[uniffi::export] impl` 块里加 `pub async fn foo(&self, ...)`，内部调 `self.inner.xxx()` 或顶层 `swarmnote_core::bar(...)`。错误转换用 `.map_err(Into::into)`；字符串 UUID 用 `parse_uuid("workspace_id", &s)`。如果需要 event bus，从 `self.event_bus.clone()`（`UniffiAppCore.event_bus` / `UniffiWorkspaceCore.event_bus` 都持一份 `Arc<UniffiEventBusAdapter>`）拿。
+4. **模块级函数**（不需要 `AppCore` 实例） —— 直接 `#[uniffi::export] pub fn foo() -> Result<T, FfiError>` 写在对应 module 顶层（例：`keychain.rs::generate_keypair_bytes()`）。TS 侧变成 `import { foo } from 'react-native-swarmnote-core';`。
+5. **重新生成 + 后处理** —— 跑 `pnpm --filter react-native-swarmnote-core ubrn:android`（或 `ubrn:ios`）；它会：
+   - 重编 Rust 到四个 Android target (arm64-v8a / armv7 / x86 / x86_64)
+   - 重新生成 `src/generated/mobile_core{,-ffi}.ts` 和 `cpp/generated/*`
+   - 复制 `.a` 到 `android/src/main/jniLibs/<abi>/libmobile_core.a`
+   - 跑 `scripts/fix-ubrn-output.mjs` 修 async-static 的已知 bug
+
+   再跑 `pnpm --filter react-native-swarmnote-core prepare` 重新编译 `lib/typescript/*.d.ts`（builder-bob 输出的类型产物才是 tsc 看的入口——忘记跑这步会导致"property 'foo' does not exist on type 'UniffiAppCoreLike'"）。
+
 ### AppCore 构造走 AppCoreBuilder + factory 注入
 
 ```rust
