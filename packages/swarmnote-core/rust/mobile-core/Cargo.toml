@@ -10,3 +10,19 @@ name = "mobile_core"
 [dependencies]
 uniffi = { version = "0.31.0", features = ["bindgen", "build", "cli"] }
 
+# Shared core — fetched from the main swarmnote repo via git dependency.
+# Cargo auto-resolves the nested `libs/` submodule containing `swarm-p2p-core`.
+swarmnote-core = { git = "https://github.com/yexiyue/swarmnote.git", branch = "develop" }
+# `entity` lives in the same workspace. Needed directly because
+# `DocumentCrud::list_documents` / `list_folders` return `documents::Model`
+# and `folders::Model`; the wrap projects those into UI-friendly records.
+entity = { git = "https://github.com/yexiyue/swarmnote.git", branch = "develop" }
+
+# Wrap-layer dependencies. Versions aligned with swarmnote-core's manifest
+# so the resolver picks a single copy of each.
+async-trait = "0.1"
+thiserror = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "macros"] }
+

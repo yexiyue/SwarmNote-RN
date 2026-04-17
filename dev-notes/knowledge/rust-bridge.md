@@ -44,16 +44,67 @@ rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-andro
 
 ## 已知问题
 
-- 当前 `mobile-core` 是独立的最小化 crate（验证链路用），后续会 submodule 引入共享 `swarmnote-core` 做真正的 FFI wrap
 - ubrn 编译 Android 产物位置可能需要手动 fix（参考 `dev-notes/blog/ubrn-android-build-gradle-fix.md`）
 
-## 待接入：`swarmnote-core` FFI wrap（下一步）
+## FFI wrap 已落地（2026-04-17）
 
-桌面端 `swarmnote-core`（位于 `swarmnote` 主仓 `crates/core/`）已经做完 FFI-friendly hardening（change `harden-core-for-ffi`）。接入步骤：
+`mobile-core` 通过 git 依赖引入 `swarmnote-core`（不抽独立 repo），wrap 代码按领域拆 module：
 
-1. 通过 git submodule 把 `swarmnote-core` 挂到 `packages/swarmnote-core/rust/swarmnote-core/`
-2. 在 `rust/mobile-core/Cargo.toml` 里 path 依赖
-3. 在 `mobile-core/src/lib.rs` 写**镜像类型 + From 转换**的 wrap，不修改 `swarmnote-core` 本身
+```text
+rust/mobile-core/src/
+├── lib.rs          # uniffi::setup_scaffolding! + pub mod
+├── path.rs         # strip_file_uri（剥 Expo 'file://' 前缀）
+├── error.rs        # FfiError + From<AppError> + parse_uuid helper
+├── keychain.rs     # ForeignKeychainProvider + adapter
+├── events.rs       # UniffiAppEvent（14 变体全映射）+ ForeignEventBus + adapter
+├── types.rs        # Workspace / Doc / Folder / FileTree / NodeStatus / inputs / MoveNodeResult
+├── app.rs          # UniffiAppCore 核心方法（构造 / 身份 / 网络 / 工作区）
+├── pairing.rs      # 配对类型 + UniffiAppCore 配对方法（impl 分离）
+├── device.rs       # 设备类型 + UniffiAppCore.list_devices
+└── workspace.rs    # UniffiWorkspaceCore（fs + documents + folders + ydoc 全部 collapse）
+```
+
+### RN-specific 设计决策（和 Tauri 不同的地方）
+
+这些决策跟 Tauri 桌面不一样，是为了匹配 RN + uniffi 的使用模式。
+
+**1. workspace_id / doc_uuid 从 handle 隐式取，不透传**
+
+Tauri 每个 `invoke('list_documents', { workspaceId })` 都要带 `workspaceId`，因为前端不持有 Rust 对象。RN 直接持有 `UniffiWorkspaceCore` 引用，所以 `ws.listDocuments()` 不用再传 workspace_id——wrap 层从 `self.inner.id()` 取。
+
+- **正确**：定义独立的 FFI input 类型（`UpsertDocInput` / `CreateFolderInput`），省略 `workspace_id`，wrap 方法里拼进 core 的 `UpsertDocumentInput`。
+- **不要**：直接镜像 core 的 input 类型——RN 调用者会重复写 workspaceId 且可能填错。
+
+**2. fs / documents / ydoc 全部 collapse 到 `UniffiWorkspaceCore`**
+
+桌面把三者分成独立对象（`fs.rs`、`document.rs`、`yjs.rs` command 模块）。RN 上全部 flat 到一个 handle：`ws.readText()` / `ws.listDocuments()` / `ws.openDoc()`。
+
+- **Why**：每个子对象都要 `uniffiDestroy()` 管理生命周期；RN 开发者只想拿 `ws` 一个引用。JSI 调用链也更短。
+- **代价**：`UniffiWorkspaceCore` 方法多（~25 个），但语义清晰（workspace 是自然的 scope）。
+
+**3. Path 参数在 wrap 层剥 `file://` 前缀**
+
+Expo 的 `FileSystem.documentDirectory` 返回 `file:///var/mobile/.../Documents/`，`tokio::fs` / `PathBuf` 要纯文件系统路径。`path.rs::strip_file_uri` 兜底剥前缀，RN 调用者可以直接传 Expo 路径。
+
+**4. 事件只走 EventBus callback（`#[uniffi::export(with_foreign)]`）**
+
+不提供 getter + poll 模式。`UniffiAppEvent` 覆盖 core 全部 14 变体，RN 实现 `ForeignEventBus.emit(event)` 分发到 zustand store。**关键**：`ExternalUpdate` 事件携带远端 Yjs update bytes，RN 必须立即转发给 WebView 编辑器——这是唯一的实时路径。
+
+**5. 时间戳统一 `std::time::SystemTime`**
+
+core 的 `chrono::DateTime<Utc>` 一律转 `SystemTime`（uniffi 原生支持 → TS `Date`）。`DeviceInfo.created_at` 例外——core 本身就是 `String` (ISO-8601)，保持透传。
+
+**6. UI-friendly 实体投影，不暴露存储内部字段**
+
+`UniffiDocument` 只有 id / folder_id / title / rel_path / created_at / updated_at / created_by。`yjs_state` / `state_vector` / `file_hash` / `lamport_clock` 永远不回到 RN——它们是存储内部细节。
+
+**7. 错误：镜像 `AppError` kind 名 + 新增 `InvalidInput` 变体**
+
+`FfiError` 22 个变体一一对应 `AppError`（kind 名稳定 API 合约），额外加 `InvalidInput { field, reason }` 覆盖 wrap 层的 UUID 解析失败。RN 侧用 `FfiError.<Variant>.instanceOf(e)` 判别（不是 `instanceof`）。
+
+**8. `move_node` 用公共 API 组装，不走 `internal::fs::ops`**
+
+桌面 `move_document` 用 `swarmnote_core::internal::fs::ops::move_node`。mobile 拒绝碰 `internal::*`，改用 `fs().rename() + rebase_documents_by_prefix() / rebase_document() + ydoc().rename_doc() + event_bus().emit(FileTreeChanged)` 组合实现相同语义。
 
 ### 只用 `api::` 命名空间
 
