@@ -82,7 +82,50 @@ SyntaxError: src/generated/mobile_core.ts: Unexpected token, expected "(" (4492:
 
 ---
 
-## 坑 3：cargo 拉私有 submodule 鉴权失败
+## 坑 3：Windows `\\?\` 长路径前缀打穿 lld（仅 Windows）
+
+**症状**：`pnpm ubrn:android` 在 Windows 上 link 阶段大量报错
+
+```
+error: linking with `C:/Users/.../cargo-ndk` failed: exit code: 1
+ld.lld: error: cannot find version script \\?\D:\workspace\...\rustc6MrA9A\list
+ld.lld: error: cannot open \\?\D:\workspace\...\deps\mobile_core.<hash>.rcgu.o: No such file or directory
+(几十条类似错误)
+```
+
+**原因**：ubrn `0.31.0-2` 在 `crates/ubrn_common/src/rust_crate.rs` 里用 `manifest_path.canonicalize_utf8()`。Windows 的 `std::fs::canonicalize` **总是**返回 `\\?\`（extended-length path）前缀，即使路径没到 MAX_PATH。这个前缀被 cargo 传给 rustc，rustc 把所有临时 `.o` / `.list` 路径也带上前缀喂给 `ld.lld`，**而 `ld.lld` 不认识 `\\?\` 前缀**，全部报 "cannot open"。
+
+传染链：`ubrn canonicalize → cargo --manifest-path \\?\... → rustc deps 路径 → lld 参数 → lld 失败`。
+
+**不能靠 `subst X: D:\...` 绕过**——cargo 内部还会 `canonicalize` 回真实盘符，`\\?\` 前缀照样加。
+
+**修复**：apply ubrn PR [#367](https://github.com/jhugman/uniffi-bindgen-react-native/pull/367) 的改动，用 `dunce::canonicalize`（自动剥 `\\?\` 前缀）替代 `std::fs::canonicalize`。通过 `pnpm patch` 持久化：
+
+```bash
+# 1. 生成 patch 源目录（路径以输出为准）
+pnpm patch uniffi-bindgen-react-native
+
+# 2. 在 patch 源目录里改 3 个文件：
+#    crates/ubrn_common/Cargo.toml      — [dependencies] 加 `dunce = "1.0.5"`
+#    crates/ubrn_common/src/files.rs    — pwd() 和 canonicalize_utf8_or_shim 用 dunce
+#    crates/ubrn_common/src/rust_crate.rs — import Utf8PathExt + 两处 canonicalize_utf8() → canonicalize_utf8_or_shim()
+
+# 3. commit patch，写进 package.json 的 pnpm.patchedDependencies
+pnpm patch-commit <patch 源目录>
+```
+
+commit 后 `patches/uniffi-bindgen-react-native@0.31.0-2.patch` 进 git，`pnpm install` 自动 apply。
+
+**什么时候可以删掉这个 patch**：ubrn 把 PR #367 合进正式 release 后（关注 `jhugman/uniffi-bindgen-react-native` 的 release notes 里 `dunce` / `canonicalize_utf8_or_shim` 相关条目）。
+
+**不要**：
+
+- 不要试图靠 `subst`、短路径、`CARGO_TARGET_DIR` 绕过——Windows `canonicalize` 对短路径也加 `\\?\`，这 bug 必须改 ubrn 源码。
+- 不要等上游修好再用 ubrn——patch 本地维护成本很低（PR #367 只改 3 个文件）。
+
+---
+
+## 坑 4：cargo 拉私有 submodule 鉴权失败
 
 **症状**（历史上踩过，不是这次）：`cargo build` 里 `mobile-core → entity (git dep on swarmnote.git) → submodule packages/editor` 拉取时
 
