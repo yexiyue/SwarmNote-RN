@@ -44,6 +44,7 @@ rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-andro
 
 ## 已知问题
 
+- ubrn 构建工具链 / 代码生成踩坑（iOS deployment target、async static 生成 bug、cargo git 鉴权）见 `dev-notes/knowledge/ubrn.md`
 - ubrn 编译 Android 产物位置可能需要手动 fix（参考 `dev-notes/blog/ubrn-android-build-gradle-fix.md`）
 
 ## FFI wrap 已落地（2026-04-17）

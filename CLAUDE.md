@@ -183,6 +183,7 @@ git commit -m "chore: update editor submodule"
 - `dev-notes/knowledge/theme-and-styling.md`
 - `dev-notes/knowledge/editor.md`
 - `dev-notes/knowledge/rust-bridge.md`
+- `dev-notes/knowledge/ubrn.md`
 - `dev-notes/knowledge/toolchain.md`
 
 设计稿位于 `dev-notes/design/mobile-design.pen`，需要通过 Pencil MCP 工具读取和修改，不要用普通文件读取工具解析 `.pen`。
