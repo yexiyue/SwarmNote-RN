@@ -9,9 +9,26 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use swarmnote_core::libp2p::identity::Keypair;
 use swarmnote_core::{AppResult, KeychainProvider};
 
 use crate::error::FfiError;
+
+/// Generate a fresh libp2p Ed25519 keypair and return its protobuf encoding.
+///
+/// Intended for RN keychain bootstraps: when `expo-secure-store` misses
+/// (first install / keychain cleared), the JS `ForeignKeychainProvider`
+/// calls this to get the bytes it should return — mirrors the desktop
+/// `DesktopKeychain`'s `Keypair::generate_ed25519().to_protobuf_encoding()`
+/// path, but exposed as a standalone function because RN needs to control
+/// the "persist" step through native APIs.
+#[uniffi::export]
+pub fn generate_keypair_bytes() -> Result<Vec<u8>, FfiError> {
+    let keypair = Keypair::generate_ed25519();
+    keypair
+        .to_protobuf_encoding()
+        .map_err(|e| FfiError::KeypairEncode(e.to_string()))
+}
 
 /// Trait the RN host implements. Methods are `async` so JS implementations
 /// can await native keychain APIs (which are all async).

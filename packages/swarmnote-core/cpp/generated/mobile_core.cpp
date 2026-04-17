@@ -413,6 +413,8 @@ extern "C" {
         RustBuffer rel_path, 
         RustBuffer content
     );
+    RustBuffer uniffi_mobile_core_fn_func_generate_keypair_bytes(RustCallStatus *uniffi_out_err
+    );
     RustBuffer ffi_mobile_core_rustbuffer_alloc(
         uint64_t size, 
         RustCallStatus *uniffi_out_err
@@ -609,6 +611,8 @@ extern "C" {
     void ffi_mobile_core_rust_future_complete_void(
         /*handle*/ uint64_t handle, 
         RustCallStatus *uniffi_out_err
+    );
+    uint16_t uniffi_mobile_core_checksum_func_generate_keypair_bytes(
     );
     uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(
     );
@@ -3485,6 +3489,14 @@ NativeMobileCore::NativeMobileCore(
             return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_mobile_core_fn_func_generate_keypair_bytes"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_func_generate_keypair_bytes"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_func_generate_keypair_bytes(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_ffi_mobile_core_rust_future_poll_u8"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_ffi_mobile_core_rust_future_poll_u8"),
@@ -3867,6 +3879,14 @@ NativeMobileCore::NativeMobileCore(
         1,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_ffi_mobile_core_rust_future_complete_void(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_func_generate_keypair_bytes"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_func_generate_keypair_bytes"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_func_generate_keypair_bytes(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace"] = jsi::Function::createFromHostFunction(
@@ -4954,6 +4974,15 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecor
         
         return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_func_generate_keypair_bytes(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_mobile_core_fn_func_generate_keypair_bytes(&status
+        );
+        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_poll_u8(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         ffi_mobile_core_rust_future_poll_u8(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<UniffiRustFutureContinuationCallback>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[2])
         );
@@ -5325,6 +5354,13 @@ jsi::Value NativeMobileCore::cpp_ffi_mobile_core_rust_future_complete_void(jsi::
 
         
         return jsi::Value::undefined();
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_func_generate_keypair_bytes(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_func_generate_keypair_bytes(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
 }
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(

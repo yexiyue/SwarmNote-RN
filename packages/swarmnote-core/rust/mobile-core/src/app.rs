@@ -7,7 +7,8 @@
 
 use std::sync::Arc;
 
-use swarmnote_core::{config::save_config, AppCore, AppCoreBuilder, NodeStatus, PeerId};
+use swarmnote_core::libp2p::PeerId;
+use swarmnote_core::{config::save_config, AppCore, AppCoreBuilder, NodeStatus};
 
 use crate::error::{FfiError, parse_uuid};
 use crate::events::{ForeignEventBus, UniffiEventBusAdapter};

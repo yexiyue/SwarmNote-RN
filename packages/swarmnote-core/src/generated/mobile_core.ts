@@ -83,6 +83,27 @@ const uniffiIsDebug =
   false;
 // Public interface members begin here.
 
+/**
+ * Generate a fresh libp2p Ed25519 keypair and return its protobuf encoding.
+ *
+ * Intended for RN keychain bootstraps: when `expo-secure-store` misses
+ * (first install / keychain cleared), the JS `ForeignKeychainProvider`
+ * calls this to get the bytes it should return — mirrors the desktop
+ * `DesktopKeychain`'s `Keypair::generate_ed25519().to_protobuf_encoding()`
+ * path, but exposed as a standalone function because RN needs to control
+ * the "persist" step through native APIs.
+ */
+export function generateKeypairBytes(): ArrayBuffer /*throws*/ {
+    return FfiConverterArrayBuffer.lift(
+        uniffiCaller.rustCallWithError(
+            /*liftError:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError),
+            /*caller:*/ (callStatus) => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_func_generate_keypair_bytes(
+                callStatus);
+            },
+            /*liftString:*/ FfiConverterString.lift,
+    ));
+    }
 
 
 
@@ -6500,6 +6521,9 @@ function uniffiEnsureInitialized() {
     const scaffoldingContractVersion = nativeModule().ubrn_ffi_mobile_core_uniffi_contract_version();
     if (bindingsContractVersion !== scaffoldingContractVersion) {
         throw new UniffiInternalError.ContractVersionMismatch(scaffoldingContractVersion, bindingsContractVersion);
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_func_generate_keypair_bytes() !== 15037) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_func_generate_keypair_bytes");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace() !== 15040) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace");

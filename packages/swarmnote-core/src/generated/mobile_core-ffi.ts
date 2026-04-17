@@ -82,6 +82,7 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_upsert_document(ptr: bigint, input: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_bytes(ptr: bigint, relPath: Uint8Array, data: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_write_text(ptr: bigint, relPath: Uint8Array, content: Uint8Array): bigint;
+    ubrn_uniffi_mobile_core_fn_func_generate_keypair_bytes(uniffi_out_err: UniffiRustCallStatus): Uint8Array;
     ubrn_ffi_mobile_core_rust_future_poll_u8(handle: bigint, callback: UniffiRustFutureContinuationCallback, callbackData: bigint): void;
     ubrn_ffi_mobile_core_rust_future_cancel_u8(handle: bigint): void;
     ubrn_ffi_mobile_core_rust_future_free_u8(handle: bigint): void;
@@ -130,6 +131,7 @@ interface NativeModuleInterface {
     ubrn_ffi_mobile_core_rust_future_cancel_void(handle: bigint): void;
     ubrn_ffi_mobile_core_rust_future_free_void(handle: bigint): void;
     ubrn_ffi_mobile_core_rust_future_complete_void(handle: bigint, uniffi_out_err: UniffiRustCallStatus): void;
+    ubrn_uniffi_mobile_core_checksum_func_generate_keypair_bytes(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_device_info(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces(): number;
