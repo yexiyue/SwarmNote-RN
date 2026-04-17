@@ -33,6 +33,7 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_start_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_list_devices(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
@@ -61,6 +62,7 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_id(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
@@ -140,6 +142,7 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_start_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_list_devices(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
@@ -160,6 +163,7 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);

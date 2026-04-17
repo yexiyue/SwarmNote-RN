@@ -15,7 +15,7 @@
 use std::time::SystemTime;
 
 use entity::workspace::{documents, folders};
-use swarmnote_core::api::{DeviceInfo, FileTreeNode, NodeStatus, OpenDocResult, WorkspaceInfo};
+use swarmnote_core::{DeviceInfo, FileTreeNode, HydrateResult, NodeStatus, OpenDocResult, WorkspaceInfo};
 
 // ── Workspace ────────────────────────────────────────────────
 
@@ -219,4 +219,28 @@ pub struct CreateFolderInput {
 pub struct MoveNodeResult {
     pub new_rel_path: String,
     pub is_dir: bool,
+}
+
+// ── Hydrate ──────────────────────────────────────────────────
+
+/// Summary returned by [`UniffiWorkspaceCore::hydrate`]. Mirrors
+/// [`swarmnote_core::HydrateResult`], widening `usize` to `u64` (uniffi
+/// does not expose `usize`; `u64` preserves full range on both 32/64-bit).
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct UniffiHydrateResult {
+    pub generated: u64,
+    pub merged: u64,
+    pub skipped: u64,
+    pub failed: u64,
+}
+
+impl From<HydrateResult> for UniffiHydrateResult {
+    fn from(r: HydrateResult) -> Self {
+        Self {
+            generated: r.generated as u64,
+            merged: r.merged as u64,
+            skipped: r.skipped as u64,
+            failed: r.failed as u64,
+        }
+    }
 }

@@ -9,7 +9,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use swarmnote_core::api::{AppResult, KeychainProvider};
+use swarmnote_core::{AppResult, KeychainProvider};
 
 use crate::error::FfiError;
 
@@ -53,9 +53,9 @@ impl KeychainProvider for UniffiKeychainAdapter {
 // `KeychainUnavailable` / `KeypairDecode`; anything else is treated as
 // `KeychainUnavailable` with the display text so the core still gets a
 // meaningful error without introducing a new variant.
-impl From<FfiError> for swarmnote_core::api::AppError {
+impl From<FfiError> for swarmnote_core::AppError {
     fn from(e: FfiError) -> Self {
-        use swarmnote_core::api::AppError;
+        use swarmnote_core::AppError;
         match e {
             FfiError::KeychainUnavailable(msg) => AppError::KeychainUnavailable(msg),
             FfiError::KeypairDecode(msg) => AppError::KeypairDecode(msg),

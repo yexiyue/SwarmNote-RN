@@ -185,16 +185,20 @@ extern "C" {
         /*handle*/ uint64_t ptr, 
         RustCallStatus *uniffi_out_err
     );
-    void uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(
         /*handle*/ uint64_t ptr, 
-        RustBuffer name, 
-        RustCallStatus *uniffi_out_err
+        RustBuffer name
     );
     /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_start_network(
         /*handle*/ uint64_t ptr
     );
     /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_stop_network(
         /*handle*/ uint64_t ptr
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer workspace_id, 
+        RustBuffer peer_id
     );
     /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiappcore_workspace_info(
         /*handle*/ uint64_t ptr, 
@@ -307,6 +311,9 @@ extern "C" {
     /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(
         /*handle*/ uint64_t ptr, 
         RustBuffer rel_path
+    );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate(
+        /*handle*/ uint64_t ptr
     );
     RustBuffer uniffi_mobile_core_fn_method_uniffiworkspacecore_id(
         /*handle*/ uint64_t ptr, 
@@ -621,6 +628,8 @@ extern "C" {
     );
     uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(
     );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer(
+    );
     uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(
     );
     uint16_t uniffi_mobile_core_checksum_method_uniffiappcore_list_devices(
@@ -660,6 +669,8 @@ extern "C" {
     uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state(
     );
     uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate(
     );
     uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_id(
     );
@@ -3058,6 +3069,14 @@ NativeMobileCore::NativeMobileCore(
             return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info"),
@@ -3280,6 +3299,14 @@ NativeMobileCore::NativeMobileCore(
         2,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_id"] = jsi::Function::createFromHostFunction(
@@ -3914,6 +3941,14 @@ NativeMobileCore::NativeMobileCore(
             return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info"),
@@ -4072,6 +4107,14 @@ NativeMobileCore::NativeMobileCore(
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id"] = jsi::Function::createFromHostFunction(
@@ -4471,14 +4514,11 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_peer
         return uniffi::mobile_core::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
 }
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-        RustCallStatus status = uniffi::mobile_core::Bridging<RustCallStatus>::rustSuccess(rt);
-        uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
-            &status
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
         );
-        uniffi::mobile_core::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
 
         
-        return jsi::Value::undefined();
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
 }
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_start_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_mobile_core_fn_method_uniffiappcore_start_network(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
@@ -4489,6 +4529,13 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_star
 }
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_mobile_core_fn_method_uniffiappcore_stop_network(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2])
         );
 
         
@@ -4726,6 +4773,13 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecor
 }
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0])
         );
 
         
@@ -5335,6 +5389,13 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcor
         
         return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(
         );
@@ -5470,6 +5531,13 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworksp
 }
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate(
         );
 
         

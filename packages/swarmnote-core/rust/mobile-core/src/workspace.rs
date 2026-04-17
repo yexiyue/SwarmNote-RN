@@ -9,22 +9,30 @@
 
 use std::sync::Arc;
 
-use swarmnote_core::api::{AppEvent, CreateFolderInput, UpsertDocumentInput, WorkspaceCore};
+use swarmnote_core::{
+    hydrate_workspace, AppEvent, CreateFolderInput, HydrateProgress, HydrateProgressFn,
+    UpsertDocumentInput, WorkspaceCore,
+};
 
-use crate::error::{parse_uuid, FfiError};
+use crate::error::{FfiError, parse_uuid};
+use crate::events::UniffiEventBusAdapter;
 use crate::types::{
     CreateFolderInput as FfiCreateFolderInput, MoveNodeResult, UniffiDocument, UniffiFileTreeNode,
-    UniffiFolder, UniffiOpenDocResult, UniffiWorkspaceInfo, UpsertDocInput,
+    UniffiFolder, UniffiHydrateResult, UniffiOpenDocResult, UniffiWorkspaceInfo, UpsertDocInput,
 };
 
 #[derive(uniffi::Object)]
 pub struct UniffiWorkspaceCore {
     inner: Arc<WorkspaceCore>,
+    /// Same adapter the owning `UniffiAppCore` plumbs into the core's
+    /// `Arc<dyn EventBus>`. Held here so `hydrate` can push
+    /// [`UniffiAppEvent::HydrateProgress`] directly without downcasting.
+    event_bus: Arc<UniffiEventBusAdapter>,
 }
 
 impl UniffiWorkspaceCore {
-    pub(crate) fn new(inner: Arc<WorkspaceCore>) -> Self {
-        Self { inner }
+    pub(crate) fn new(inner: Arc<WorkspaceCore>, event_bus: Arc<UniffiEventBusAdapter>) -> Self {
+        Self { inner, event_bus }
     }
 }
 
@@ -48,10 +56,37 @@ impl UniffiWorkspaceCore {
         self.inner.close().await.map_err(Into::into)
     }
 
+    /// Ensure every document in the workspace has a valid `yjs_state`.
+    /// Emits [`UniffiAppEvent::HydrateProgress`] once per document through
+    /// the event bus. Desktop runs this after opening a workspace; RN
+    /// should do the same (typically inside `openDefaultWorkspace`).
+    pub async fn hydrate(&self) -> Result<UniffiHydrateResult, FfiError> {
+        let workspace_uuid = self.inner.id();
+        let workspace_id_str = workspace_uuid.to_string();
+        let event_bus = self.event_bus.clone();
+
+        let progress: HydrateProgressFn = Arc::new(move |p: HydrateProgress| {
+            event_bus.emit_hydrate_progress(
+                workspace_id_str.clone(),
+                p.current as u64,
+                p.total as u64,
+            );
+        });
+
+        let result =
+            hydrate_workspace(self.inner.db(), self.inner.fs().as_ref(), workspace_uuid, &progress)
+                .await?;
+        Ok(result.into())
+    }
+
     // ── Filesystem ────────────────────────────────────────────
 
     pub async fn read_text(&self, rel_path: String) -> Result<String, FfiError> {
-        self.inner.fs().read_text(&rel_path).await.map_err(Into::into)
+        self.inner
+            .fs()
+            .read_text(&rel_path)
+            .await
+            .map_err(Into::into)
     }
 
     pub async fn write_text(&self, rel_path: String, content: String) -> Result<(), FfiError> {
@@ -63,7 +98,11 @@ impl UniffiWorkspaceCore {
     }
 
     pub async fn read_bytes(&self, rel_path: String) -> Result<Vec<u8>, FfiError> {
-        self.inner.fs().read_bytes(&rel_path).await.map_err(Into::into)
+        self.inner
+            .fs()
+            .read_bytes(&rel_path)
+            .await
+            .map_err(Into::into)
     }
 
     pub async fn write_bytes(&self, rel_path: String, data: Vec<u8>) -> Result<(), FfiError> {
@@ -135,16 +174,17 @@ impl UniffiWorkspaceCore {
     // ── Documents CRUD ────────────────────────────────────────
 
     pub async fn list_documents(&self) -> Result<Vec<UniffiDocument>, FfiError> {
-        let docs = self.inner.documents().list_documents(self.inner.id()).await?;
+        let docs = self
+            .inner
+            .documents()
+            .list_documents(self.inner.id())
+            .await?;
         Ok(docs.into_iter().map(UniffiDocument::from).collect())
     }
 
     /// Insert or update a document row. `workspace_id` is implicit from the
     /// workspace handle — the caller only supplies folder / title / path.
-    pub async fn upsert_document(
-        &self,
-        input: UpsertDocInput,
-    ) -> Result<UniffiDocument, FfiError> {
+    pub async fn upsert_document(&self, input: UpsertDocInput) -> Result<UniffiDocument, FfiError> {
         let id = input
             .id
             .as_deref()
@@ -311,11 +351,7 @@ impl UniffiWorkspaceCore {
     /// Apply a local Y.Doc update (originated by CodeMirror in the WebView).
     /// Triggers debounced writeback to disk + DB; flush completion fires
     /// [`UniffiAppEvent::DocFlushed`].
-    pub async fn apply_update(
-        &self,
-        doc_uuid: String,
-        update: Vec<u8>,
-    ) -> Result<(), FfiError> {
+    pub async fn apply_update(&self, doc_uuid: String, update: Vec<u8>) -> Result<(), FfiError> {
         let uuid = parse_uuid("doc_uuid", &doc_uuid)?;
         self.inner
             .ydoc()
@@ -328,11 +364,7 @@ impl UniffiWorkspaceCore {
     /// even when the doc isn't open.
     pub async fn close_doc(&self, doc_uuid: String) -> Result<(), FfiError> {
         let uuid = parse_uuid("doc_uuid", &doc_uuid)?;
-        self.inner
-            .ydoc()
-            .close_doc(uuid)
-            .await
-            .map_err(Into::into)
+        self.inner.ydoc().close_doc(uuid).await.map_err(Into::into)
     }
 
     /// Update the `rel_path` tracked by an open Y.Doc (used after a file

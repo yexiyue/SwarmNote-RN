@@ -27,9 +27,10 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_network_status(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(ptr: bigint, path: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_peer_id(ptr: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(ptr: bigint, name: Uint8Array, uniffi_out_err: UniffiRustCallStatus): void;
+    ubrn_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(ptr: bigint, name: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_start_network(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(ptr: bigint): bigint;
+    ubrn_uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer(ptr: bigint, workspaceId: Uint8Array, peerId: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_workspace_info(ptr: bigint, workspaceId: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_devices(ptr: bigint, filter: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_generate_pairing_code(ptr: bigint, expiresInSecs: bigint): bigint;
@@ -58,6 +59,7 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_delete_folder(ptr: bigint, folderId: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_encode_full_state(ptr: bigint, docUuid: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_exists(ptr: bigint, relPath: Uint8Array): bigint;
+    ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_id(ptr: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_info(ptr: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_is_dir(ptr: bigint, relPath: Uint8Array): bigint;
@@ -137,6 +139,7 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_start_network(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(): number;
+    ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_devices(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_generate_pairing_code(): number;
@@ -157,6 +160,7 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_delete_folder(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_encode_full_state(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists(): number;
+    ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_info(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_is_dir(): number;

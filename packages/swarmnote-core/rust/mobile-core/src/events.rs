@@ -1,7 +1,7 @@
 //! Event bridge from `swarmnote-core` to RN.
 //!
 //! [`ForeignEventBus`] is the single callback the RN host implements; every
-//! [`swarmnote_core::api::AppEvent`] the core emits passes through
+//! [`swarmnote_core::AppEvent`] the core emits passes through
 //! [`UniffiEventBusAdapter::emit`], which maps to [`UniffiAppEvent`] and
 //! hands it to JS.
 //!
@@ -13,7 +13,7 @@
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use swarmnote_core::api::{AppEvent, EventBus};
+use swarmnote_core::{AppEvent, EventBus};
 
 use crate::device::UniffiDevice;
 use crate::pairing::{UniffiOsInfo, UniffiPairedDeviceInfo, UniffiPairingMethod};
@@ -25,21 +25,33 @@ use crate::pairing::{UniffiOsInfo, UniffiPairedDeviceInfo, UniffiPairingMethod};
 pub enum UniffiAppEvent {
     // ── Y.Doc / documents ──
     /// A dirty Y.Doc was flushed to disk + DB (post-writeback).
-    DocFlushed { doc_id: String },
+    DocFlushed {
+        doc_id: String,
+    },
     /// Remote update applied to an open document — the editor should
     /// integrate the update bytes immediately.
-    ExternalUpdate { doc_id: String, update: Vec<u8> },
+    ExternalUpdate {
+        doc_id: String,
+        update: Vec<u8>,
+    },
     /// External `.md` edit while unsaved edits existed — RN must prompt
     /// user to reload or keep.
-    ExternalConflict { doc_id: String, rel_path: String },
+    ExternalConflict {
+        doc_id: String,
+        rel_path: String,
+    },
 
     // ── File tree ──
     /// Workspace file tree changed externally; re-scan.
-    FileTreeChanged { workspace_id: String },
+    FileTreeChanged {
+        workspace_id: String,
+    },
 
     // ── Devices / discovery ──
     /// Full device snapshot — RN should atomically replace its list.
-    DevicesChanged { devices: Vec<UniffiDevice> },
+    DevicesChanged {
+        devices: Vec<UniffiDevice>,
+    },
 
     // ── Pairing ──
     /// Inbound pairing request awaiting user confirmation. RN prompts the
@@ -54,8 +66,12 @@ pub enum UniffiAppEvent {
     /// A device was paired (outbound or inbound). `info` is `None` for the
     /// outbound-success case where the peer's full info arrives later via
     /// Identify.
-    PairedDeviceAdded { info: Option<UniffiPairedDeviceInfo> },
-    PairedDeviceRemoved { peer_id: String },
+    PairedDeviceAdded {
+        info: Option<UniffiPairedDeviceInfo>,
+    },
+    PairedDeviceRemoved {
+        peer_id: String,
+    },
 
     // ── Network / P2P node ──
     /// NAT status changed (public reachable, symmetric-NAT, etc.).
@@ -65,6 +81,18 @@ pub enum UniffiAppEvent {
     },
     NodeStarted,
     NodeStopped,
+
+    // ── Workspace hydrate (mobile-only; pushed by `UniffiWorkspaceCore::hydrate`) ──
+    /// Streamed progress while hydrating a workspace's Y.Doc state. Emitted
+    /// **before** processing each document, so `current` starts at 1 and
+    /// reaches `total` at completion. Unlike every other variant, this event
+    /// is NOT mapped from a core `AppEvent`: `hydrate_workspace` takes a
+    /// progress closure directly, and the wrap layer forwards each tick here.
+    HydrateProgress {
+        workspace_id: String,
+        current: u64,
+        total: u64,
+    },
 
     // ── Sync (per-peer, per-workspace) ──
     SyncStarted {
@@ -103,6 +131,17 @@ pub(crate) struct UniffiEventBusAdapter {
 impl UniffiEventBusAdapter {
     pub(crate) fn new(foreign: Arc<dyn ForeignEventBus>) -> Self {
         Self { foreign }
+    }
+
+    /// Push a [`UniffiAppEvent::HydrateProgress`] tick to RN. Used by
+    /// `UniffiWorkspaceCore::hydrate` — the hydrate closure owns a clone of
+    /// this adapter and calls this for every processed doc.
+    pub(crate) fn emit_hydrate_progress(&self, workspace_id: String, current: u64, total: u64) {
+        self.foreign.emit(UniffiAppEvent::HydrateProgress {
+            workspace_id,
+            current,
+            total,
+        });
     }
 }
 
@@ -147,7 +186,9 @@ fn map_event(event: AppEvent) -> UniffiAppEvent {
         AppEvent::PairedDeviceAdded { info } => UniffiAppEvent::PairedDeviceAdded {
             info: info.map(UniffiPairedDeviceInfo::from),
         },
-        AppEvent::PairedDeviceRemoved { peer_id } => UniffiAppEvent::PairedDeviceRemoved { peer_id },
+        AppEvent::PairedDeviceRemoved { peer_id } => {
+            UniffiAppEvent::PairedDeviceRemoved { peer_id }
+        }
         AppEvent::NetworkStatusChanged {
             nat_status,
             public_addr,

@@ -8,15 +8,14 @@
 //!   mobile-core (this crate)   ← lives here
 //!        │  Arc<dyn trait> + adapter structs
 //!        ▼
-//!   swarmnote-core::api::*
+//!   swarmnote-core (flat public surface)
 //!        │
 //!        ▼
 //!   swarm-p2p-core / yrs / sea-orm / ...
 //! ```
 //!
 //! See `dev-notes/knowledge/rust-bridge.md` for the wrap template + the
-//! "don't do" list (no `uniffi` derives on the shared crate, no access to
-//! `swarmnote_core::internal::*`, etc.).
+//! "don't do" list (no `uniffi` derives on the shared crate, etc.).
 
 uniffi::setup_scaffolding!();
 

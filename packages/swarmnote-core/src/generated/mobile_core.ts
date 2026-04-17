@@ -639,6 +639,64 @@ const FfiConverterTypeUniffiFolder = (() => {
 })();
 
 
+/**
+ * Summary returned by [`UniffiWorkspaceCore::hydrate`]. Mirrors
+ * [`swarmnote_core::HydrateResult`], widening `usize` to `u64` (uniffi
+ * does not expose `usize`; `u64` preserves full range on both 32/64-bit).
+ */
+export type UniffiHydrateResult = {
+    generated: /*u64*/bigint,
+    merged: /*u64*/bigint,
+    skipped: /*u64*/bigint,
+    failed: /*u64*/bigint
+}
+
+/**
+ * Generated factory for {@link UniffiHydrateResult} record objects.
+ */
+export const UniffiHydrateResult = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiHydrateResult, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiHydrateResult>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiHydrateResult = (() => {
+    type TypeName = UniffiHydrateResult;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                generated: FfiConverterUInt64.read(from), 
+                merged: FfiConverterUInt64.read(from), 
+                skipped: FfiConverterUInt64.read(from), 
+                failed: FfiConverterUInt64.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterUInt64.write(value.generated, into);
+            FfiConverterUInt64.write(value.merged, into);
+            FfiConverterUInt64.write(value.skipped, into);
+            FfiConverterUInt64.write(value.failed, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterUInt64.allocationSize(value.generated) + 
+            FfiConverterUInt64.allocationSize(value.merged) + 
+            FfiConverterUInt64.allocationSize(value.skipped) + 
+            FfiConverterUInt64.allocationSize(value.failed);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
 export type UniffiOpenDocResult = {
     docUuid: string,
     /**
@@ -2596,6 +2654,7 @@ export enum UniffiAppEvent_Tags {
     NetworkStatusChanged = "NetworkStatusChanged",
     NodeStarted = "NodeStarted",
     NodeStopped = "NodeStopped",
+    HydrateProgress = "HydrateProgress",
     SyncStarted = "SyncStarted",
     SyncProgress = "SyncProgress",
     SyncCompleted = "SyncCompleted"
@@ -2994,6 +3053,46 @@ export const UniffiAppEvent = (() => {
     }
     
 
+    type HydrateProgress__interface = {
+        tag: UniffiAppEvent_Tags.HydrateProgress;
+        inner: Readonly<{workspaceId: string; current: /*u64*/bigint; total: /*u64*/bigint}>
+    };
+
+    
+    /**
+     * Streamed progress while hydrating a workspace's Y.Doc state. Emitted
+     * **before** processing each document, so `current` starts at 1 and
+     * reaches `total` at completion. Unlike every other variant, this event
+     * is NOT mapped from a core `AppEvent`: `hydrate_workspace` takes a
+     * progress closure directly, and the wrap layer forwards each tick here.
+     */
+    class HydrateProgress_ extends UniffiEnum implements HydrateProgress__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.HydrateProgress;
+        readonly inner: Readonly<{workspaceId: string; current: /*u64*/bigint; total: /*u64*/bigint}>;
+        constructor(inner: { workspaceId: string, current: /*u64*/bigint, total: /*u64*/bigint }) {
+            super("UniffiAppEvent", "HydrateProgress");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { workspaceId: string, current: /*u64*/bigint, total: /*u64*/bigint }): HydrateProgress_ {
+            return new HydrateProgress_(inner);
+        }
+
+        static instanceOf(obj: any): obj is HydrateProgress_ {
+            return obj.tag === UniffiAppEvent_Tags.HydrateProgress;
+        }
+        
+
+        
+
+    }
+    
+
     type SyncStarted__interface = {
         tag: UniffiAppEvent_Tags.SyncStarted;
         inner: Readonly<{workspaceId: string; peerId: string}>
@@ -3117,6 +3216,7 @@ export const UniffiAppEvent = (() => {
   NetworkStatusChanged: NetworkStatusChanged_, 
   NodeStarted: NodeStarted_, 
   NodeStopped: NodeStopped_, 
+  HydrateProgress: HydrateProgress_, 
   SyncStarted: SyncStarted_, 
   SyncProgress: SyncProgress_, 
   SyncCompleted: SyncCompleted_
@@ -3153,9 +3253,10 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                 case 9: return new UniffiAppEvent.NetworkStatusChanged({natStatus: FfiConverterString.read(from), publicAddr: FfiConverterOptionalString.read(from) });
                 case 10: return new UniffiAppEvent.NodeStarted();
                 case 11: return new UniffiAppEvent.NodeStopped();
-                case 12: return new UniffiAppEvent.SyncStarted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from) });
-                case 13: return new UniffiAppEvent.SyncProgress({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), completed: FfiConverterUInt32.read(from), total: FfiConverterUInt32.read(from) });
-                case 14: return new UniffiAppEvent.SyncCompleted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), cancelled: FfiConverterBool.read(from) });
+                case 12: return new UniffiAppEvent.HydrateProgress({workspaceId: FfiConverterString.read(from), current: FfiConverterUInt64.read(from), total: FfiConverterUInt64.read(from) });
+                case 13: return new UniffiAppEvent.SyncStarted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from) });
+                case 14: return new UniffiAppEvent.SyncProgress({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), completed: FfiConverterUInt32.read(from), total: FfiConverterUInt32.read(from) });
+                case 15: return new UniffiAppEvent.SyncCompleted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), cancelled: FfiConverterBool.read(from) });
                 default: throw new UniffiInternalError.UnexpectedEnumCase();
             }
         }
@@ -3230,15 +3331,23 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                     ordinalConverter.write(11, into);
                     return;
                 }
-                case UniffiAppEvent_Tags.SyncStarted: {
+                case UniffiAppEvent_Tags.HydrateProgress: {
                     ordinalConverter.write(12, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.workspaceId, into);
+                    FfiConverterUInt64.write(inner.current, into);
+                    FfiConverterUInt64.write(inner.total, into);
+                    return;
+                }
+                case UniffiAppEvent_Tags.SyncStarted: {
+                    ordinalConverter.write(13, into);
                     const inner = value.inner;
                     FfiConverterString.write(inner.workspaceId, into);
                     FfiConverterString.write(inner.peerId, into);
                     return;
                 }
                 case UniffiAppEvent_Tags.SyncProgress: {
-                    ordinalConverter.write(13, into);
+                    ordinalConverter.write(14, into);
                     const inner = value.inner;
                     FfiConverterString.write(inner.workspaceId, into);
                     FfiConverterString.write(inner.peerId, into);
@@ -3247,7 +3356,7 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                     return;
                 }
                 case UniffiAppEvent_Tags.SyncCompleted: {
-                    ordinalConverter.write(14, into);
+                    ordinalConverter.write(15, into);
                     const inner = value.inner;
                     FfiConverterString.write(inner.workspaceId, into);
                     FfiConverterString.write(inner.peerId, into);
@@ -3328,16 +3437,24 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                 case UniffiAppEvent_Tags.NodeStopped: {
                     return ordinalConverter.allocationSize(11);
                 }
-                case UniffiAppEvent_Tags.SyncStarted: {
+                case UniffiAppEvent_Tags.HydrateProgress: {
                     const inner = value.inner;
                     let size = ordinalConverter.allocationSize(12);
+                    size += FfiConverterString.allocationSize(inner.workspaceId);
+                    size += FfiConverterUInt64.allocationSize(inner.current);
+                    size += FfiConverterUInt64.allocationSize(inner.total);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.SyncStarted: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(13);
                     size += FfiConverterString.allocationSize(inner.workspaceId);
                     size += FfiConverterString.allocationSize(inner.peerId);
                     return size;
                 }
                 case UniffiAppEvent_Tags.SyncProgress: {
                     const inner = value.inner;
-                    let size = ordinalConverter.allocationSize(13);
+                    let size = ordinalConverter.allocationSize(14);
                     size += FfiConverterString.allocationSize(inner.workspaceId);
                     size += FfiConverterString.allocationSize(inner.peerId);
                     size += FfiConverterUInt32.allocationSize(inner.completed);
@@ -3346,7 +3463,7 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                 }
                 case UniffiAppEvent_Tags.SyncCompleted: {
                     const inner = value.inner;
-                    let size = ordinalConverter.allocationSize(14);
+                    let size = ordinalConverter.allocationSize(15);
                     size += FfiConverterString.allocationSize(inner.workspaceId);
                     size += FfiConverterString.allocationSize(inner.peerId);
                     size += FfiConverterBool.allocationSize(inner.cancelled);
@@ -4351,7 +4468,7 @@ const uniffiCallbackInterfaceForeignKeychainProvider: { vtable: UniffiVTableCall
 
 
 /**
- * Device-level core, wrapping [`swarmnote_core::api::AppCore`].
+ * Device-level core, wrapping [`swarmnote_core::AppCore`].
  *
  * `fs_factory` defaults to `LocalFs` — mobile sandbox paths (Expo's
  * `documentDirectory`) work directly. `watcher_factory` is intentionally
@@ -4395,10 +4512,17 @@ export interface UniffiAppCoreLike {
      */
     peerId()  /*throws*/: string;
     /**
-     * Update the user-facing device name in memory. Persistence is handled
-     * by the core's config writeback on next config mutation.
+     * Update the user-facing device name. Persists immediately to
+     * `{app_data_dir}/config.json` and, if the P2P node is running, restarts
+     * it so the new name propagates through libp2p Identify's
+     * `agent_version`. Mirrors the desktop `commands::identity::set_device_name`.
+     *
+     * If P2P restart fails mid-way (`stop_network` succeeds but
+     * `start_network` errors), the new name is **not rolled back** — the
+     * disk config keeps the user's choice and the node ends up stopped with
+     * the error surfaced to RN.
      */
-    setDeviceName(name: string)  /*throws*/: void;
+    setDeviceName(name: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
     /**
      * Start the P2P node. Fails with [`FfiError::NetworkAlreadyRunning`] if
      * already up. RN should call this in `onAppActive`.
@@ -4409,6 +4533,17 @@ export interface UniffiAppCoreLike {
      * `onAppBackground`.
      */
     stopNetwork(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
+     * Kick off a full sync session between this device and a specific paired
+     * peer for a given workspace. Mirrors the desktop
+     * `commands::sync::trigger_workspace_sync`.
+     *
+     * Fails with [`FfiError::NetworkNotRunning`] if P2P is not up, or with
+     * [`FfiError::InvalidInput`] if either ID fails to parse. Progress and
+     * completion are observed through the usual `SyncStarted` /
+     * `SyncProgress` / `SyncCompleted` events on the event bus.
+     */
+    triggerSyncWithPeer(workspaceId: string, peerId: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
     /**
      * Look up a workspace's info by UUID without forcing the caller to
      * hold the `UniffiWorkspaceCore`. Returns `None` if the workspace is
@@ -4466,7 +4601,7 @@ export type UniffiAppCoreInterface = UniffiAppCoreLike;
 
 
 /**
- * Device-level core, wrapping [`swarmnote_core::api::AppCore`].
+ * Device-level core, wrapping [`swarmnote_core::AppCore`].
  *
  * `fs_factory` defaults to `LocalFs` — mobile sandbox paths (Expo's
  * `documentDirectory`) work directly. `watcher_factory` is intentionally
@@ -4684,18 +4819,42 @@ async  openWorkspace(path: string, asyncOpts_?: { signal: AbortSignal }): Promis
     }
     
     /**
-     * Update the user-facing device name in memory. Persistence is handled
-     * by the core's config writeback on next config mutation.
+     * Update the user-facing device name. Persists immediately to
+     * `{app_data_dir}/config.json` and, if the P2P node is running, restarts
+     * it so the new name propagates through libp2p Identify's
+     * `agent_version`. Mirrors the desktop `commands::identity::set_device_name`.
+     *
+     * If P2P restart fails mid-way (`stop_network` succeeds but
+     * `start_network` errors), the new name is **not rolled back** — the
+     * disk config keeps the user's choice and the node ends up stopped with
+     * the error surfaced to RN.
      */
- setDeviceName(name: string): void /*throws*/ {
-        uniffiCaller.rustCallWithError(
-            /*liftError:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError),
-            /*caller:*/ (callStatus) => { nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this), 
-        FfiConverterString.lower(name),
-                callStatus);
+async  setDeviceName(name: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(name)
+                );
             },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
             /*liftString:*/ FfiConverterString.lift,
-    );
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
     }
     
     /**
@@ -4743,6 +4902,44 @@ async  stopNetwork(asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws
                 return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(
                     uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this)
                     
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Kick off a full sync session between this device and a specific paired
+     * peer for a given workspace. Mirrors the desktop
+     * `commands::sync::trigger_workspace_sync`.
+     *
+     * Fails with [`FfiError::NetworkNotRunning`] if P2P is not up, or with
+     * [`FfiError::InvalidInput`] if either ID fails to parse. Progress and
+     * completion are observed through the usual `SyncStarted` /
+     * `SyncProgress` / `SyncCompleted` events on the event bus.
+     */
+async  triggerSyncWithPeer(workspaceId: string, peerId: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_trigger_sync_with_peer(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(workspaceId),FfiConverterString.lower(peerId)
                 );
             },
             /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
@@ -5139,6 +5336,13 @@ export interface UniffiWorkspaceCoreLike {
      */
     encodeFullState(docUuid: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<ArrayBuffer | undefined>;
     exists(relPath: string, asyncOpts_?: { signal: AbortSignal }) : Promise<boolean>;
+    /**
+     * Ensure every document in the workspace has a valid `yjs_state`.
+     * Emits [`UniffiAppEvent::HydrateProgress`] once per document through
+     * the event bus. Desktop runs this after opening a workspace; RN
+     * should do the same (typically inside `openDefaultWorkspace`).
+     */
+    hydrate(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiHydrateResult>;
     id() : string;
     info() : UniffiWorkspaceInfo;
     isDir(relPath: string, asyncOpts_?: { signal: AbortSignal }) : Promise<boolean>;
@@ -5519,6 +5723,40 @@ async  exists(relPath: string, asyncOpts_?: { signal: AbortSignal }): Promise<bo
             /*liftString:*/ FfiConverterString.lift,
             /*asyncOpts:*/ asyncOpts_,
             
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Ensure every document in the workspace has a valid `yjs_state`.
+     * Emits [`UniffiAppEvent::HydrateProgress`] once per document through
+     * the event bus. Desktop runs this after opening a workspace; RN
+     * should do the same (typically inside `openDefaultWorkspace`).
+     */
+async  hydrate(asyncOpts_?: { signal: AbortSignal }): Promise<UniffiHydrateResult> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_hydrate(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterTypeUniffiHydrateResult.lift.bind(FfiConverterTypeUniffiHydrateResult),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
         );
     } catch (__error: any) {
         if (uniffiIsDebug && __error instanceof Error) {
@@ -6281,7 +6519,7 @@ function uniffiEnsureInitialized() {
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id() !== 33021) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_peer_id");
     }
-    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name() !== 23236) {
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name() !== 62004) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_start_network() !== 20143) {
@@ -6289,6 +6527,9 @@ function uniffiEnsureInitialized() {
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network() !== 6521) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_stop_network");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer() !== 92) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info() !== 6310) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info");
@@ -6349,6 +6590,9 @@ function uniffiEnsureInitialized() {
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists() !== 42392) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_exists");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate() !== 28374) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_hydrate");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_id() !== 8962) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_id");
@@ -6444,6 +6688,7 @@ export default Object.freeze({
     FfiConverterTypeUniffiDocument,
     FfiConverterTypeUniffiFileTreeNode,
     FfiConverterTypeUniffiFolder,
+    FfiConverterTypeUniffiHydrateResult,
     FfiConverterTypeUniffiNodeStatus,
     FfiConverterTypeUniffiOpenDocResult,
     FfiConverterTypeUniffiOsInfo,

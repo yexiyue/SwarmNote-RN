@@ -1,4 +1,4 @@
-//! FFI-side mirror of [`swarmnote_core::api::AppError`].
+//! FFI-side mirror of [`swarmnote_core::AppError`].
 //!
 //! We don't add `#[derive(uniffi::Error)]` to the shared `AppError` — that
 //! would pull `uniffi` into the shared crate for every desktop build. Instead
@@ -9,7 +9,7 @@
 //! Additional variants (`InvalidInput`) cover wrap-layer parse errors that
 //! don't exist in the shared API surface (bad UUIDs, malformed paths, etc.).
 
-use swarmnote_core::api::AppError;
+use swarmnote_core::AppError;
 
 /// Wrap-layer error type exposed to RN. Every `Result<T, FfiError>` on a
 /// `#[uniffi::export]` fn becomes `Promise<T>` on the TS side; rejections

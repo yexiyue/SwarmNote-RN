@@ -24,10 +24,8 @@
 
 use std::time::SystemTime;
 
-use swarmnote_core::api::{PairedDeviceInfo, PairingCodeInfo};
-use swarmnote_core::protocol::{
-    OsInfo, PairingMethod, PairingRefuseReason, PairingResponse,
-};
+use swarmnote_core::protocol::{OsInfo, PairingMethod, PairingRefuseReason, PairingResponse};
+use swarmnote_core::{PairedDeviceInfo, PairingCodeInfo};
 
 use crate::app::UniffiAppCore;
 use crate::error::FfiError;

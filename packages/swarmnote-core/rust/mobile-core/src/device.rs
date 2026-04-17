@@ -7,7 +7,7 @@
 
 use std::time::SystemTime;
 
-use swarmnote_core::api::{ConnectionType, Device, DeviceFilter, DeviceStatus};
+use swarmnote_core::{ConnectionType, Device, DeviceFilter, DeviceStatus};
 
 use crate::app::UniffiAppCore;
 
