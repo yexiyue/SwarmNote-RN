@@ -18,6 +18,37 @@ NativeWind v5 使用 Tailwind CSS v4，采用 CSS-first 配置，不需要 `tail
 
 **相关文件**：`src/global.css`、`postcss.config.mjs`、`metro.config.js`、`babel.config.js`
 
+### SafeAreaView 的 className 布局类不生效（v5 preview.3 已知 bug）
+
+`react-native-safe-area-context` 的 `<SafeAreaView>` 在 NativeWind v5 preview.3 下，`className` 里的**布局类**（`flex-1` / `items-*` / `justify-*` / `gap-*` / `px-*`）**不会应用**，颜色类（`bg-*` / `text-*`）却能用。结果：页面内容塌缩在屏幕顶部，子节点互相重叠。
+
+**症状**：
+- 所有内容挤在顶部（子 View 的 `flex-1` 因父级没高度全部失效）
+- 按钮、标题、图标重叠
+- 但颜色（button 橙色 / 背景米白）正常
+
+**根因**：NativeWind v5 preview 对 `SafeAreaView` 的 className→style 通道处理有 bug，相关 issue：[react-native-css#234](https://github.com/nativewind/react-native-css/issues/234)。维护者 `@danstepanov` 确认是 bug，尚未修复。
+
+**正确做法**：把布局类从 SafeAreaView 的 `className` 搬到 inline `style`；颜色类可以留在 `className`。内层普通 `View` 的 `className="flex-1"` 等正常工作，不用改。
+
+```tsx
+<SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top", "bottom"]}>
+  {/* 内层普通 View 的 flex-1 是生效的 */}
+  <View className="flex-1 px-6 pb-6">
+    ...
+  </View>
+</SafeAreaView>
+```
+
+**不要做**：
+- 不要在 SafeAreaView 上用 `className="flex-1"` —— 不会报错，但静默失效
+- 不要把 `style` 和 `className` 重复写同一属性（flex-1 + style flex:1）—— 按 `react-native-css` 语义，style 会覆盖 className
+- 不要去掉 inline `style={{flex:1}}` 尝试用其他变通（如 `h-full` / 绝对定位），都解决不了本质的"SafeAreaView 自己没高度"问题
+
+**何时可以删掉这个 workaround**：NativeWind v5 正式版发布且 issue #234 关闭后；届时全项目 grep `style={{ flex: 1 }} className="bg-background"` 改回 `className="flex-1 bg-background"`。
+
+**相关文件**：`src/app/onboarding/*.tsx`、`src/app/(tabs)/*.tsx`、`src/app/pairing/input-code.tsx`
+
 ### 暗色模式选择器
 
 v5 使用标准 `@media` 查询，不是 v4 的 `.dark\:root`。
@@ -138,9 +169,64 @@ const navTheme = useNavTheme();
 - RNR CLI 会提示 "Tailwind config not found" 警告，v5 不需要 tailwind.config.js，忽略即可
 - `components.json` 中 `tailwind.config` 字段为空字符串（v5 不需要）
 
+### Android TextInput 中文字符被裁切
+
+RN `<TextInput>` 在 Android 上默认给中文 / CJK 字形加 `includeFontPadding: true`，再加上固定 `h-10` / `h-12` 容器，字形上下会被切掉（"我的 iPhone" 的"我"顶部被削）。iOS 忽略这两个 prop，不受影响。
+
+**正确做法**（已落地在 `src/components/ui/input.tsx`）：
+
+```tsx
+<TextInput
+  textAlignVertical="center"
+  style={[Platform.OS === "android" && { includeFontPadding: false }, style]}
+  {...props}
+/>
+```
+
+**不要做**：
+
+- 不要把 `includeFontPadding` 直接当 prop 传给 `TextInput`——RN 类型上它不是 TextInputProps 字段，只能通过 `style` 传
+- 不要靠加 `py-2` 挤空间解决——不同字重 / 字号差异会再次踩到
+
+**相关文件**：`src/components/ui/input.tsx`
+
 ### 浮层组件依赖
 
 Dialog、AlertDialog、Popover、Tooltip、DropdownMenu、Select 等浮层组件依赖 `<PortalHost />`，已在根布局 `_layout.tsx` 配置。
+
+## 图标库
+
+### 统一使用 lucide-react-native
+
+所有 lucide icon 走 `lucide-react-native`，颜色通过 `useThemeColors()` 动态读取：
+
+```tsx
+import { ArrowLeft } from "lucide-react-native";
+const colors = useThemeColors();
+<ArrowLeft color={colors.foreground} size={24} />
+```
+
+**不要做**：
+
+- 不要用 emoji 做图标
+- 不要用 `react-native-vector-icons` / 自己画 SVG——设计稿里所有图标名都对齐 lucide 命名
+- 不要硬编码颜色 hex，用 `useThemeColors()`（例外：设计稿里明确指定的功能色如 `#4CAF50` 绿色）
+
+## OTP / 6 位验证码输入
+
+### 选用 `input-otp-native`
+
+配对码输入用 [`input-otp-native`](https://github.com/yjose/input-otp-native)，headless / copy-paste 风格，样式用 NativeWind 自写。已落地在 `src/app/pairing/input-code.tsx`。
+
+**为什么不是 `react-native-otp-entry`**：后者是成品组件，定制样式要绕 props；`input-otp-native` 源码进项目 + `render={({ slots }) => ...}` 暴露每个格子的 `char` / `isActive`，跟 shadcn 哲学一致。
+
+**关键 prop**：
+
+- `maxLength={6}`、`value` / `onChange` 双向绑定、`onComplete` 在用户输完 6 位时触发
+- 每个 `SlotProps` 含 `char`（当前字符，空时 null）和 `isActive`（是否当前光标位 / 正在输入的格子）
+- `ref` + `otpRef.current?.clear()` 用于失败时重置（配对码错误清空）
+
+**相关文件**：`src/app/pairing/input-code.tsx`
 
 ## Pencil 设计文件
 

@@ -5,7 +5,6 @@ import {
 } from "react-native-swarmnote-core";
 import { useNotificationStore } from "@/stores/notification-store";
 import { syncKey, useSwarmStore } from "@/stores/swarm-store";
-import { getAppCore } from "./app-core";
 
 /** `ForeignEventBus` implementation: switches on `event.tag` and writes
  *  directly into the appropriate Zustand store. `emit` is called from the
@@ -115,13 +114,14 @@ export class EventBus implements ForeignEventBus {
   }
 }
 
-function refreshPairedDevices(): void {
-  getAppCore()
-    .listPairedDevices()
-    .then((list) => {
-      useSwarmStore.getState().setPairedDevices(list);
-    })
-    .catch((err) => {
-      console.warn("[event-bus] listPairedDevices failed:", err);
-    });
+async function refreshPairedDevices(): Promise<void> {
+  // Dynamic import breaks the `app-core -> event-bus -> app-core` load-time
+  // cycle. Safe because the event can only fire after `initAppCore()` resolved.
+  try {
+    const { getAppCore } = await import("./app-core");
+    const list = await getAppCore().listPairedDevices();
+    useSwarmStore.getState().setPairedDevices(list);
+  } catch (err) {
+    console.warn("[event-bus] listPairedDevices failed:", err);
+  }
 }

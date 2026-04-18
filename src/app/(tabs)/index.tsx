@@ -30,7 +30,7 @@ export default function Home() {
   const hydrating = workspaceInfo ? hydrateProgress[workspaceInfo.id] : undefined;
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView style={{ flex: 1 }} className="bg-background">
       {keychainEphemeral ? (
         <View className="bg-destructive/10 px-4 py-2">
           <Text className="text-xs text-destructive">

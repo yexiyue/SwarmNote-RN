@@ -1,15 +1,18 @@
 import { useRouter } from "expo-router";
+import { ArrowLeft } from "lucide-react-native";
 import { useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { getAppCore } from "@/core/app-core";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useOnboardingStore } from "@/stores/onboarding-store";
 
 export default function DeviceName() {
   const router = useRouter();
+  const colors = useThemeColors();
   const nextStep = useOnboardingStore((s) => s.nextStep);
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -33,25 +36,64 @@ export default function DeviceName() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-1 gap-6 px-6 pt-12">
-        <View className="gap-2">
-          <Text className="text-2xl font-bold text-foreground">给你的设备起个名字</Text>
-          <Text className="text-sm text-muted-foreground">其他设备将通过这个名字识别你</Text>
+    <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top", "bottom"]}>
+      <View className="flex-1 gap-8 px-6 pt-2 pb-6">
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          accessibilityLabel="返回"
+          className="h-11 w-11 -ml-2 items-start justify-center"
+        >
+          <ArrowLeft color={colors.foreground} size={24} />
+        </Pressable>
+
+        <View className="gap-2.5">
+          <Text className="text-[28px] font-bold text-foreground">给设备取个名字</Text>
+          <Text className="text-[15px] leading-6 text-muted-foreground">
+            用于在 P2P 网络中识别这台设备，{"\n"}其他设备配对时会看到这个名称。
+          </Text>
         </View>
-        <Input
-          placeholder="例如：我的 iPhone"
-          value={name}
-          onChangeText={setName}
-          autoFocus
-          maxLength={40}
-        />
-        {error !== null ? <Text className="text-sm text-destructive">{error}</Text> : null}
-      </View>
-      <View className="px-6 pb-6">
-        <Button onPress={onNext} disabled={disabled} size="lg">
-          {saving ? <ActivityIndicator /> : <Text>下一步</Text>}
-        </Button>
+
+        <View className="gap-2">
+          <Text className="text-sm font-medium text-foreground">设备名称</Text>
+          <Input
+            className="h-12 rounded-[10px] border-border bg-muted px-3.5 text-base"
+            placeholder="我的 iPhone"
+            value={name}
+            onChangeText={setName}
+            autoFocus
+            maxLength={40}
+          />
+          <Text className="text-[13px] text-muted-foreground">
+            默认使用系统主机名，你可以随时在设置中修改
+          </Text>
+          {error !== null ? <Text className="text-[13px] text-destructive">{error}</Text> : null}
+        </View>
+
+        <View className="flex-1" />
+
+        <View className="gap-4">
+          <Button
+            onPress={onNext}
+            disabled={disabled}
+            size="lg"
+            className="h-13 rounded-xl"
+            accessibilityLabel="继续"
+          >
+            {saving ? (
+              <ActivityIndicator color={colors.foreground} />
+            ) : (
+              <Text className="text-[17px] font-semibold text-primary-foreground">继续</Text>
+            )}
+          </Button>
+
+          <View className="flex-row items-center justify-center gap-2">
+            <View className="size-2 rounded-full bg-muted-foreground/40" />
+            <View className="size-2.5 rounded-full bg-primary" />
+            <View className="size-2 rounded-full bg-muted-foreground/40" />
+            <View className="size-2 rounded-full bg-muted-foreground/40" />
+          </View>
+        </View>
       </View>
     </SafeAreaView>
   );

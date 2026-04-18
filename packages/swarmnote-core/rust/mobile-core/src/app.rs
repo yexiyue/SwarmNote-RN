@@ -31,7 +31,7 @@ pub struct UniffiAppCore {
     pub(crate) event_bus: Arc<UniffiEventBusAdapter>,
 }
 
-#[uniffi::export]
+#[uniffi::export(async_runtime = "tokio")]
 impl UniffiAppCore {
     /// Bootstrap the core: load/create config, initialize identity from the
     /// keychain, open `devices.db`. Does NOT start the P2P node — call

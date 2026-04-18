@@ -1,7 +1,7 @@
 import { Platform, TextInput } from "react-native";
 import { cn } from "@/lib/utils";
 
-function Input({ className, ...props }: React.ComponentProps<typeof TextInput>) {
+function Input({ className, style, ...props }: React.ComponentProps<typeof TextInput>) {
   return (
     <TextInput
       className={cn(
@@ -21,6 +21,10 @@ function Input({ className, ...props }: React.ComponentProps<typeof TextInput>) 
         }),
         className,
       )}
+      // Android: disable extra font padding & force vertical centering so CJK
+      // glyphs don't get clipped inside a fixed-height TextInput. iOS ignores.
+      textAlignVertical="center"
+      style={[Platform.OS === "android" && { includeFontPadding: false }, style]}
       {...props}
     />
   );

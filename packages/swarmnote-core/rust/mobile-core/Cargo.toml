@@ -8,7 +8,7 @@ crate-type = ["cdylib", "staticlib"]
 name = "mobile_core"
 
 [dependencies]
-uniffi = { version = "0.31.0", features = ["bindgen", "build", "cli"] }
+uniffi = { version = "0.31.0", features = ["bindgen", "build", "cli", "tokio"] }
 
 # Shared core — fetched from the main swarmnote repo via git dependency.
 # Cargo auto-resolves the nested `libs/` submodule containing `swarm-p2p-core`.

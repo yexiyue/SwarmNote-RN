@@ -36,7 +36,7 @@ impl UniffiWorkspaceCore {
     }
 }
 
-#[uniffi::export]
+#[uniffi::export(async_runtime = "tokio")]
 impl UniffiWorkspaceCore {
     // ── Workspace metadata ────────────────────────────────────
 

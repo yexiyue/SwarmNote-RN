@@ -47,6 +47,39 @@ rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-andro
 - ubrn 构建工具链 / 代码生成踩坑（iOS deployment target、async static 生成 bug、cargo git 鉴权）见 `dev-notes/knowledge/ubrn.md`
 - ubrn 编译 Android 产物位置可能需要手动 fix（参考 `dev-notes/blog/ubrn-android-build-gradle-fix.md`）
 
+### `open_workspace` 要求目录已存在，否则 `InvalidPath`
+
+`swarmnote_core::AppCore::open_workspace` 第一步就 `path.is_dir()`，返回 false 直接抛 `AppError::InvalidPath` → FFI 层映射为 `FfiError.InvalidPath`。mobile 侧首启时 `${document}/default` 还没建出来，调用会失败。
+
+**正确做法**：RN 侧在调 `openWorkspace` 前用 `new Directory(Paths.document, "default").create({ intermediates: true, idempotent: true })` 兜底创建。Rust 侧保持"目录必须存在"的语义，不要改成自动 mkdir——核心要区分"用户指定了不存在的路径"和"刚创建的空 workspace"。
+
+**不要做**：不要在 Rust wrap 层 `std::fs::create_dir_all(&path)`。那会掩盖用户误输入外部路径的错误（如果 `open_workspace` 接受任意挂载路径）。创建目录是 host 的职责。
+
+**相关文件**：`src/core/workspace-manager.ts::ensureDefaultWorkspaceDir`
+
+### uniffi async 方法必须标 `async_runtime = "tokio"`
+
+`#[uniffi::export] impl` 块里含 `async fn` 时，如果不加 `async_runtime = "tokio"`，生成的桥接代码会用 uniffi 默认的 futures executor，它**不是 tokio Reactor**——`sea-orm` / `tokio::fs` 等任何依赖 tokio reactor 的 future 会立刻 panic `there is no reactor running, must be called from the context of a Tokio 1.x runtime`。
+
+**正确做法**：
+```rust
+#[uniffi::export(async_runtime = "tokio")]
+impl UniffiAppCore {
+    pub async fn start_network(&self) -> Result<(), FfiError> { ... }
+}
+```
+
+`Cargo.toml` 的 uniffi 依赖也要启用 `tokio` feature：
+```toml
+uniffi = { version = "0.31", features = ["bindgen", "build", "cli", "tokio"] }
+```
+
+所有含 async 方法的 impl 块都要标（`app.rs` / `pairing.rs` / `device.rs` / `workspace.rs`）。模块级 async 函数同理。
+
+**症状**：运行时首个 async 调用（一般是 `UniffiAppCore::create`）panic `[Error: Rust panic]` 但栈看不到具体原因；只有 adb logcat 能看到 `no reactor running`。
+
+**相关文件**：`packages/swarmnote-core/rust/mobile-core/src/app.rs`、`device.rs`、`pairing.rs`、`workspace.rs`
+
 ## FFI wrap 已落地（2026-04-17）
 
 `mobile-core` 通过 git 依赖引入 `swarmnote-core`（不抽独立 repo），wrap 代码按领域拆 module：

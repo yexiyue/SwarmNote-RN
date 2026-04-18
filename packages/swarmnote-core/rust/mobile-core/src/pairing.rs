@@ -189,7 +189,7 @@ pub struct UniffiDeviceByCodeResult {
 
 // ── Methods on UniffiAppCore ─────────────────────────────────
 
-#[uniffi::export]
+#[uniffi::export(async_runtime = "tokio")]
 impl UniffiAppCore {
     /// Generate a 6-digit pairing code, publish the device's OsInfo +
     /// listen addrs under that code to the DHT, and return the code + its

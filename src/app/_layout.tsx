@@ -7,6 +7,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, useColorScheme, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { PairingRequestHost } from "@/components/pairing-request-host";
 import { initAppCore } from "@/core/app-core";
 import { useNavTheme } from "@/hooks/useThemeColors";
@@ -47,18 +48,25 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={navTheme}>
-      <StatusBar style={isDark ? "light" : "dark"} />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="pairing/input-code" options={{ presentation: "modal" }} />
-        <Stack.Screen name="editor-test" />
-        <Stack.Screen name="explore" />
-      </Stack>
-      <PairingRequestHost />
-      <PortalHost />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider value={navTheme}>
+        <StatusBar style={isDark ? "light" : "dark"} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="pairing/input-code" options={{ animation: "slide_from_right" }} />
+          <Stack.Screen name="pairing/found-device" options={{ animation: "slide_from_right" }} />
+          <Stack.Screen
+            name="pairing/success"
+            options={{ animation: "slide_from_right", gestureEnabled: false }}
+          />
+          <Stack.Screen name="editor-test" />
+          <Stack.Screen name="explore" />
+        </Stack>
+        <PairingRequestHost />
+        <PortalHost />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

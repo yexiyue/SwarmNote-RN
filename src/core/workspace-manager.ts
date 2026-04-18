@@ -1,4 +1,4 @@
-import { Paths } from "expo-file-system";
+import { Directory, Paths } from "expo-file-system";
 import type { UniffiWorkspaceCoreLike } from "react-native-swarmnote-core";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { getAppCore } from "./app-core";
@@ -7,9 +7,16 @@ const DEFAULT_WORKSPACE_DIRNAME = "default";
 
 let activeWorkspace: UniffiWorkspaceCoreLike | null = null;
 
-/** Rust side strips the leading `file://` via `strip_file_uri`. */
-function defaultWorkspacePath(): string {
-  return Paths.join(Paths.document, DEFAULT_WORKSPACE_DIRNAME);
+/** Ensure the default workspace directory exists on disk. The Rust core's
+ *  `open_workspace` rejects missing paths with `InvalidPath`, so this must
+ *  run before the first `openWorkspace` call on a fresh install. Rust side
+ *  then strips the leading `file://` via `strip_file_uri`. */
+function ensureDefaultWorkspaceDir(): string {
+  const dir = new Directory(Paths.document, DEFAULT_WORKSPACE_DIRNAME);
+  if (!dir.exists) {
+    dir.create({ intermediates: true, idempotent: true });
+  }
+  return dir.uri;
 }
 
 /** Open (or return the cached handle for) the default workspace at
@@ -21,7 +28,7 @@ export async function openDefaultWorkspace(): Promise<UniffiWorkspaceCoreLike> {
   if (activeWorkspace !== null) return activeWorkspace;
 
   const core = getAppCore();
-  const ws = await core.openWorkspace(defaultWorkspacePath());
+  const ws = await core.openWorkspace(ensureDefaultWorkspaceDir());
   activeWorkspace = ws;
   useWorkspaceStore.getState().setInfo(ws.info());
 

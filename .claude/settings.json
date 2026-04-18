@@ -1,16 +1,4 @@
 {
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'CHANGED=$(git diff --name-only HEAD 2>/dev/null | grep -E \"^src/\" | head -1); if [ -n \"$CHANGED\" ]; then echo \"[dev-workflow] 检测到 src/ 下有代码变更，请运行 /simplify 检查代码质量\"; fi'"
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "allow": [
       "Bash(ls -la .cursor* .cursorrules .github/copilot*)",
@@ -45,7 +33,27 @@
       "Bash(gh issue create --title 'navigation: Drawer + Tab 混合导航骨架' --label type:feature,priority:critical,size:l,layer:L1,mvp --milestone v0.1.0 --body ':*)",
       "Bash(GH_PAGER=cat gh run list --limit 3)",
       "Bash(GH_PAGER=cat gh run view 24171431874 --log-failed)",
-      "WebFetch(domain:jhugman.github.io)"
+      "WebFetch(domain:jhugman.github.io)",
+      "mcp__mobile__device_get_target",
+      "mcp__mobile__system_logs",
+      "mcp__mobile__system_activity",
+      "mcp__mobile__ui_analyze",
+      "mcp__mobile__system_shell",
+      "mcp__mobile__app_launch",
+      "mcp__mobile__system_wait",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'CHANGED=$(git diff --name-only HEAD 2>/dev/null | grep -E \"^src/\" | head -1); if [ -n \"$CHANGED\" ]; then echo \"[dev-workflow] 检测到 src/ 下有代码变更，请运行 /simplify 检查代码质量\"; fi'"
+          }
+        ]
+      }
     ]
   }
 }

@@ -107,7 +107,7 @@ impl From<Device> for UniffiDevice {
 
 // ── Methods on UniffiAppCore ─────────────────────────────────
 
-#[uniffi::export]
+#[uniffi::export(async_runtime = "tokio")]
 impl UniffiAppCore {
     /// List devices matching the filter. Returns `Vec::new()` if P2P is not
     /// running — the RN UI should render an empty list, not an error.
