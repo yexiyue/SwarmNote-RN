@@ -1,12 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  ArrowLeft,
-  Laptop,
-  type LucideIcon,
-  Monitor,
-  Smartphone,
-  Tablet,
-} from "lucide-react-native";
+import { ArrowLeft } from "lucide-react-native";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,19 +7,8 @@ import { UniffiPairingMethod } from "react-native-swarmnote-core";
 import { Text } from "@/components/ui/text";
 import { getAppCore } from "@/core/app-core";
 import { useThemeColors } from "@/hooks/useThemeColors";
-
-function devicePlatformIcon(platform: string): LucideIcon {
-  const p = platform.toLowerCase();
-  if (p.includes("ios") || p.includes("android")) return Smartphone;
-  if (p.includes("ipad") || p.includes("tablet")) return Tablet;
-  if (p.includes("mac") || p.includes("windows")) return Laptop;
-  return Monitor;
-}
-
-function truncatePeerId(peerId: string): string {
-  if (peerId.length <= 16) return peerId;
-  return `${peerId.slice(0, 8)}…${peerId.slice(-4)}`;
-}
+import { devicePlatformIcon } from "@/lib/device-platform";
+import { truncatePeerId } from "@/lib/peer-id";
 
 export default function FoundDevice() {
   const router = useRouter();

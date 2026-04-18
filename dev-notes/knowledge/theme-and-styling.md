@@ -212,6 +212,86 @@ const colors = useThemeColors();
 - 不要用 `react-native-vector-icons` / 自己画 SVG——设计稿里所有图标名都对齐 lucide 命名
 - 不要硬编码颜色 hex，用 `useThemeColors()`（例外：设计稿里明确指定的功能色如 `#4CAF50` 绿色）
 
+### lucide-react-native 缺失图标对照
+
+`lucide-react-native@1.8` 与 web 版 `lucide-react` **图标集不完全一致**，以下名称在 RN 版里不存在或被改名：
+
+| 想要的图标 | 实际导出名 |
+| --- | --- |
+| `Github` | **不存在**，用 `Code`（设置/关于页 GitHub 链接）或直接在 SVG 资源里自定义 |
+| `MoreVertical` | `EllipsisVertical` |
+| `WrapText` | 不存在（语义替换：`Ruler` 用于"可读行宽"） |
+| `CheckCircle2` | `BadgeCheck`（带勾选标记的徽章更贴近"已是最新"语义） |
+| `Code2` | `Code` |
+
+编码前可以 `ls node_modules/lucide-react-native/dist/esm/icons/ | grep -i <name>` 确认。
+
+## Pager / 侧滑面板
+
+### Obsidian 风格的 workspace ↔ files 双页用 `react-native-pager-view`
+
+不是用 expo-router stack + `slide_from_left` 加手势层。那种方案只有"过阈值就 push"的单次动画，没有"手指跟随 + 看见另一页内容 + 松手 snap"的体验。
+
+**正确做法**：在 `(main)/index.tsx` 顶层用 `PagerView` 承载两页，files 是 page 0、workspace 是 page 1，`initialPage={1}`。panel-left 按钮和"关闭"按钮通过 `pagerRef.current?.setPage(...)` 编程切页，左右滑由原生组件接管（iOS UIPageViewController / Android ViewPager2）。
+
+```tsx
+<PagerView ref={pagerRef} style={{ flex: 1 }} initialPage={1} offscreenPageLimit={1} overdrag>
+  <View key="files" collapsable={false} style={{ flex: 1 }}>
+    <FilesPanel onClose={() => pagerRef.current?.setPage(1)} />
+  </View>
+  <View key="workspace" collapsable={false} style={{ flex: 1 }}>
+    {/* workspace content */}
+  </View>
+</PagerView>
+```
+
+**关键 prop 解释**：
+
+- `collapsable={false}` 必须加在每个子 View 上，否则 Android RN 编译期会把单子 View 的容器 optimize 掉，PagerView 认不到页
+- `overdrag` 在第一/最后一页允许短暂弹性拖动，跟 Obsidian 一致
+- `offscreenPageLimit={1}` 保留 1 页在后台不销毁，页面状态连续
+- 文件树 / 工具栏的 SafeAreaView 要放在每一页**内部**（不是 PagerView 外层），两页各自处理安全区
+
+**为什么不能用 stack + slide_from_left + Pan**：stack 动画是 push 瞬间播一次，手势只能做"过阈值就触发"的单次动作，体验不跟手。
+
+**note 编辑器仍走 stack push**：`router.push("/note/[id]")` 盖在整个 pager 之上，跟桌面打开笔记等价，不参与左右滑。
+
+**添加新依赖要记得** `npx expo prebuild` + 重新 `pnpm android` / `pnpm ios`，因为 pager-view 有原生模块。
+
+**相关文件**：`src/app/(main)/index.tsx`、`src/components/files-panel.tsx`
+
+## Bottom Sheet
+
+### 选用 `@gorhom/bottom-sheet@^5`
+
+项目内所有 Obsidian 风格的底部弹起面板（命令 sheet、主题选择 sheet 等）用 `@gorhom/bottom-sheet` v5，不要再写 `react-native` `Modal` + `animationType="slide"` 那套，体验差（没有 drag handle 跟手、没有 snap、关闭只能点遮罩）。
+
+**根布局强制要求**（[src/app/_layout.tsx](src/app/_layout.tsx)）：
+
+```tsx
+<GestureHandlerRootView style={{ flex: 1 }}>
+  <SafeAreaProvider>
+    <ThemeProvider ...>
+      <BottomSheetModalProvider>
+        ...app tree...
+      </BottomSheetModalProvider>
+    </ThemeProvider>
+  </SafeAreaProvider>
+</GestureHandlerRootView>
+```
+
+缺 `GestureHandlerRootView` 或 `BottomSheetModalProvider` 任一层会静默失败（sheet 根本不显示或手势无效）。
+
+**组件封装模式**：sheet 组件用 `forwardRef` + `useImperativeHandle` 对外暴露 `{ present, dismiss }`，不要把 `open` / `onClose` 布尔 state 提到 parent，这会破坏 gorhom 的动画生命周期。消费方保持一个 `useRef<CommandSheetRef>(null)` 并 `ref.current?.present()` 触发。
+
+**动态高度**：`enableDynamicSizing` + `<BottomSheetView>`，让 sheet 高度按内容自适应，不写死 `snapPoints`。
+
+**主题色**：`backgroundStyle={{ backgroundColor: colors.card }}` + `handleIndicatorStyle={{ backgroundColor: colors.border }}`，走项目主题变量。
+
+**遮罩**：`BottomSheetBackdrop` + `pressBehavior="close"` + `appearsOnIndex={0}` + `disappearsOnIndex={-1}`。
+
+**相关文件**：`src/components/command-sheet.tsx`、`src/components/theme-picker-sheet.tsx`
+
 ## OTP / 6 位验证码输入
 
 ### 选用 `input-otp-native`

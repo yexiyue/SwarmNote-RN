@@ -4692,7 +4692,7 @@
       "y": 3786,
       "name": "Onboarding 1: Welcome",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -5023,7 +5023,7 @@
       "y": 3786,
       "name": "Onboarding 2: Device Name",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -5325,7 +5325,7 @@
       "y": 3786,
       "name": "Onboarding 3: Pairing",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -5794,7 +5794,7 @@
       "y": 3786,
       "name": "Onboarding 4: Complete",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -6160,7 +6160,7 @@
       "y": 5907,
       "name": "Pairing: Input Code",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -6528,7 +6528,7 @@
       "y": 5907,
       "name": "Pairing: Request Dialog",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -6740,7 +6740,7 @@
       "y": 5907,
       "name": "Pairing: Success",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -7159,7 +7159,7 @@
       "y": 5907,
       "name": "Pairing: Found Device",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -7548,7 +7548,7 @@
       "y": 7000,
       "name": "Main: Workspace (empty)",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -7782,7 +7782,7 @@
       "y": 7000,
       "name": "Main: Files (Recent)",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -7851,51 +7851,6 @@
                   "fill": "$--foreground"
                 }
               ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "mUFWs",
-          "name": "Header",
-          "width": "fill_container",
-          "height": 52,
-          "padding": [
-            0,
-            20
-          ],
-          "justifyContent": "space_between",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "icon_font",
-              "id": "Fa2AH",
-              "name": "flBack",
-              "width": 24,
-              "height": 24,
-              "iconFontName": "arrow-left",
-              "iconFontFamily": "lucide",
-              "fill": "$--foreground"
-            },
-            {
-              "type": "text",
-              "id": "TH4i0",
-              "name": "flTitle",
-              "fill": "$--foreground",
-              "content": "文件",
-              "fontFamily": "Inter",
-              "fontSize": 20,
-              "fontWeight": "700"
-            },
-            {
-              "type": "icon_font",
-              "id": "nQZxv",
-              "name": "flPlus",
-              "width": 24,
-              "height": 24,
-              "iconFontName": "plus",
-              "iconFontFamily": "lucide",
-              "fill": "$--foreground"
             }
           ]
         },
@@ -8129,6 +8084,172 @@
               ]
             }
           ]
+        },
+        {
+          "type": "frame",
+          "id": "7yGck",
+          "name": "File Bottom",
+          "width": "fill_container",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "rHz79",
+              "name": "flSep1",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$--border"
+            },
+            {
+              "type": "frame",
+              "id": "q6vAJ",
+              "name": "flToolbar",
+              "width": "fill_container",
+              "height": 52,
+              "padding": [
+                0,
+                20
+              ],
+              "justifyContent": "space_around",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "08kGl",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "square-pen",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--muted-foreground"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "cTlMt",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "folder-plus",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--muted-foreground"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "uSnbF",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "arrow-up-narrow-wide",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--muted-foreground"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "W8dt6",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "chevrons-down-up",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--muted-foreground"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "toITD",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "x",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--muted-foreground"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GV2Ev",
+              "name": "flSep2",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$--border"
+            },
+            {
+              "type": "frame",
+              "id": "FcCQQ",
+              "name": "File Footer",
+              "width": "fill_container",
+              "height": 56,
+              "padding": [
+                0,
+                10,
+                0,
+                12
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "hc94w",
+                  "name": "flWsChip",
+                  "height": 36,
+                  "fill": "$--muted",
+                  "cornerRadius": 8,
+                  "gap": 6,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "r7qGX",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "folder",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WU6pN",
+                      "fill": "$--foreground",
+                      "content": "默认工作区",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "7KyXg",
+                      "width": 12,
+                      "height": 12,
+                      "iconFontName": "chevrons-up-down",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "noDHs",
+                  "name": "flSettingsBtn",
+                  "width": 36,
+                  "height": 36,
+                  "cornerRadius": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "bI2UC",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "settings",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -8139,7 +8260,7 @@
       "y": 7000,
       "name": "Settings: Index (Modal)",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -8544,7 +8665,7 @@
       "y": 7000,
       "name": "Bottom Command Bar",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "reusable": true,
       "width": 353,
@@ -8612,7 +8733,7 @@
       "y": 7900,
       "name": "Settings: General",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -9225,7 +9346,7 @@
       "y": 7900,
       "name": "Settings: Network",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -9622,7 +9743,7 @@
       "y": 7900,
       "name": "Settings: Devices",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,
@@ -10343,7 +10464,7 @@
       "y": 7900,
       "name": "Settings: About",
       "theme": {
-        "Mode": "Dark"
+        "Mode": "Light"
       },
       "clip": true,
       "width": 393,

@@ -1,13 +1,5 @@
 import { useRouter } from "expo-router";
-import {
-  ArrowLeft,
-  Laptop,
-  type LucideIcon,
-  Monitor,
-  Radar,
-  Smartphone,
-  Tablet,
-} from "lucide-react-native";
+import { ArrowLeft, Radar } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,17 +9,10 @@ import { Text } from "@/components/ui/text";
 import { getAppCore } from "@/core/app-core";
 import { usePairingCodeGenerator } from "@/hooks/usePairingCodeGenerator";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { devicePlatformIcon } from "@/lib/device-platform";
 import { useNetworkPreferenceStore } from "@/stores/network-preference-store";
 import { useOnboardingStore } from "@/stores/onboarding-store";
 import { useSwarmStore } from "@/stores/swarm-store";
-
-function devicePlatformIcon(platform: string): LucideIcon {
-  const p = platform.toLowerCase();
-  if (p.includes("ios") || p.includes("android")) return Smartphone;
-  if (p.includes("ipad") || p.includes("tablet")) return Tablet;
-  if (p.includes("mac") || p.includes("windows")) return Laptop;
-  return Monitor;
-}
 
 function deviceMeta(device: UniffiDevice): string {
   const os = device.os ? device.os : "未知";

@@ -7,5 +7,5 @@ export default function Index() {
   const hasOnboarded = useOnboardingStore((s) => s.hasOnboarded);
   // `as never` sidesteps typedRoutes' type-gen which only resolves after
   // `expo start`; routes below exist in the filesystem so runtime is fine.
-  return <Redirect href={(hasOnboarded ? "/(tabs)" : "/onboarding/welcome") as never} />;
+  return <Redirect href={(hasOnboarded ? "/(main)" : "/onboarding/welcome") as never} />;
 }

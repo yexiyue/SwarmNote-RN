@@ -19,7 +19,7 @@ export function WorkspaceProvider({
 }
 
 /** Get the active `UniffiWorkspaceCoreLike`, throwing if none is mounted.
- *  Call sites are always inside `(tabs)/...` routes where the layout
+ *  Call sites are always inside `(main)/...` routes where the layout
  *  guarantees a workspace is open — if this throws, it's a routing bug. */
 export function useWorkspace(): UniffiWorkspaceCoreLike {
   const ws = useContext(WorkspaceContext);

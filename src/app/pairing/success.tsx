@@ -5,14 +5,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { UniffiConnectionType } from "react-native-swarmnote-core";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { truncatePeerId } from "@/lib/peer-id";
 import { useSwarmStore } from "@/stores/swarm-store";
-
-const SUCCESS_GREEN = "#4CAF50";
-
-function truncatePeerId(peerId: string): string {
-  if (peerId.length <= 16) return peerId;
-  return `${peerId.slice(0, 8)}…${peerId.slice(-4)}`;
-}
 
 function connectionLabel(type: UniffiConnectionType | undefined, latency?: number): string {
   if (type === undefined) return "已连接";
@@ -51,7 +45,7 @@ export default function PairingSuccess() {
       <View className="flex-1 justify-center gap-5 px-6 pb-6">
         <View className="items-center gap-3">
           <View className="h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <Check color={SUCCESS_GREEN} size={32} strokeWidth={2.5} />
+            <Check color={colors.success} size={32} strokeWidth={2.5} />
           </View>
           <Text className="text-[22px] font-bold text-foreground">配对成功！</Text>
           <Text className="text-center text-[15px] text-muted-foreground">
@@ -84,8 +78,8 @@ export default function PairingSuccess() {
           <View className="flex-row items-center justify-between">
             <Text className="text-[14px] text-muted-foreground">连接状态</Text>
             <View className="flex-row items-center gap-1.5">
-              <View style={{ backgroundColor: SUCCESS_GREEN }} className="h-2 w-2 rounded-full" />
-              <Text style={{ color: SUCCESS_GREEN }} className="text-[14px] font-medium">
+              <View style={{ backgroundColor: colors.success }} className="h-2 w-2 rounded-full" />
+              <Text style={{ color: colors.success }} className="text-[14px] font-medium">
                 {connectionLabel(device?.connection, latency)}
               </Text>
             </View>

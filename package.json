@@ -16,6 +16,7 @@
     "reset-project": "node ./scripts/reset-project.js"
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^5.2.9",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/elements": "^2.9.10",
@@ -64,6 +65,7 @@
     "react-native": "0.83.4",
     "react-native-css": "^3.0.7",
     "react-native-gesture-handler": "~2.30.0",
+    "react-native-pager-view": "8.0.0",
     "react-native-reanimated": "4.2.1",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-screens": "~4.23.0",

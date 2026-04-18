@@ -1,5 +1,6 @@
 import "../global.css";
 
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
 import { Stack } from "expo-router";
@@ -7,6 +8,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, useColorScheme, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { PairingRequestHost } from "@/components/pairing-request-host";
 import { initAppCore } from "@/core/app-core";
@@ -48,25 +50,36 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider value={navTheme}>
-        <StatusBar style={isDark ? "light" : "dark"} />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="onboarding" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="pairing/input-code" options={{ animation: "slide_from_right" }} />
-          <Stack.Screen name="pairing/found-device" options={{ animation: "slide_from_right" }} />
-          <Stack.Screen
-            name="pairing/success"
-            options={{ animation: "slide_from_right", gestureEnabled: false }}
-          />
-          <Stack.Screen name="editor-test" />
-          <Stack.Screen name="explore" />
-        </Stack>
-        <PairingRequestHost />
-        <PortalHost />
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider value={navTheme}>
+          <BottomSheetModalProvider>
+            <StatusBar style={isDark ? "light" : "dark"} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="onboarding" />
+              <Stack.Screen name="(main)" />
+              <Stack.Screen
+                name="settings"
+                options={{ presentation: "modal", animation: "slide_from_bottom" }}
+              />
+              <Stack.Screen name="pairing/input-code" options={{ animation: "slide_from_right" }} />
+              <Stack.Screen
+                name="pairing/found-device"
+                options={{ animation: "slide_from_right" }}
+              />
+              <Stack.Screen
+                name="pairing/success"
+                options={{ animation: "slide_from_right", gestureEnabled: false }}
+              />
+              <Stack.Screen name="editor-test" />
+              <Stack.Screen name="explore" />
+            </Stack>
+            <PairingRequestHost />
+            <PortalHost />
+          </BottomSheetModalProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

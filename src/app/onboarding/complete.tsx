@@ -7,12 +7,8 @@ import type { UniffiDeviceInfo } from "react-native-swarmnote-core";
 import { Text } from "@/components/ui/text";
 import { getAppCore } from "@/core/app-core";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { truncatePeerId } from "@/lib/peer-id";
 import { useOnboardingStore } from "@/stores/onboarding-store";
-
-function truncatePeerId(peerId: string): string {
-  if (peerId.length <= 16) return peerId;
-  return `${peerId.slice(0, 8)}…${peerId.slice(-4)}`;
-}
 
 export default function Complete() {
   const router = useRouter();
@@ -30,7 +26,7 @@ export default function Complete() {
 
   const onEnter = () => {
     markCompleted();
-    router.replace("/(tabs)" as never);
+    router.replace("/(main)" as never);
   };
 
   return (
