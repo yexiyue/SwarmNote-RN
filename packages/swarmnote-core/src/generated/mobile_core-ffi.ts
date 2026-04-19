@@ -27,6 +27,8 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_network_status(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(ptr: bigint, path: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_peer_id(ptr: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
+    ubrn_uniffi_mobile_core_fn_method_uniffiappcore_recent_workspaces(ptr: bigint): bigint;
+    ubrn_uniffi_mobile_core_fn_method_uniffiappcore_remove_recent_workspace(ptr: bigint, path: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(ptr: bigint, name: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_start_network(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(ptr: bigint): bigint;
@@ -138,6 +140,8 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_network_status(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id(): number;
+    ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_recent_workspaces(): number;
+    ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_remove_recent_workspace(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_start_network(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(): number;

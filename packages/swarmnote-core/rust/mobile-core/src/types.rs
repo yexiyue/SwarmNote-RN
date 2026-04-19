@@ -15,7 +15,10 @@
 use std::time::SystemTime;
 
 use entity::workspace::{documents, folders};
-use swarmnote_core::{DeviceInfo, FileTreeNode, HydrateResult, NodeStatus, OpenDocResult, WorkspaceInfo};
+use swarmnote_core::{
+    DeviceInfo, FileTreeNode, HydrateResult, NodeStatus, OpenDocResult, RecentWorkspace,
+    WorkspaceInfo,
+};
 
 // ── Workspace ────────────────────────────────────────────────
 
@@ -38,6 +41,32 @@ impl From<WorkspaceInfo> for UniffiWorkspaceInfo {
             created_by: w.created_by,
             created_at: w.created_at.into(),
             updated_at: w.updated_at.into(),
+        }
+    }
+}
+
+/// Persistent MRU entry from `GlobalConfig.recent_workspaces`. Unlike
+/// `UniffiWorkspaceInfo`, this is available for workspaces that have been
+/// opened previously even when the handle is not currently loaded — the
+/// host surfaces this list in the workspace picker UI.
+///
+/// `last_opened_at` stays as an ISO-8601 string (mirror of core's typing)
+/// so RN can display it directly without a Date round-trip.
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct UniffiRecentWorkspace {
+    pub path: String,
+    pub name: String,
+    pub last_opened_at: String,
+    pub uuid: Option<String>,
+}
+
+impl From<RecentWorkspace> for UniffiRecentWorkspace {
+    fn from(w: RecentWorkspace) -> Self {
+        Self {
+            path: w.path,
+            name: w.name,
+            last_opened_at: w.last_opened_at,
+            uuid: w.uuid,
         }
     }
 }

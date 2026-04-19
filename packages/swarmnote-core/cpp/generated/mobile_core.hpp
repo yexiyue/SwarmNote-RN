@@ -30,6 +30,8 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_network_status(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_peer_id(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_recent_workspaces(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_remove_recent_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_set_device_name(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_start_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_stop_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
@@ -141,6 +143,8 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_network_status(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_recent_workspaces(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_remove_recent_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_start_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_stop_network(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);

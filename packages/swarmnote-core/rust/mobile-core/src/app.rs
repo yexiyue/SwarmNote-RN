@@ -14,7 +14,7 @@ use crate::error::{FfiError, parse_uuid};
 use crate::events::{ForeignEventBus, UniffiEventBusAdapter};
 use crate::keychain::{ForeignKeychainProvider, UniffiKeychainAdapter};
 use crate::path::strip_file_uri;
-use crate::types::{UniffiDeviceInfo, UniffiNodeStatus, UniffiWorkspaceInfo};
+use crate::types::{UniffiDeviceInfo, UniffiNodeStatus, UniffiRecentWorkspace, UniffiWorkspaceInfo};
 use crate::workspace::UniffiWorkspaceCore;
 
 /// Device-level core, wrapping [`swarmnote_core::AppCore`].
@@ -143,6 +143,31 @@ impl UniffiAppCore {
             .into_iter()
             .map(|ws| ws.info().clone().into())
             .collect()
+    }
+
+    /// Persistent MRU list of workspaces the user has opened on this device
+    /// (source: `GlobalConfig.recent_workspaces`, capped at 10). Available
+    /// even for workspaces that are not currently loaded — the RN host uses
+    /// this to populate the workspace picker without forcing `open` on every
+    /// entry.
+    pub async fn recent_workspaces(&self) -> Vec<UniffiRecentWorkspace> {
+        self.inner
+            .recent_workspaces()
+            .await
+            .into_iter()
+            .map(Into::into)
+            .collect()
+    }
+
+    /// Drop an entry from the persistent recent list. No-op if `path` is not
+    /// present. **Does not delete files on disk** — hosts that want to wipe
+    /// the workspace directory must do so themselves (delete workspace is a
+    /// separate future API).
+    pub async fn remove_recent_workspace(&self, path: String) -> Result<(), FfiError> {
+        self.inner
+            .remove_recent_workspace(&path)
+            .await
+            .map_err(Into::into)
     }
 
     /// Look up a workspace's info by UUID without forcing the caller to

@@ -953,6 +953,68 @@ const FfiConverterTypeUniffiPairingCodeInfo = (() => {
 })();
 
 
+/**
+ * Persistent MRU entry from `GlobalConfig.recent_workspaces`. Unlike
+ * `UniffiWorkspaceInfo`, this is available for workspaces that have been
+ * opened previously even when the handle is not currently loaded — the
+ * host surfaces this list in the workspace picker UI.
+ *
+ * `last_opened_at` stays as an ISO-8601 string (mirror of core's typing)
+ * so RN can display it directly without a Date round-trip.
+ */
+export type UniffiRecentWorkspace = {
+    path: string,
+    name: string,
+    lastOpenedAt: string,
+    uuid?: string
+}
+
+/**
+ * Generated factory for {@link UniffiRecentWorkspace} record objects.
+ */
+export const UniffiRecentWorkspace = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiRecentWorkspace, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiRecentWorkspace>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiRecentWorkspace = (() => {
+    type TypeName = UniffiRecentWorkspace;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                path: FfiConverterString.read(from), 
+                name: FfiConverterString.read(from), 
+                lastOpenedAt: FfiConverterString.read(from), 
+                uuid: FfiConverterOptionalString.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.path, into);
+            FfiConverterString.write(value.name, into);
+            FfiConverterString.write(value.lastOpenedAt, into);
+            FfiConverterOptionalString.write(value.uuid, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.path) + 
+            FfiConverterString.allocationSize(value.name) + 
+            FfiConverterString.allocationSize(value.lastOpenedAt) + 
+            FfiConverterOptionalString.allocationSize(value.uuid);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
 export type UniffiWorkspaceInfo = {
     id: string,
     name: string,
@@ -4533,6 +4595,21 @@ export interface UniffiAppCoreLike {
      */
     peerId()  /*throws*/: string;
     /**
+     * Persistent MRU list of workspaces the user has opened on this device
+     * (source: `GlobalConfig.recent_workspaces`, capped at 10). Available
+     * even for workspaces that are not currently loaded — the RN host uses
+     * this to populate the workspace picker without forcing `open` on every
+     * entry.
+     */
+    recentWorkspaces(asyncOpts_?: { signal: AbortSignal }) : Promise<Array<UniffiRecentWorkspace>>;
+    /**
+     * Drop an entry from the persistent recent list. No-op if `path` is not
+     * present. **Does not delete files on disk** — hosts that want to wipe
+     * the workspace directory must do so themselves (delete workspace is a
+     * separate future API).
+     */
+    removeRecentWorkspace(path: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
      * Update the user-facing device name. Persists immediately to
      * `{app_data_dir}/config.json` and, if the P2P node is running, restarts
      * it so the new name propagates through libp2p Identify's
@@ -4837,6 +4914,75 @@ async  openWorkspace(path: string, asyncOpts_?: { signal: AbortSignal }): Promis
             },
             /*liftString:*/ FfiConverterString.lift,
     ));
+    }
+    
+    /**
+     * Persistent MRU list of workspaces the user has opened on this device
+     * (source: `GlobalConfig.recent_workspaces`, capped at 10). Available
+     * even for workspaces that are not currently loaded — the RN host uses
+     * this to populate the workspace picker without forcing `open` on every
+     * entry.
+     */
+async  recentWorkspaces(asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiRecentWorkspace>> {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_recent_workspaces(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayTypeUniffiRecentWorkspace.lift.bind(FfiConverterArrayTypeUniffiRecentWorkspace),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Drop an entry from the persistent recent list. No-op if `path` is not
+     * present. **Does not delete files on disk** — hosts that want to wipe
+     * the workspace directory must do so themselves (delete workspace is a
+     * separate future API).
+     */
+async  removeRecentWorkspace(path: string, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_remove_recent_workspace(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(path)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
     }
     
     /**
@@ -6489,6 +6635,10 @@ const FfiConverterArrayTypeUniffiFolder = new FfiConverterArray(FfiConverterType
 const FfiConverterArrayTypeUniffiPairedDeviceInfo = new FfiConverterArray(FfiConverterTypeUniffiPairedDeviceInfo);
 
 
+// FfiConverter for Array<UniffiRecentWorkspace>
+const FfiConverterArrayTypeUniffiRecentWorkspace = new FfiConverterArray(FfiConverterTypeUniffiRecentWorkspace);
+
+
 // FfiConverter for Array<UniffiWorkspaceInfo>
 const FfiConverterArrayTypeUniffiWorkspaceInfo = new FfiConverterArray(FfiConverterTypeUniffiWorkspaceInfo);
 
@@ -6542,6 +6692,12 @@ function uniffiEnsureInitialized() {
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_peer_id() !== 33021) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_peer_id");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_recent_workspaces() !== 24887) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_recent_workspaces");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_remove_recent_workspace() !== 5913) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_remove_recent_workspace");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name() !== 62004) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_set_device_name");
@@ -6721,6 +6877,7 @@ export default Object.freeze({
     FfiConverterTypeUniffiPairingMethod,
     FfiConverterTypeUniffiPairingRefuseReason,
     FfiConverterTypeUniffiPairingResponse,
+    FfiConverterTypeUniffiRecentWorkspace,
     FfiConverterTypeUniffiWorkspaceCore,
     FfiConverterTypeUniffiWorkspaceInfo,
     FfiConverterTypeUpsertDocInput,
