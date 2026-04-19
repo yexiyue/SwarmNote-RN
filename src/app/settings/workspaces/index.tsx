@@ -8,16 +8,12 @@ import {
   Inbox,
   Plus,
 } from "lucide-react-native";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { UniffiRecentWorkspace } from "react-native-swarmnote-core";
 import { SettingDivider } from "@/components/setting-row";
 import { Text } from "@/components/ui/text";
-import {
-  WorkspaceCreateSheet,
-  type WorkspaceCreateSheetRef,
-} from "@/components/workspace-create-sheet";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { useRecentWorkspacesStore } from "@/stores/recent-workspaces-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -28,7 +24,6 @@ export default function WorkspacesIndex() {
   const items = useRecentWorkspacesStore((s) => s.items);
   const refresh = useRecentWorkspacesStore((s) => s.refresh);
   const activeInfo = useWorkspaceStore((s) => s.info);
-  const sheetRef = useRef<WorkspaceCreateSheetRef>(null);
 
   useEffect(() => {
     refresh();
@@ -37,6 +32,7 @@ export default function WorkspacesIndex() {
   const openDetail = (path: string) => {
     router.push(`/settings/workspaces/${encodeURIComponent(path)}` as never);
   };
+  const openCreate = () => router.push("/settings/workspaces/new" as never);
 
   const count = items?.length ?? 0;
 
@@ -49,11 +45,7 @@ export default function WorkspacesIndex() {
           </Pressable>
           <Text className="text-[16px] font-semibold text-foreground">工作区</Text>
         </View>
-        <Pressable
-          onPress={() => sheetRef.current?.present()}
-          hitSlop={12}
-          accessibilityLabel="新建工作区"
-        >
+        <Pressable onPress={openCreate} hitSlop={12} accessibilityLabel="新建工作区">
           <Plus color={colors.foreground} size={22} />
         </Pressable>
       </View>
@@ -67,7 +59,7 @@ export default function WorkspacesIndex() {
             icon={FolderPlus}
             label="新建工作区"
             description="在 App 空间创建一个新的工作区"
-            onPress={() => sheetRef.current?.present()}
+            onPress={openCreate}
           />
           <SettingDivider />
           <AddRow
@@ -99,13 +91,6 @@ export default function WorkspacesIndex() {
           )}
         </Section>
       </ScrollView>
-
-      <WorkspaceCreateSheet
-        ref={sheetRef}
-        onCreated={() => {
-          router.replace("/(main)" as never);
-        }}
-      />
     </SafeAreaView>
   );
 }

@@ -31,6 +31,7 @@ export default function WorkspaceScreen() {
   };
 
   const openWorkspaceManager = () => router.push("/settings/workspaces" as never);
+  const openWorkspaceCreate = () => router.push("/settings/workspaces/new" as never);
 
   if (workspace === null) {
     return (
@@ -50,7 +51,7 @@ export default function WorkspaceScreen() {
             创建你的第一个工作区开始记录
           </Text>
           <Pressable
-            onPress={openWorkspaceManager}
+            onPress={openWorkspaceCreate}
             className="mt-6 h-10 flex-row items-center justify-center gap-1.5 rounded-lg bg-primary px-5"
             accessibilityLabel="创建工作区"
           >
