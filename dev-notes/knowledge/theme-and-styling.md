@@ -333,3 +333,87 @@ const colors = useThemeColors();
 - `Code Pairing Card/Generated` (b5PSu) — 配对码卡片已生成状态
 
 Pencil 不支持 Figma 式组件变体，不同状态用独立 reusable 组件 + `/` 命名分层。
+
+### batch_design 常见坑
+
+用 `batch_design` 在 .pen 文件里 insert / update 节点时踩过的雷：
+
+**不支持的 frame 属性**：
+
+- `effects`（drop_shadow 等）— 报 `unexpected property`；如果需要阴影效果，目前只能靠 fill + 留白硬凑层次，或者用 inspector 手动加
+- `clipsContent` — 同样 unexpected property
+
+**`fontFamily` 引用 token 会 warning**：
+
+- `fontFamily: "$--font-primary"` / `"$--font-secondary"` 会报 `Font family '$--font-primary' is invalid`，但操作不 fail，节点照常创建
+- 可以直接省略 `fontFamily` 字段让节点走默认（iOS 系统字体），或传具体字体名（"SF Pro Display" / "Inter"）
+
+**text 节点宽度**：
+
+- 长文本如果不写 `width: "fill_container"`，会按内容撑开到一行撑爆容器；写了 `width: "fill_container"` 才会在容器宽度内 wrap
+- 中文字符行高约 22px（fontSize: 11 时），估算一行能放 ~27 字，超过会换行但可能溢出边界
+
+**批次上限**：每次 `batch_design` **硬上限 25 ops**，超过会整块 rollback。大 frame 要拆成 2-4 批。
+
+**返回的 binding 不跨批次**：每次 batch 结束后，`op=I(var, ...)` 的 `var` 就失效了；下一批要引用前面节点必须用它返回的真实 node id（如 `I("X2p3s", ...)`）。
+
+**fit_content 空容器警告**：创建 `height: "fit_content"` 的容器但暂时不放 child，会 warning `will result in zero size`；只要下一批把 child 塞进去就行。
+
+**array 类参数要传 JSON**：MCP schema 里 array 参数传字符串会报 `width must be a number` / `is not a string slice`。`find_empty_space_on_canvas` 实际用起来坏了（传 number / string 都报错），靠 `snapshot_layout` 手动看现有 frame 坐标代替。
+
+**文件体积**：`batch_get` 整个 frame 返回 JSON 动辄 9 MB+，超过 token 上限。只用 `get_editor_state` 拿 top-level node id，用 `snapshot_layout` 拿坐标，再 `get_screenshot` 取视觉反馈，不要去 `batch_get` 整个 frame。
+
+### 工作区管理页（2026-04-18，2026-04-19 参考 Obsidian 调整）
+
+设计稿里的 5 个 frame 对齐桌面端 `src/routes/workspace-manager.tsx` 的功能，但做了移动端特化。二轮参照 Obsidian 移动端 vault 启动页后调整了操作路径。
+
+**设计决策**：
+
+- **单活动工作区模型**：同一时刻只有一个 active workspace；切换 = 卸载 + 加载。
+- **存储策略一期只做 App storage**：工作区统一放 App 私有沙盒，不给"Device storage / 公共存储"选项。理由：
+  - iOS 没有 Device storage 的对等语义，双端必须通过 App storage 才能统一
+  - P2P 同步 + CRDT 是产品核心，**不靠文件管理器搬文件**（Obsidian 靠这个是因为没有内建 sync）
+  - `.swarmnote/` CRDT 元数据放公共目录容易被用户或备份工具破坏
+  - 卸载清除 = 符合移动端用户心智和隐私预期
+  - P3 再考虑"导出工作区到文件夹"作为备份/分享功能
+- **不做 "Open folder as workspace"**：移动端用户几乎没有现成 SwarmNote workspace 目录，从桌面端来的工作区走「从设备同步」更自然。
+- **操作简化**：桌面端「新建 / 打开本地 / 同步远程」三卡简化为「新建 / 从设备同步」两项。
+- **空态/有态同结构**（参照 devices 页：主操作在上、列表在下）：同一套页面布局，"添加工作区"卡片（新建 / 同步）放在顶部，"我的工作区"列表放在下方；空态时列表卡内嵌虚线空态占位（inbox icon + 「还没有工作区」+ 引导文案），不画独立 Hero 页。
+- **项操作走独立子页**（对齐 Obsidian，不走 Action Sheet）：从 Populated 列表项右箭头进 Detail 页，Detail 里的「重命名」「删除」再各 push 到独立 frame。
+- **无 Forget 操作**：因为没有外部 storage，「从列表移除」和「删除」等价，只保留红色的「删除工作区」。
+- **删除走严肃 confirm 页**：不是 alert dialog，而是完整 frame，要求用户输入工作区名才激活删除按钮（对齐 GitHub 等危险操作的谨慎模式）。
+- **Detail 页不展示原始 App storage 路径**（`/data/data/...` / iOS sandbox UUID 对用户既无意义又不可打开），改展示「存储类型」+「工作区 ID 前缀」，对齐「我的 iPhone」卡里「Peer ID: 12D3KooW…」的范式。工作区 ID 右侧放 copy 按钮，方便跨设备比对同一工作区（未来云端 issue 报障也需要这个 ID）。
+- **入口**：首次启动（onboarding 完成后）自动跳 Empty；后续从 files 页底部工作区切换按钮进入 Populated。
+
+**frame 清单**：
+
+| Frame | ID | 用途 |
+| --- | --- | --- |
+| `Main: Workspace Manager` | `X2p3s` | 主页面（添加卡在上 + 工作区列表在下） |
+| `Main: Workspace Manager (empty list)` | `VmEGM` | 工作区列表为空态（card 内虚线空态占位） |
+| `Workspace Detail` | `RD6Zv` | 项详情（信息卡 + 同步状态 + 操作卡 3 行；信息卡里展示 存储类型 + 工作区 ID 可复制） |
+| `Workspace Rename` | `6ifdA` | 重命名子页（当前名 + input + primary 保存） |
+| `Workspace Delete Confirm` | `u2Dwk` | 删除确认（警示 + 损失卡 + 输入名 + 双按钮） |
+
+**视觉风格**：对齐项目设置页（`QeN2L` / `QxzNL` / `0g67Q` / `BHpLd`）——AppBar + section label + `bg-card` 圆角卡 + 卡内 divider 分行 + 40×40 图标方块 + 琥珀金强调色。**不采用** Obsidian 扁平无 card 的列表风格。
+
+**一期实装范围（2026-04-19，openspec change `implement-workspace-manager`）**：
+
+已实装：
+
+- 列表页 `src/app/settings/workspaces/index.tsx`：加载 `GlobalConfig.recent_workspaces`，空/有合一结构，"新建"可用 / "从设备同步" disabled 标"即将推出"
+- 详情页 `src/app/settings/workspaces/[id].tsx`：信息卡（40×40 icon + name + meta + 工作区 ID 可复制）+ 操作卡 3 行（"打开工作区" active ；"重命名" "删除" disabled）
+- 新建 sheet `src/components/workspace-create-sheet.tsx`：gorhom bottom sheet，实时校验命名冲突/非法字符，创建成功后自动切换 + `router.replace("/(main)")`
+- host 层 `src/core/workspace-manager.ts` 重构：`createWorkspace(name)` / `switchWorkspace(path)` / `openLastOrDefault()`（含老版本 `${document}/default` 迁移 fallback）
+- 入口：设置首页"工作区"导航行、files-panel 底部工作区 pill、`(main)` 顶部 `⋮`
+
+未实装（UI 留位 + "即将推出" badge）：
+
+- 重命名 / 删除工作区（Rust API 缺失）
+- 从设备同步工作区（依赖 sync flow 完善）
+
+**目录命名策略**：新建工作区目录为 `${Paths.document}/workspaces/<用户输入 name>/`；名冲突就让用户改名（不自动加后缀）。工作区 UUID（`WorkspaceInfo.id`）是 DB 生成的稳定键，和目录名解耦 —— 未来 rename 只改 DB name 字段不改目录。
+
+**Rust 层依赖**：需要 `swarmnote-core >= 6c6803e`（develop 分支）的 `AppCore::recent_workspaces / touch_recent_workspace / remove_recent_workspace` public API。`open_workspace` 会自动 touch MRU，host 无需显式调。
+
+**相关文件**：`dev-notes/design/mobile-design.pen`、`openspec/changes/implement-workspace-manager/`

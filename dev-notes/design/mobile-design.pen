@@ -3543,7 +3543,7 @@
                   "type": "ref",
                   "ref": "C3KOZ",
                   "x": 24,
-                  "y": 24.019943701668048,
+                  "y": 24.01994370166805,
                   "width": "fill_container",
                   "descendants": {
                     "NEMHS": {
@@ -10898,6 +10898,2319 @@
                   "fontWeight": "normal"
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "X2p3s",
+      "x": 0,
+      "y": 8900,
+      "name": "Main: Workspace Manager",
+      "width": 393,
+      "height": 852,
+      "fill": "$--background",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "n3wYx",
+          "name": "Status Bar",
+          "width": "fill_container",
+          "height": 62,
+          "fill": "$--background"
+        },
+        {
+          "type": "frame",
+          "id": "Diqbh",
+          "name": "AppBar",
+          "width": "fill_container",
+          "height": 52,
+          "gap": 12,
+          "padding": [
+            0,
+            16
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "CqAeg",
+              "name": "Back",
+              "width": 32,
+              "height": 32,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "3Li5G",
+                  "name": "backIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "arrow-left",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--foreground"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "vaRIJ",
+              "name": "title",
+              "fill": "$--foreground",
+              "content": "工作区",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "nnZii",
+          "name": "Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            12,
+            16,
+            24,
+            16
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "CkPJ4",
+              "name": "Brand",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Dm0A4",
+                  "name": "brandLogo",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "$--primary",
+                  "cornerRadius": 12,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "cj2Wp",
+                      "name": "brandIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "pen-line",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "VUdK2",
+                  "name": "brandText",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "53klx",
+                      "name": "brandName",
+                      "fill": "$--foreground",
+                      "content": "SwarmNote",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "saW1l",
+                      "name": "brandDesc",
+                      "fill": "$--muted-foreground",
+                      "content": "v0.1.2 · 去中心化 P2P 笔记",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "QoGiW",
+              "name": "Section/Add",
+              "width": "fill_container",
+              "padding": [
+                0,
+                4
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "4S1PF",
+                  "name": "sec1Label",
+                  "fill": "$--muted-foreground",
+                  "content": "添加工作区",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "letterSpacing": 0.5
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "2vsnG",
+              "name": "AddCard",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 14,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "xy0Be",
+                  "name": "Row/NewWorkspace",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "fMeHB",
+                      "name": "a1Icon",
+                      "width": 38,
+                      "height": 38,
+                      "fill": "$--primary",
+                      "cornerRadius": 10,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "VIRJd",
+                          "name": "a1Glyph",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "folder-plus",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary-foreground"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "6ulJj",
+                      "name": "a1Mid",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "sd3Wc",
+                          "name": "a1Title",
+                          "fill": "$--foreground",
+                          "content": "新建工作区",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "tbaNg",
+                          "name": "a1Desc",
+                          "fill": "$--muted-foreground",
+                          "content": "在应用空间创建新的工作区",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "74fdr",
+                      "name": "a1Chev",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hTaIg",
+                  "name": "divAdd",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$--border"
+                },
+                {
+                  "type": "frame",
+                  "id": "UUPni",
+                  "name": "Row/Sync",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "L68yX",
+                      "name": "a2Icon",
+                      "width": 38,
+                      "height": 38,
+                      "fill": "$--accent",
+                      "cornerRadius": 10,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "lIo69",
+                          "name": "a2Glyph",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "refresh-cw",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "HBC07",
+                      "name": "a2Mid",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "f6e7x",
+                          "name": "a2Title",
+                          "fill": "$--foreground",
+                          "content": "从设备同步",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "dexcZ",
+                          "name": "a2Sub",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "WsrOr",
+                              "name": "a2Desc",
+                              "fill": "$--muted-foreground",
+                              "content": "从已配对设备拉取",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "5c9Yv",
+                              "name": "a2Dot",
+                              "width": 6,
+                              "height": 6,
+                              "fill": "#4CAF50",
+                              "cornerRadius": 3
+                            },
+                            {
+                              "type": "text",
+                              "id": "9WOBv",
+                              "name": "a2Status",
+                              "fill": "#4CAF50",
+                              "content": "2 台在线",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "v73sR",
+                      "name": "a2Chev",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fzgDD",
+              "name": "Section/My",
+              "width": "fill_container",
+              "padding": [
+                0,
+                4
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "KeiyF",
+                  "name": "sec2Label",
+                  "fill": "$--muted-foreground",
+                  "content": "我的工作区",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "letterSpacing": 0.5
+                },
+                {
+                  "type": "text",
+                  "id": "gH0fA",
+                  "name": "sec2Count",
+                  "fill": "$--muted-foreground",
+                  "content": "2 个",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "DFiwe",
+              "name": "WorkspaceCard",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 14,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "aukUy",
+                  "name": "Row/Active",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "PH9e1",
+                      "name": "r1Icon",
+                      "width": 38,
+                      "height": 38,
+                      "fill": "$--primary",
+                      "cornerRadius": 10,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "H4ZMY",
+                          "name": "r1Glyph",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "book-open",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary-foreground"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "iDWUU",
+                      "name": "r1Mid",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "aH4KS",
+                          "name": "r1Name",
+                          "fill": "$--foreground",
+                          "content": "笔记",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "uBsm7",
+                          "name": "r1Meta",
+                          "fill": "$--muted-foreground",
+                          "content": "今天打开 · 已同步 2 台",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "7DNwq",
+                      "name": "r1Pill",
+                      "fill": "$--primary",
+                      "cornerRadius": 10,
+                      "gap": 4,
+                      "padding": [
+                        3,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "xGyeo",
+                          "name": "r1PillIc",
+                          "width": 12,
+                          "height": 12,
+                          "iconFontName": "check",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary-foreground"
+                        },
+                        {
+                          "type": "text",
+                          "id": "rLeRs",
+                          "name": "r1PillTx",
+                          "fill": "$--primary-foreground",
+                          "content": "当前",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "AJfnS",
+                  "name": "divWs",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$--border"
+                },
+                {
+                  "type": "frame",
+                  "id": "bULyC",
+                  "name": "Row/Default",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "A5cn6",
+                      "name": "r2Icon",
+                      "width": 38,
+                      "height": 38,
+                      "fill": "$--muted",
+                      "cornerRadius": 10,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "ptfO9",
+                          "name": "r2Glyph",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "folder",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--muted-foreground"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "0R4Bg",
+                      "name": "r2Mid",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "DrhGw",
+                          "name": "r2Name",
+                          "fill": "$--foreground",
+                          "content": "工作",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "GdN2T",
+                          "name": "r2Meta",
+                          "fill": "$--muted-foreground",
+                          "content": "昨天打开 · 已同步 1 台",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "nv10S",
+                      "name": "r2Chev",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "PFrqk",
+              "name": "helper",
+              "fill": "$--muted-foreground",
+              "content": "工作区存储在应用空间，卸载 App 时会被清除。",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "RD6Zv",
+      "x": 0,
+      "y": 9800,
+      "name": "Workspace Detail",
+      "width": 393,
+      "height": 852,
+      "fill": "$--background",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "l1thg",
+          "name": "Status Bar",
+          "width": "fill_container",
+          "height": 62,
+          "fill": "$--background"
+        },
+        {
+          "type": "frame",
+          "id": "KAwSz",
+          "name": "AppBar",
+          "width": "fill_container",
+          "height": 52,
+          "gap": 12,
+          "padding": [
+            0,
+            16
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "CZMTB",
+              "name": "dBack",
+              "width": 32,
+              "height": 32,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "4VMJt",
+                  "name": "dBackIc",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "arrow-left",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--foreground"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "D4kt6",
+              "name": "dTitle",
+              "fill": "$--foreground",
+              "content": "工作",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "I3N2l",
+          "name": "Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            12,
+            16,
+            24,
+            16
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "lwuKA",
+              "name": "InfoCard",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 14,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fB40e",
+                  "name": "HeaderRow",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "g2dzj",
+                      "name": "hrIcon",
+                      "width": 40,
+                      "height": 40,
+                      "fill": "$--muted",
+                      "cornerRadius": 10,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "xxISZ",
+                          "name": "hrGlyph",
+                          "width": 22,
+                          "height": 22,
+                          "iconFontName": "folder",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--muted-foreground"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "Ijyb7",
+                      "name": "hrName",
+                      "fill": "$--foreground",
+                      "content": "工作",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "GRhda",
+                  "name": "metaTag",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "mFEPm",
+                      "name": "mtStorage",
+                      "fill": "$--muted-foreground",
+                      "content": "应用空间",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "OeR2c",
+                      "name": "mtSep1",
+                      "fill": "$--muted-foreground",
+                      "content": "·",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "nJbzV",
+                      "name": "mtCount",
+                      "fill": "$--muted-foreground",
+                      "content": "12 个笔记",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZvJ0V",
+                      "name": "mtSep2",
+                      "fill": "$--muted-foreground",
+                      "content": "·",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "XphFy",
+                      "name": "mtSize",
+                      "fill": "$--muted-foreground",
+                      "content": "2.4 MB",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kdWad",
+                  "name": "divNew",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$--border"
+                },
+                {
+                  "type": "frame",
+                  "id": "eO8PU",
+                  "name": "WorkspaceIdRow",
+                  "width": "fill_container",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SjCJ1",
+                      "name": "idLabel",
+                      "fill": "$--muted-foreground",
+                      "content": "工作区 ID",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "tQmAc",
+                      "name": "idValue",
+                      "fill": "$--foreground",
+                      "content": "8b3fc9a2…d471",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "IzfvU",
+                      "name": "idSpacer",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "BsAK3",
+                      "name": "CopyBtn",
+                      "width": 28,
+                      "height": 28,
+                      "fill": "$--muted",
+                      "cornerRadius": 8,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "aczxS",
+                          "name": "idCopyIc",
+                          "width": 14,
+                          "height": 14,
+                          "iconFontName": "copy",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--muted-foreground"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "dEgwm",
+              "name": "SyncStatus",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 12,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "gap": 10,
+              "padding": [
+                10,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "TRTwJ",
+                  "name": "syncDot",
+                  "width": 8,
+                  "height": 8,
+                  "fill": "#4CAF50",
+                  "cornerRadius": 4
+                },
+                {
+                  "type": "text",
+                  "id": "EhMCB",
+                  "name": "syncTxt",
+                  "fill": "$--foreground",
+                  "content": "与 1 台设备保持同步",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "5vLHI",
+                  "name": "syncTime",
+                  "fill": "$--muted-foreground",
+                  "content": "刚刚",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "04VeT",
+              "name": "actSec",
+              "width": "fill_container",
+              "padding": [
+                0,
+                4
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zRhr2",
+                  "name": "actSecLabel",
+                  "fill": "$--muted-foreground",
+                  "content": "操作",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "letterSpacing": 0.5
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "xhZSr",
+              "name": "ActionCard",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 14,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "MG4sF",
+                  "name": "Action/Open",
+                  "width": "fill_container",
+                  "gap": 14,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "uttpj",
+                      "name": "aoIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "arrow-right-to-line",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "DyZxd",
+                      "name": "aoLabel",
+                      "fill": "$--foreground",
+                      "content": "打开并切换为当前工作区",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xCa6X",
+                      "name": "aoSp",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "IvGjY",
+                      "name": "aoChev",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "yRGeE",
+                  "name": "actDiv1",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$--border"
+                },
+                {
+                  "type": "frame",
+                  "id": "W65K9",
+                  "name": "Action/Rename",
+                  "width": "fill_container",
+                  "gap": 14,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "aixGv",
+                      "name": "arIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "pencil-line",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--foreground"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rtCDm",
+                      "name": "arLabel",
+                      "fill": "$--foreground",
+                      "content": "重命名",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "a36Gi",
+                      "name": "arSp",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "hmHqy",
+                      "name": "arChev",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "tuZOd",
+                  "name": "actDiv2",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$--border"
+                },
+                {
+                  "type": "frame",
+                  "id": "YzRdm",
+                  "name": "Action/Delete",
+                  "width": "fill_container",
+                  "gap": 14,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "vXlBH",
+                      "name": "adIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "trash-2",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--destructive"
+                    },
+                    {
+                      "type": "text",
+                      "id": "36TCk",
+                      "name": "adLabel",
+                      "fill": "$--destructive",
+                      "content": "删除工作区",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "K8pPM",
+                      "name": "adSp",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "AfNdD",
+                      "name": "adChev",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "6ifdA",
+      "x": 443,
+      "y": 9800,
+      "name": "Workspace Rename",
+      "width": 393,
+      "height": 852,
+      "fill": "$--background",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "TpnIV",
+          "name": "Status Bar",
+          "width": "fill_container",
+          "height": 62,
+          "fill": "$--background"
+        },
+        {
+          "type": "frame",
+          "id": "9LVmU",
+          "name": "AppBar",
+          "width": "fill_container",
+          "height": 52,
+          "gap": 12,
+          "padding": [
+            0,
+            16
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "n6K4J",
+              "name": "rnBack",
+              "width": 32,
+              "height": 32,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "cM5sw",
+                  "name": "rnBackIc",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "arrow-left",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--foreground"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "EXLMO",
+              "name": "rnTitle",
+              "fill": "$--foreground",
+              "content": "重命名工作区",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "3JXZe",
+          "name": "Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            20,
+            16,
+            24,
+            16
+          ],
+          "justifyContent": "space_between",
+          "children": [
+            {
+              "type": "frame",
+              "id": "ERQrL",
+              "name": "rnMain",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "L8GvS",
+                  "name": "Current",
+                  "width": "fill_container",
+                  "fill": "$--muted",
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    12,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "d0vvS",
+                      "name": "rcIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "folder",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "58ppM",
+                      "name": "rcText",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "wbqBm",
+                          "name": "rcLabel",
+                          "fill": "$--muted-foreground",
+                          "content": "当前名称",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "4QFDA",
+                          "name": "rcValue",
+                          "fill": "$--foreground",
+                          "content": "工作",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "TUzgN",
+                  "name": "rnSecLabel",
+                  "fill": "$--muted-foreground",
+                  "content": "新名称",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "letterSpacing": 0.5
+                },
+                {
+                  "type": "frame",
+                  "id": "Gkdo4",
+                  "name": "InputWrap",
+                  "width": "fill_container",
+                  "height": 48,
+                  "fill": "$--input",
+                  "cornerRadius": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1.5,
+                    "fill": "$--primary"
+                  },
+                  "padding": [
+                    0,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ST0H6",
+                      "name": "rnInputTxt",
+                      "fill": "$--foreground",
+                      "content": "个人笔记",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DoEs4",
+                      "name": "rnCaret",
+                      "width": 2,
+                      "height": 18,
+                      "fill": "$--primary"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "IFfNl",
+                  "name": "rnHint",
+                  "fill": "$--muted-foreground",
+                  "content": "1–40 字符，支持中英文与常见符号。",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "o2bmy",
+              "name": "rnBtnWrap",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "4UoFc",
+                  "name": "Submit",
+                  "width": "fill_container",
+                  "height": 50,
+                  "fill": "$--primary",
+                  "cornerRadius": 14,
+                  "gap": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "OdZJH",
+                      "name": "rnBtnIc",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "check",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary-foreground"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Aoa2I",
+                      "name": "rnBtnTx",
+                      "fill": "$--primary-foreground",
+                      "content": "保存",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "u2Dwk",
+      "x": 886,
+      "y": 9800,
+      "name": "Workspace Delete Confirm",
+      "width": 393,
+      "height": 852,
+      "fill": "$--background",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "SAu9g",
+          "name": "Status Bar",
+          "width": "fill_container",
+          "height": 62,
+          "fill": "$--background"
+        },
+        {
+          "type": "frame",
+          "id": "jV3N8",
+          "name": "AppBar",
+          "width": "fill_container",
+          "height": 52,
+          "gap": 12,
+          "padding": [
+            0,
+            16
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "HKvxg",
+              "name": "dcBack",
+              "width": 32,
+              "height": 32,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "5RgJk",
+                  "name": "dcBackIc",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "arrow-left",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--foreground"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "tfS5m",
+              "name": "dcTitle",
+              "fill": "$--foreground",
+              "content": "删除工作区",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "yeQAL",
+          "name": "Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            16,
+            16,
+            24,
+            16
+          ],
+          "justifyContent": "space_between",
+          "children": [
+            {
+              "type": "frame",
+              "id": "qOwLL",
+              "name": "dcMain",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 18,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "BVBla",
+                  "name": "dcWarn",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": [
+                    16,
+                    0,
+                    4,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "nsFqx",
+                      "name": "warnIcon",
+                      "width": 64,
+                      "height": 64,
+                      "fill": "#EB47471F",
+                      "cornerRadius": 32,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "ZCCSs",
+                          "name": "warnGlyph",
+                          "width": 30,
+                          "height": 30,
+                          "iconFontName": "triangle-alert",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--destructive"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "OsHIv",
+                      "name": "warnTitle",
+                      "fill": "$--foreground",
+                      "content": "确定要删除此工作区？",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "F6HPv",
+                      "name": "warnDesc",
+                      "fill": "$--muted-foreground",
+                      "content": "删除后所有笔记将被永久清除，操作无法撤销。",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "tfeto",
+                  "name": "LossCard",
+                  "width": "fill_container",
+                  "fill": "$--card",
+                  "cornerRadius": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Qel3i",
+                      "name": "lossHeader",
+                      "width": "fill_container",
+                      "gap": 10,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "6TEKr",
+                          "name": "lhIcon",
+                          "width": 32,
+                          "height": 32,
+                          "fill": "$--muted",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "rRxtz",
+                              "name": "lhGlyph",
+                              "width": 16,
+                              "height": 16,
+                              "iconFontName": "folder",
+                              "iconFontFamily": "lucide",
+                              "fill": "$--muted-foreground"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "Lh4dr",
+                          "name": "lhName",
+                          "fill": "$--foreground",
+                          "content": "工作",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "z0urk",
+                      "name": "lossDiv",
+                      "width": "fill_container",
+                      "height": 1,
+                      "fill": "$--border"
+                    },
+                    {
+                      "type": "text",
+                      "id": "0nuQ1",
+                      "name": "lossStats",
+                      "fill": "$--muted-foreground",
+                      "content": "12 个笔记 · 2.4 MB · 已同步 1 台设备",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "7CuDV",
+                  "name": "confirmSec",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "4mfTB",
+                      "name": "confirmLabel",
+                      "fill": "$--muted-foreground",
+                      "content": "请输入工作区名确认",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                      "letterSpacing": 0.5
+                    },
+                    {
+                      "type": "frame",
+                      "id": "1fkqL",
+                      "name": "confirmHint",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "NYn40",
+                          "name": "chLabel",
+                          "fill": "$--muted-foreground",
+                          "content": "输入",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "sqqna",
+                          "name": "chName",
+                          "fill": "$--destructive",
+                          "content": "工作",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "9FxJh",
+                          "name": "chSuffix",
+                          "fill": "$--muted-foreground",
+                          "content": "以继续",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "asMYv",
+                      "name": "confirmInputWrap",
+                      "width": "fill_container",
+                      "height": 48,
+                      "fill": "$--input",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1.5,
+                        "fill": "$--destructive"
+                      },
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "9hMfD",
+                          "name": "confirmInputTxt",
+                          "fill": "$--foreground",
+                          "content": "工作",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ECB0p",
+                          "name": "confirmCaret",
+                          "width": 2,
+                          "height": 18,
+                          "fill": "$--destructive"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GPpWt",
+              "name": "dcBtnCol",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "hYHkd",
+                  "name": "Cancel",
+                  "width": "fill_container",
+                  "height": 48,
+                  "cornerRadius": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "V3Miy",
+                      "name": "dcCancelTx",
+                      "fill": "$--foreground",
+                      "content": "取消",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "12MIZ",
+                  "name": "Delete",
+                  "width": "fill_container",
+                  "height": 50,
+                  "fill": "$--destructive",
+                  "cornerRadius": 14,
+                  "gap": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "CRUqR",
+                      "name": "dcDelIc",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "trash-2",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--destructive-foreground"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZmOfz",
+                      "name": "dcDelTx",
+                      "fill": "$--destructive-foreground",
+                      "content": "永久删除此工作区",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "VmEGM",
+      "x": 443,
+      "y": 8900,
+      "name": "Main: Workspace Manager (empty list)",
+      "width": 393,
+      "height": 852,
+      "fill": "$--background",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "jIF9V",
+          "name": "Status Bar",
+          "width": "fill_container",
+          "height": 62,
+          "fill": "$--background"
+        },
+        {
+          "type": "frame",
+          "id": "jk0Ma",
+          "name": "AppBar",
+          "width": "fill_container",
+          "height": 52,
+          "gap": 12,
+          "padding": [
+            0,
+            16
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "GStX0",
+              "name": "eBack",
+              "width": 32,
+              "height": 32,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "kLjGn",
+                  "name": "eBackIc",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "arrow-left",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--foreground"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "JwXGm",
+              "name": "eTopTitle",
+              "fill": "$--foreground",
+              "content": "工作区",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "j0Ojd",
+          "name": "Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            12,
+            16,
+            24,
+            16
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "BSTgv",
+              "name": "eBrand",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "w7NnS",
+                  "name": "eLogo",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "$--primary",
+                  "cornerRadius": 12,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "n3aCp",
+                      "name": "eLogoIc",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "pen-line",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "oSklt",
+                  "name": "eBrandTx",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "74K8a",
+                      "name": "eBrandName",
+                      "fill": "$--foreground",
+                      "content": "SwarmNote",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WZdDc",
+                      "name": "eBrandDesc",
+                      "fill": "$--muted-foreground",
+                      "content": "开始添加你的第一个工作区",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "6hy7y",
+              "name": "eSec1",
+              "width": "fill_container",
+              "padding": [
+                0,
+                4
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ikgib",
+                  "name": "eSec1Lbl",
+                  "fill": "$--muted-foreground",
+                  "content": "添加工作区",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "letterSpacing": 0.5
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "9VOyP",
+              "name": "AddCard",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 14,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zR0cS",
+                  "name": "Row/New",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "4CluZ",
+                      "name": "eAddR1Ic",
+                      "width": 38,
+                      "height": 38,
+                      "fill": "$--primary",
+                      "cornerRadius": 10,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "nwsAJ",
+                          "name": "eAddR1Gl",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "folder-plus",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary-foreground"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tIbiq",
+                      "name": "eAddR1Mid",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "BPGAT",
+                          "name": "eAddR1Tt",
+                          "fill": "$--foreground",
+                          "content": "新建工作区",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "xe1cK",
+                          "name": "eAddR1Ds",
+                          "fill": "$--muted-foreground",
+                          "content": "在应用空间创建新的工作区",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "SKgmL",
+                      "name": "eAddR1Cv",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "JfNPi",
+                  "name": "eAddDiv",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$--border"
+                },
+                {
+                  "type": "frame",
+                  "id": "nwbtL",
+                  "name": "Row/Sync",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    14,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "JHiHN",
+                      "name": "eAddR2Ic",
+                      "width": 38,
+                      "height": 38,
+                      "fill": "$--accent",
+                      "cornerRadius": 10,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "u5lx5",
+                          "name": "eAddR2Gl",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "refresh-cw",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "TT5mM",
+                      "name": "eAddR2Mid",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "I3FGH",
+                          "name": "eAddR2Tt",
+                          "fill": "$--foreground",
+                          "content": "从设备同步",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "U6lo1",
+                          "name": "eAddR2Sub",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "T7sSN",
+                              "name": "eAddR2Ds",
+                              "fill": "$--muted-foreground",
+                              "content": "从已配对设备拉取",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "6lb83",
+                              "name": "eAddR2Dot",
+                              "width": 6,
+                              "height": 6,
+                              "fill": "#4CAF50",
+                              "cornerRadius": 3
+                            },
+                            {
+                              "type": "text",
+                              "id": "AADrn",
+                              "name": "eAddR2St",
+                              "fill": "#4CAF50",
+                              "content": "2 台在线",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "wYvcs",
+                      "name": "eAddR2Cv",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "chevron-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "be6Xk",
+              "name": "eSec2",
+              "width": "fill_container",
+              "padding": [
+                0,
+                4
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "oYWYg",
+                  "name": "eSec2Lbl",
+                  "fill": "$--muted-foreground",
+                  "content": "我的工作区",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "letterSpacing": 0.5
+                },
+                {
+                  "type": "text",
+                  "id": "hItYi",
+                  "name": "eSec2Ct",
+                  "fill": "$--muted-foreground",
+                  "content": "0 个",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Iekru",
+              "name": "WorkspaceCard/Empty",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 14,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": [
+                32,
+                20,
+                28,
+                20
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "elikS",
+                  "name": "eEmptyIc",
+                  "width": 56,
+                  "height": 56,
+                  "fill": "$--muted",
+                  "cornerRadius": 28,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "iySDO",
+                      "name": "eEmptyGl",
+                      "width": 26,
+                      "height": 26,
+                      "iconFontName": "inbox",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "p9OTh",
+                  "name": "eEmptyTt",
+                  "fill": "$--foreground",
+                  "content": "还没有工作区",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "MQhLo",
+                  "name": "eEmptyDs",
+                  "fill": "$--muted-foreground",
+                  "content": "通过上方操作添加你的第一个工作区",
+                  "textAlign": "center",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "Vyxmy",
+              "name": "eHelper",
+              "fill": "$--muted-foreground",
+              "content": "工作区存储在应用空间，卸载 App 时会被清除。",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
             }
           ]
         }

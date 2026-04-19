@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import {
   AlertTriangle,
   ChevronRight,
+  FolderClosed,
   Globe,
   Info,
   type LucideIcon,
@@ -95,6 +96,12 @@ export default function SettingsIndex() {
             icon={MonitorSmartphone}
             label="设备"
             onPress={() => router.push("/settings/devices" as never)}
+          />
+          <SettingDivider />
+          <NavRow
+            icon={FolderClosed}
+            label="工作区"
+            onPress={() => router.push("/settings/workspaces" as never)}
           />
           <SettingDivider />
           <NavRow

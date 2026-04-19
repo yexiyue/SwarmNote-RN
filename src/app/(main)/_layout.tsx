@@ -3,27 +3,34 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import type { UniffiWorkspaceCoreLike } from "react-native-swarmnote-core";
 import { NetworkLifecycleMounter } from "@/components/network-lifecycle-mounter";
-import { openDefaultWorkspace } from "@/core/workspace-manager";
+import { openLastOrDefault } from "@/core/workspace-manager";
 import { WorkspaceProvider } from "@/providers/workspace-provider";
 
+/** Three-state resolution:
+ *  - `undefined`: boot probe still in flight, render spinner
+ *  - `null`: resolved, no workspace exists yet → show "no workspace" shell
+ *  - value: workspace handle ready */
+type WorkspaceResolution = UniffiWorkspaceCoreLike | null | undefined;
+
 export default function MainLayout() {
-  const [workspace, setWorkspace] = useState<UniffiWorkspaceCoreLike | null>(null);
+  const [workspace, setWorkspace] = useState<WorkspaceResolution>(undefined);
 
   useEffect(() => {
     let cancelled = false;
-    openDefaultWorkspace()
+    openLastOrDefault()
       .then((ws) => {
         if (!cancelled) setWorkspace(ws);
       })
       .catch((err: unknown) => {
-        console.warn("[main] openDefaultWorkspace failed:", err);
+        console.warn("[main] openLastOrDefault failed:", err);
+        if (!cancelled) setWorkspace(null);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  if (workspace === null) {
+  if (workspace === undefined) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
         <ActivityIndicator />

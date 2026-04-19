@@ -1,40 +1,40 @@
 import { Directory, Paths } from "expo-file-system";
 import type { UniffiWorkspaceCoreLike } from "react-native-swarmnote-core";
+import { validateWorkspaceName, workspaceNameToDirUri } from "@/lib/workspace-naming";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { getAppCore } from "./app-core";
 
-const DEFAULT_WORKSPACE_DIRNAME = "default";
+/** Legacy default workspace location from the pre-multi-workspace era. Kept
+ *  only for migration: if the user has `${document}/default/` on disk but no
+ *  entry in the MRU list (first launch after this change), we transparently
+ *  open it and let core auto-touch seed the MRU. */
+const LEGACY_DEFAULT_DIRNAME = "default";
 
 let activeWorkspace: UniffiWorkspaceCoreLike | null = null;
 
-/** Ensure the default workspace directory exists on disk. The Rust core's
- *  `open_workspace` rejects missing paths with `InvalidPath`, so this must
- *  run before the first `openWorkspace` call on a fresh install. Rust side
- *  then strips the leading `file://` via `strip_file_uri`. */
-function ensureDefaultWorkspaceDir(): string {
-  const dir = new Directory(Paths.document, DEFAULT_WORKSPACE_DIRNAME);
-  if (!dir.exists) {
-    dir.create({ intermediates: true, idempotent: true });
+/** Open a workspace at the given absolute path and mark it active.
+ *  Strips `file://` prefix on the Rust side; caller can pass Expo URIs
+ *  directly. If the same workspace is already active (by path), returns
+ *  the cached handle without re-opening. */
+export async function openWorkspaceAt(path: string): Promise<UniffiWorkspaceCoreLike> {
+  if (activeWorkspace !== null) {
+    const currentInfo = activeWorkspace.info();
+    if (currentInfo.path === path.replace(/^file:\/\//, "")) {
+      return activeWorkspace;
+    }
+    // Different workspace requested — close the old one first to honor the
+    // "at most one active workspace" contract on mobile.
+    await closeWorkspace();
   }
-  return dir.uri;
-}
-
-/** Open (or return the cached handle for) the default workspace at
- *  `${Paths.document.uri}/default`. First call triggers `workspace.hydrate()`
- *  so every document's yjs_state is valid before the UI queries them.
- *
- *  Obeys the mobile contract: at most one active `UniffiWorkspaceCore`. */
-export async function openDefaultWorkspace(): Promise<UniffiWorkspaceCoreLike> {
-  if (activeWorkspace !== null) return activeWorkspace;
 
   const core = getAppCore();
-  const ws = await core.openWorkspace(ensureDefaultWorkspaceDir());
+  const ws = await core.openWorkspace(path);
   activeWorkspace = ws;
   useWorkspaceStore.getState().setInfo(ws.info());
 
-  // Fire-and-forget: hydrate streams progress events through the event bus,
-  // which swarmStore.hydrateProgress picks up. Errors are surfaced via event
-  // bus + returned HydrateResult's `failed` counter — not thrown.
+  // Fire-and-forget hydrate: progress streams through the event bus to
+  // swarmStore.hydrateProgress, failures surface as event bus entries +
+  // returned HydrateResult.failed. Never throws here.
   ws.hydrate().catch((err: unknown) => {
     console.warn("[workspace] hydrate failed:", err);
   });
@@ -42,9 +42,82 @@ export async function openDefaultWorkspace(): Promise<UniffiWorkspaceCoreLike> {
   return ws;
 }
 
+/** Boot-time entry point. Tries (in order):
+ *  1. Most-recently-used workspace from MRU list
+ *  2. Legacy `${document}/default/` directory (pre-multi-workspace install)
+ *  3. Returns `null` — caller shows the "no workspace" empty shell
+ *
+ *  Does not throw; any open error just falls through to the next option. */
+export async function openLastOrDefault(): Promise<UniffiWorkspaceCoreLike | null> {
+  const core = getAppCore();
+
+  try {
+    const recent = await core.recentWorkspaces();
+    if (recent.length > 0) {
+      try {
+        return await openWorkspaceAt(recent[0].path);
+      } catch (err) {
+        console.warn("[workspace] open recent[0] failed, will try legacy default:", err);
+      }
+    }
+  } catch (err) {
+    console.warn("[workspace] recentWorkspaces() failed:", err);
+  }
+
+  const legacyDir = new Directory(Paths.document, LEGACY_DEFAULT_DIRNAME);
+  if (legacyDir.exists) {
+    try {
+      return await openWorkspaceAt(legacyDir.uri);
+    } catch (err) {
+      console.warn("[workspace] legacy default open failed:", err);
+    }
+  }
+
+  return null;
+}
+
+/** Create a new workspace directory under the app sandbox and open it.
+ *  Rolls back the mkdir if `openWorkspace` fails, so a failed create never
+ *  leaves an orphan empty directory that would shadow a later retry with
+ *  the same name. */
+export async function createWorkspace(name: string): Promise<UniffiWorkspaceCoreLike> {
+  const validation = validateWorkspaceName(name);
+  if (!validation.ok) {
+    throw new Error(validation.reason);
+  }
+
+  const uri = workspaceNameToDirUri(name);
+  const dir = new Directory(uri);
+  if (dir.exists) {
+    throw new Error("同名工作区已存在");
+  }
+
+  dir.create({ intermediates: true, idempotent: false });
+
+  try {
+    return await openWorkspaceAt(uri);
+  } catch (err) {
+    try {
+      dir.delete();
+    } catch (cleanupErr) {
+      console.warn("[workspace] rollback delete failed:", cleanupErr);
+    }
+    throw err;
+  }
+}
+
+/** Switch the active workspace to a different path. Closes the current one
+ *  (flushing dirty docs) and opens the target. If opening the target fails,
+ *  the active workspace ends up as `null` — callers should route to the
+ *  no-workspace shell rather than auto-reopening the old one (which may
+ *  itself be broken). */
+export async function switchWorkspace(path: string): Promise<UniffiWorkspaceCoreLike> {
+  return openWorkspaceAt(path);
+}
+
 /** Close the active workspace handle and drop the cached reference.
  *  Must be called before the app unmounts (or before switching to another
- *  workspace in the future) to flush dirty docs. */
+ *  workspace) to flush dirty docs. */
 export async function closeWorkspace(): Promise<void> {
   if (activeWorkspace === null) return;
   const ws = activeWorkspace;
@@ -58,21 +131,13 @@ export async function closeWorkspace(): Promise<void> {
   }
 }
 
-/** Multi-workspace UI isn't in scope for v1 — stub kept so future changes
- *  can slot in without breaking the public surface. */
-export async function switchWorkspace(_path: string): Promise<UniffiWorkspaceCoreLike> {
-  throw new Error("switchWorkspace not implemented (single-workspace MVP)");
-}
-
-/** Synchronous accessor for the active handle; throws if not open. */
 export function getActiveWorkspace(): UniffiWorkspaceCoreLike {
   if (activeWorkspace === null) {
-    throw new Error("No workspace open — call openDefaultWorkspace() first");
+    throw new Error("No workspace open — call openLastOrDefault() first");
   }
   return activeWorkspace;
 }
 
-/** Nullable accessor (loading screens, onboarding). */
 export function getActiveWorkspaceOrNull(): UniffiWorkspaceCoreLike | null {
   return activeWorkspace;
 }

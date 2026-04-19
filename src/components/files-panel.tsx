@@ -107,7 +107,7 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
 
       <View className="flex-row items-center justify-between border-t border-border px-3 py-2.5">
         <Pressable
-          onPress={() => console.log("[files] switch workspace")}
+          onPress={() => router.push("/settings/workspaces" as never)}
           accessibilityLabel="切换工作区"
           className="flex-row items-center gap-1.5 h-9 rounded-lg bg-muted px-3"
         >
