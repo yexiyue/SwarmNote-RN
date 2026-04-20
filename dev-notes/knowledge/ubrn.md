@@ -35,16 +35,17 @@ error: could not compile `mobile-core` (lib)
 
 ```toml
 [env]
-IPHONEOS_DEPLOYMENT_TARGET = "15.1"
+IPHONEOS_DEPLOYMENT_TARGET = "17.0"
 ```
 
 - `IPHONEOS_DEPLOYMENT_TARGET` 同时影响 `cc` crate 和 `rustc`——两边统一到同一 min version 就不再错配。
-- `15.1` 对齐 React Native 0.83 的 `min_ios_version_supported`（`SwarmnoteCore.podspec` 里用的就是这个变量）。
+- `17.0` 与 app 的 `ios.deploymentTarget`（由 `expo-build-properties` 在 `app.json` 里配）对齐，见坑 5。
 - 作用域故意放在 crate 级 `.cargo/config.toml`，不污染全局 cargo。
 
 **不要**：
 - 不要改成 `10.0` 或更低版本把 C 警告压下去——新 SDK 里 iOS 10 已经不可用。
 - 不要只设 `IPHONEOS_DEPLOYMENT_TARGET` 当临时 shell env，重新进终端会丢；写进 crate 级 config 更稳。
+- 不要把 `15.1` 这个旧值写回来——2025-04 起 Apple 强制 App Store 提交 target iOS 17+ SDK，且 Xcode 26 的 `SwiftUICore.tbd` allowable-clients 也把 15/16 挡在外面（见坑 5）。
 
 ---
 
@@ -147,6 +148,130 @@ git-fetch-with-cli = true
 
 ---
 
+## 坑 5：Xcode 26 链接报 `SwiftUICore.tbd` "not an allowed client"
+
+**症状**：`expo run:ios` / `xcodebuild` 链接 app target 时
+
+```
+Could not parse or use implicit file '.../SwiftUICore.framework/SwiftUICore.tbd':
+cannot link directly with 'SwiftUICore' because product being built is not an allowed client of it
+ld: Undefined symbols for architecture arm64
+```
+
+**原因**：Xcode 16+（包括 Xcode 26）的 linker 对 Apple 私有子 framework `SwiftUICore.tbd` 有 `allowable-clients` 白名单，只对 iOS 17+ target 开放。SDK 里 CocoaPods 插入的 implicit autolink 会把它拖进来，deployment target < 17 就被拒。跟 `ubrn` 本身无关，但因为我们会跑 `pnpm ubrn:ios` 产出 xcframework，链接阶段才会暴露。
+
+**修复**（Expo 官方路径）：
+
+1. 装 `expo-build-properties`：`npx expo install expo-build-properties`
+2. `app.json` plugins 里加：
+
+   ```json
+   ["expo-build-properties", {
+     "ios": { "deploymentTarget": "17.0" }
+   }]
+   ```
+
+3. `.cargo/config.toml` 的 `IPHONEOS_DEPLOYMENT_TARGET` 同步到 `17.0`（见坑 1）
+4. `npx expo prebuild --platform ios --clean`（让它按新 target 重写 `ios/swarmnotemobile.xcodeproj/project.pbxproj` + `ios/Podfile.properties.json`）
+5. `pnpm --filter react-native-swarmnote-core ubrn:ios` 重编 xcframework，验证 `LC_BUILD_VERSION minos = 17.0`：
+   ```bash
+   otool -l target/aarch64-apple-ios-sim/debug/libmobile_core.a | grep -A3 LC_BUILD_VERSION | head
+   ```
+
+**为什么不用 `-weak_framework SwiftUICore` 这种 Podfile hack**：社区有零星做法用 `post_install` 往 `OTHER_LDFLAGS` 塞 `-weak_framework SwiftUICore` 压住错误，但 Expo/RN 都没官方背书；运行到 < iOS 17 设备上如果真调 SwiftUICore 会 silent crash。且 Apple 2025-04 起已强制 App Store 提交 target iOS 17+ SDK，这不是临时绕过、是大方向。
+
+**相关 issue**：
+- [expo/expo#44229](https://github.com/expo/expo/issues/44229) — SDK 55 + Xcode 26.4 build failures
+- [expo/expo#41991](https://github.com/expo/expo/issues/41991) — SDK 54 + Xcode 26
+- [expo/expo#36276](https://github.com/expo/expo/issues/36276) — 最早一批 allowable-clients 讨论
+
+**Safety net**（目前没踩到，记在这里备用）：如果后续发现某些 Pod target 没被 `expo-build-properties` 覆盖（历史 [expo/expo#28476](https://github.com/expo/expo/issues/28476)），通过 Expo config plugin 往 Podfile 注入 `post_install` 兜底（直接改 `ios/Podfile` 会被 `expo prebuild` 覆盖，别直接改）：
+
+```ruby
+installer.pods_project.targets.each do |target|
+  target.build_configurations.each do |config|
+    if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 17.0
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '17.0'
+    end
+  end
+end
+```
+
+---
+
+## 坑 6：`libmobile_core.a` 缺 Apple framework 符号（`_SC*` 系列）
+
+**症状**：Rust 静态库链进 app 时报
+
+```
+Undefined symbols for architecture arm64:
+  "_SCPreferencesCreate", referenced from: ...
+  "_kSCNetworkInterfaceTypeIEEE80211", referenced from: ...
+ld: symbol(s) not found for architecture arm64
+```
+
+**原因**：Rust 依赖链 `libp2p-tcp → if-watch → system-configuration` 的 build.rs 会 emit `cargo:rustc-link-lib=framework=SystemConfiguration`，但 **cargo 在 `crate-type = ["staticlib"]` 下故意丢弃所有 transitive build metadata**（[rust-lang/cargo#4814](https://github.com/rust-lang/cargo/issues/4814)，2017 年就存在的设计限制，上游不会修）。于是 `libmobile_core.a` 里只有对 `_SC*` 符号的引用，没有 `-framework SystemConfiguration` 指令。app 链接时自然找不到。
+
+**修复**：在 `packages/swarmnote-core/SwarmnoteCore.podspec` 显式声明：
+
+```ruby
+s.frameworks = "SystemConfiguration"
+```
+
+这是业界通用做法——**Signal（libsignal）、Mozilla application-services 都是手写 framework 列表**，没有自动传播方案。ubrn `ubrn.config.yaml` 也没有 `ios.frameworks` 字段可用。
+
+**如何发现新依赖需要哪些 framework**：每次加 Rust crate 后跑一次
+
+```bash
+cd packages/swarmnote-core/rust/mobile-core
+cargo build --target aarch64-apple-ios --message-format=json 2>/dev/null \
+  | grep -oE 'rustc-link-lib=framework=[A-Za-z]+' | sort -u
+```
+
+把输出里每个 `framework=X` 对照 podspec 的 `s.frameworks`，缺的补上，并在 podspec 里用注释标明由哪条 crate 链触发，方便未来 review。
+
+**常见嫌疑**：`libp2p` / `rustls` / `tokio` / `ring` 这个组合可能用到 `SystemConfiguration` / `Security` / `Network` / `CoreFoundation`。按实际链接报错增加，不用预防性全加。
+
+---
+
+## 坑 7：RN 0.83 Turbo Module codegen duplicate symbols
+
+**症状**：xcodebuild 链接 app 时报
+
+```
+duplicate symbol '_OBJC_CLASS_$_NativeSwarmnoteCoreSpecBase' in:
+    .../SwarmnoteCore/libSwarmnoteCore.a[6](SwarmnoteCoreSpec-generated.o)
+    .../ReactCodegen/libReactCodegen.a[45](SwarmnoteCoreSpec-generated.o)
+ld: 5 duplicate symbols
+```
+
+**原因**：RN 0.70+ 新架构有两种模式（详见 [reactwg/react-native-new-architecture discussions#158](https://github.com/reactwg/react-native-new-architecture/discussions/158)）：
+
+| 模式 | `codegenConfig.includesGeneratedCode` | `codegenConfig.outputDir` | podspec `source_files` 是否含 `ios/generated/**` |
+| --- | --- | --- | --- |
+| **A — app 侧生成**（库用这个） | 不设 | 不设 | **否** |
+| **B — 库预生成代码随包发** | `true` | 设 | 是 |
+
+这是互斥的：
+- 不设 `includesGeneratedCode: true` 时，aggregated `ReactCodegen` pod target 会统一编所有 TurboModule spec 进 `libReactCodegen.a`。
+- 如果此时库的 podspec 也 glob 了 `ios/generated/**`，且 `codegenConfig.outputDir.ios` 配成 `"ios/generated"`，RN codegen CLI 还会额外写一份到库本地目录 → 两边都编 → duplicate symbol。
+
+ubrn `0.31.0-2` 和早期 `create-react-native-library` 0.61 的模板默认产出 **Mode A 用途但 Mode B 写法** 的 podspec + package.json，就是这个错配。[callstack/react-native-builder-bob#755](https://github.com/callstack/react-native-builder-bob/issues/755) 追的就是这个 bug。
+
+**修复**（Mode A — 本仓选）：
+
+1. 删 `package.json` 的 `codegenConfig.outputDir`
+2. podspec 的 `source_files` 去掉 `"ios/generated/**/*.{h,m,mm}"`（保留 `cpp/generated/**`——那是 ubrn 的 JSI wrapper，不是 RN codegen）
+3. 删 `packages/swarmnote-core/ios/generated/` 残留目录
+4. `.gitignore` 确保 `ios/generated/` 被忽略（本仓已有）
+5. `pod install` + rebuild
+
+**不要试 Mode B**：`includesGeneratedCode: true` 在跨 RN 版本时脆弱——[facebook/react-native#55544](https://github.com/facebook/react-native/issues/55544) 说 RN 0.84 的 codegen 改了 `ResultT` 类型别名，< 0.84 预生成的代码在 ≥ 0.84 上编不过。
+
+**ubrn 下次 `ubrn:checkout` 可能把 `ios/generated/**` glob 写回 podspec**——如果它真覆盖（`ubrn.config.yaml` 的 `noOverwrite` 默认保护已提交文件），checkout 后 review podspec 确认这一条没被加回。
+
+---
+
 ## 生成代码铁律
 
 `cpp/generated/` 和 `src/generated/` 完全由 ubrn 管，**唯一允许的手改**就是上面坑 2 的 `async static` patch，而且那一步由 `scripts/fix-ubrn-output.mjs` 自动完成，不要手工 edit。
@@ -157,7 +282,8 @@ git-fetch-with-cli = true
 
 **相关文件**：
 - `packages/swarmnote-core/ubrn.config.yaml`
-- `packages/swarmnote-core/package.json`（`ubrn:*` 脚本）
-- `packages/swarmnote-core/rust/mobile-core/.cargo/config.toml`
+- `packages/swarmnote-core/package.json`（`ubrn:*` 脚本 + `codegenConfig`——不要加 `outputDir`，见坑 7）
+- `packages/swarmnote-core/rust/mobile-core/.cargo/config.toml`（`IPHONEOS_DEPLOYMENT_TARGET`，见坑 1、5）
 - `packages/swarmnote-core/scripts/fix-ubrn-output.mjs`
-- `packages/swarmnote-core/SwarmnoteCore.podspec`（`min_ios_version_supported` 来源）
+- `packages/swarmnote-core/SwarmnoteCore.podspec`（`s.frameworks` 见坑 6、`source_files` 不要含 `ios/generated/**` 见坑 7）
+- `app.json`（`expo-build-properties` 的 `ios.deploymentTarget`，见坑 5）

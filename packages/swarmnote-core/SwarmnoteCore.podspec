@@ -15,8 +15,13 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => min_ios_version_supported }
   s.source       = { :git => "https://github.com/yexiyue/SwarmNote-RN.git", :tag => "#{s.version}" }
 
-  s.source_files = "ios/**/*.{h,m,mm,swift}", "ios/generated/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}", "cpp/generated/**/*.{hpp,cpp,c,h}"
+  # RN 0.83 aggregated ReactCodegen target 统一编译 SwarmnoteCoreSpec,
+  # 这里不能再 glob "ios/generated/**" 否则 libSwarmnoteCore.a 和 libReactCodegen.a 会产生 duplicate symbols
+  s.source_files = "ios/**/*.{h,m,mm,swift}", "cpp/**/*.{hpp,cpp,c,h}", "cpp/generated/**/*.{hpp,cpp,c,h}"
   s.vendored_frameworks = "SwarmnoteCoreFramework.xcframework"
+  # libmobile_core.a 里的 libp2p (via if-watch → system-configuration crate) 需要 SystemConfiguration.framework
+  # Rust rlib 合并成 static lib 后 autolink 指令丢失,必须在 podspec 显式声明
+  s.frameworks    = "SystemConfiguration"
   s.dependency    "uniffi-bindgen-react-native", "0.31.0-2"
 
   install_modules_dependencies(s)
