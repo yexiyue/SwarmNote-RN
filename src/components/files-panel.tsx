@@ -8,44 +8,19 @@ import {
   type LucideIcon,
   Settings,
 } from "lucide-react-native";
-import { memo, useCallback, useMemo, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { memo, useCallback, useEffect, useMemo } from "react";
+import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import type { UniffiFileTreeNode } from "react-native-swarmnote-core";
+import { InlineNameInput } from "@/components/files/InlineNameInput";
 import { FilesToolbar } from "@/components/files-toolbar";
 import { Text } from "@/components/ui/text";
+import { createFolderAt, createNoteAt } from "@/core/files-actions";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { useCurrentDocStore } from "@/stores/current-doc-store";
+import { useFileTreeStore } from "@/stores/file-tree-store";
+import { type Draft, useFilesUiStore } from "@/stores/files-ui-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
-
-interface FileNode {
-  id: string;
-  name: string;
-  kind: "folder" | "file";
-  children?: FileNode[];
-}
-
-const MOCK_TREE: FileNode[] = [
-  {
-    id: "folder-project",
-    name: "项目",
-    kind: "folder",
-    children: [
-      { id: "note-idea", name: "构思.md", kind: "file" },
-      { id: "note-arch", name: "架构.md", kind: "file" },
-    ],
-  },
-  { id: "folder-weekly", name: "周会记录", kind: "folder", children: [] },
-  { id: "note-untitled", name: "Untitled.md", kind: "file" },
-];
-
-function collectFolderIds(nodes: FileNode[], acc: string[] = []): string[] {
-  for (const n of nodes) {
-    if (n.kind === "folder") {
-      acc.push(n.id);
-      if (n.children) collectFolderIds(n.children, acc);
-    }
-  }
-  return acc;
-}
 
 interface FilesPanelProps {
   onClose: () => void;
@@ -56,58 +31,164 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
   const colors = useThemeColors();
   const workspaceInfo = useWorkspaceStore((s) => s.info);
 
-  // Expanded-folder set at panel level. Previous revision used a `collapseSignal` counter
-  // with a `useEffect` in every tree node — that forced every node to subscribe and re-run
-  // on any collapse. Now we own the state here, a single setState collapses the whole tree.
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(collectFolderIds(MOCK_TREE)));
+  const tree = useFileTreeStore((s) => s.tree);
+  const loading = useFileTreeStore((s) => s.loading);
+  const refresh = useFileTreeStore((s) => s.refresh);
 
-  const toggleFolder = useCallback((id: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const selectedNodeId = useFilesUiStore((s) => s.selectedNodeId);
+  const expandedFolderIds = useFilesUiStore((s) => s.expandedFolderIds);
+  const draft = useFilesUiStore((s) => s.draft);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    return () => {
+      // Panel unmount: drop any in-flight draft so it doesn't leak into the
+      // next session. UI state is allowed to reset; workspace switches also
+      // clear via `reset()` elsewhere.
+      useFilesUiStore.getState().cancelDraft();
+    };
   }, []);
 
-  const collapseAll = useCallback(() => setExpanded(new Set()), []);
+  const handleNodePress = useCallback((node: UniffiFileTreeNode) => {
+    const isFolder = node.children !== undefined && node.children !== null;
+    useFilesUiStore.getState().select(node.id);
+    if (isFolder) {
+      useFilesUiStore.getState().toggleExpand(node.id);
+    } else {
+      useCurrentDocStore
+        .getState()
+        .open(node.id)
+        .catch((err: unknown) => {
+          console.warn("[files-panel] open doc failed:", err);
+        });
+    }
+  }, []);
 
-  const tree = useMemo(
-    () =>
-      MOCK_TREE.map((node) => (
-        <FileTreeNode
-          key={node.id}
-          node={node}
-          depth={0}
-          expanded={expanded}
-          colors={colors}
-          onToggle={toggleFolder}
-        />
-      )),
-    [expanded, colors, toggleFolder],
+  const deriveParentRelPath = useCallback((): string | null => {
+    if (selectedNodeId === null) return null;
+    if (tree === null) return null;
+    const found = findNode(tree, selectedNodeId);
+    if (found === null) return null;
+    const isFolder = found.children !== undefined && found.children !== null;
+    if (isFolder) return found.id;
+    const idx = found.id.lastIndexOf("/");
+    return idx === -1 ? null : found.id.slice(0, idx);
+  }, [selectedNodeId, tree]);
+
+  const onNewNote = useCallback(() => {
+    useFilesUiStore
+      .getState()
+      .startDraft({ kind: "document", parentRelPath: deriveParentRelPath() });
+  }, [deriveParentRelPath]);
+
+  const onNewFolder = useCallback(() => {
+    useFilesUiStore.getState().startDraft({ kind: "folder", parentRelPath: deriveParentRelPath() });
+  }, [deriveParentRelPath]);
+
+  const onCollapseAll = useCallback(() => useFilesUiStore.getState().collapseAll(), []);
+
+  const onSubmitDraft = useCallback(async () => {
+    const current = useFilesUiStore.getState().draft;
+    if (current === null) return;
+    const name = current.name.trim();
+    if (name.length === 0) {
+      useFilesUiStore.getState().cancelDraft();
+      return;
+    }
+    useFilesUiStore.getState().setDraftSubmitting(true);
+    try {
+      if (current.kind === "folder") {
+        await createFolderAt(current.parentRelPath, name);
+      } else {
+        await createNoteAt(current.parentRelPath, name);
+      }
+      useFilesUiStore.getState().cancelDraft();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      useFilesUiStore.getState().setDraftError(msg);
+    }
+  }, []);
+
+  const onCancelDraft = useCallback(() => useFilesUiStore.getState().cancelDraft(), []);
+  const onChangeDraftName = useCallback(
+    (name: string) => useFilesUiStore.getState().setDraftName(name),
+    [],
   );
+
+  const treeContent = useMemo(() => {
+    if (tree === null) {
+      return (
+        <View className="py-6 items-center">
+          {loading ? (
+            <ActivityIndicator color={colors.mutedForeground} />
+          ) : (
+            <Text className="text-[12px] text-muted-foreground">加载中…</Text>
+          )}
+        </View>
+      );
+    }
+    if (tree.length === 0 && draft === null) {
+      return (
+        <View className="py-6 px-4 items-center">
+          <Text className="text-[12px] text-muted-foreground text-center">
+            还没有笔记，点击下方工具栏新建
+          </Text>
+        </View>
+      );
+    }
+    return (
+      <TreeList
+        nodes={tree}
+        depth={0}
+        selectedNodeId={selectedNodeId}
+        expandedFolderIds={expandedFolderIds}
+        colors={colors}
+        draft={draft}
+        parentRelPath={null}
+        onNodePress={handleNodePress}
+        onSubmitDraft={onSubmitDraft}
+        onCancelDraft={onCancelDraft}
+        onChangeDraftName={onChangeDraftName}
+      />
+    );
+  }, [
+    tree,
+    loading,
+    selectedNodeId,
+    expandedFolderIds,
+    colors,
+    draft,
+    handleNodePress,
+    onSubmitDraft,
+    onCancelDraft,
+    onChangeDraftName,
+  ]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top", "bottom"]}>
       <ScrollView
         contentContainerClassName="px-2 pt-3 pb-4"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         className="flex-1"
       >
-        {tree}
+        {treeContent}
       </ScrollView>
 
       <FilesToolbar
-        onNewNote={() => console.log("[files] new note")}
-        onNewFolder={() => console.log("[files] new folder")}
+        onNewNote={onNewNote}
+        onNewFolder={onNewFolder}
         onSort={() => console.log("[files] sort")}
-        onCollapseAll={collapseAll}
+        onCollapseAll={onCollapseAll}
         onClose={onClose}
       />
 
       <View className="flex-row items-center justify-between border-t border-border px-3 py-2.5">
         <Pressable
-          onPress={() => router.push("/settings/workspaces" as never)}
+          onPress={() => router.push("/workspaces" as never)}
           accessibilityLabel="切换工作区"
           className="flex-row items-center gap-1.5 h-9 rounded-lg bg-muted px-3"
         >
@@ -132,39 +213,111 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
 
 type ThemeColors = ReturnType<typeof useThemeColors>;
 
-interface FileTreeNodeProps {
-  node: FileNode;
+interface TreeListProps {
+  nodes: UniffiFileTreeNode[];
   depth: number;
-  expanded: Set<string>;
+  selectedNodeId: string | null;
+  expandedFolderIds: Set<string>;
   colors: ThemeColors;
-  onToggle: (id: string) => void;
+  draft: Draft | null;
+  /** relPath of the folder this list represents; `null` for root. Used to
+   *  decide where to drop the inline draft input. */
+  parentRelPath: string | null;
+  onNodePress: (node: UniffiFileTreeNode) => void;
+  onSubmitDraft: () => void;
+  onCancelDraft: () => void;
+  onChangeDraftName: (name: string) => void;
+}
+
+function TreeList({
+  nodes,
+  depth,
+  selectedNodeId,
+  expandedFolderIds,
+  colors,
+  draft,
+  parentRelPath,
+  onNodePress,
+  onSubmitDraft,
+  onCancelDraft,
+  onChangeDraftName,
+}: TreeListProps) {
+  const showDraftHere = draft !== null && draft.parentRelPath === parentRelPath;
+  return (
+    <View>
+      {nodes.map((node) => (
+        <FileTreeNode
+          key={node.id}
+          node={node}
+          depth={depth}
+          selected={selectedNodeId === node.id}
+          expandedFolderIds={expandedFolderIds}
+          colors={colors}
+          draft={draft}
+          onNodePress={onNodePress}
+          onSubmitDraft={onSubmitDraft}
+          onCancelDraft={onCancelDraft}
+          onChangeDraftName={onChangeDraftName}
+          selectedNodeId={selectedNodeId}
+        />
+      ))}
+      {showDraftHere && draft !== null ? (
+        <InlineNameInput
+          kind={draft.kind}
+          value={draft.name}
+          submitting={draft.submitting}
+          error={draft.error}
+          depth={depth}
+          onChangeText={onChangeDraftName}
+          onSubmit={onSubmitDraft}
+          onCancel={onCancelDraft}
+        />
+      ) : null}
+    </View>
+  );
+}
+
+interface FileTreeNodeProps {
+  node: UniffiFileTreeNode;
+  depth: number;
+  selected: boolean;
+  selectedNodeId: string | null;
+  expandedFolderIds: Set<string>;
+  colors: ThemeColors;
+  draft: Draft | null;
+  onNodePress: (node: UniffiFileTreeNode) => void;
+  onSubmitDraft: () => void;
+  onCancelDraft: () => void;
+  onChangeDraftName: (name: string) => void;
 }
 
 const FileTreeNode = memo(function FileTreeNode({
   node,
   depth,
-  expanded,
+  selected,
+  selectedNodeId,
+  expandedFolderIds,
   colors,
-  onToggle,
+  draft,
+  onNodePress,
+  onSubmitDraft,
+  onCancelDraft,
+  onChangeDraftName,
 }: FileTreeNodeProps) {
-  const isFolder = node.kind === "folder";
-  const isOpen = isFolder && expanded.has(node.id);
+  const isFolder = node.children !== undefined && node.children !== null;
+  const isOpen = isFolder && expandedFolderIds.has(node.id);
   const Icon: LucideIcon = isFolder ? Folder : FileText;
   const Chevron = isOpen ? ChevronDown : ChevronRight;
-
-  const onPress = () => {
-    if (isFolder) onToggle(node.id);
-    else console.log("[files] open note", node.id);
-  };
-
   const childCount = isFolder ? (node.children?.length ?? 0) : 0;
 
   return (
     <View>
       <Pressable
-        onPress={onPress}
+        onPress={() => onNodePress(node)}
         style={{ paddingLeft: 8 + depth * 16 }}
-        className="h-9 flex-row items-center gap-1.5 pr-3 rounded-md active:bg-muted"
+        className={`h-9 flex-row items-center gap-1.5 pr-3 rounded-md ${
+          selected ? "bg-muted" : "active:bg-muted"
+        }`}
         accessibilityLabel={node.name}
       >
         {isFolder ? (
@@ -184,18 +337,32 @@ const FileTreeNode = memo(function FileTreeNode({
           <Text className="text-[11px] text-muted-foreground">{childCount}</Text>
         ) : null}
       </Pressable>
-      {isOpen && node.children
-        ? node.children.map((child) => (
-            <FileTreeNode
-              key={child.id}
-              node={child}
-              depth={depth + 1}
-              expanded={expanded}
-              colors={colors}
-              onToggle={onToggle}
-            />
-          ))
-        : null}
+      {isOpen && node.children ? (
+        <TreeList
+          nodes={node.children}
+          depth={depth + 1}
+          selectedNodeId={selectedNodeId}
+          expandedFolderIds={expandedFolderIds}
+          colors={colors}
+          draft={draft}
+          parentRelPath={node.id}
+          onNodePress={onNodePress}
+          onSubmitDraft={onSubmitDraft}
+          onCancelDraft={onCancelDraft}
+          onChangeDraftName={onChangeDraftName}
+        />
+      ) : null}
     </View>
   );
 });
+
+function findNode(nodes: UniffiFileTreeNode[], id: string): UniffiFileTreeNode | null {
+  for (const n of nodes) {
+    if (n.id === id) return n;
+    if (n.children !== undefined && n.children !== null) {
+      const nested = findNode(n.children, id);
+      if (nested !== null) return nested;
+    }
+  }
+  return null;
+}

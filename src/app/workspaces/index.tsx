@@ -24,15 +24,16 @@ export default function WorkspacesIndex() {
   const items = useRecentWorkspacesStore((s) => s.items);
   const refresh = useRecentWorkspacesStore((s) => s.refresh);
   const activeInfo = useWorkspaceStore((s) => s.info);
+  const canGoBack = router.canGoBack();
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
   const openDetail = (path: string) => {
-    router.push(`/settings/workspaces/${encodeURIComponent(path)}` as never);
+    router.push(`/workspaces/${encodeURIComponent(path)}` as never);
   };
-  const openCreate = () => router.push("/settings/workspaces/new" as never);
+  const openCreate = () => router.push("/workspaces/new" as never);
 
   const count = items?.length ?? 0;
 
@@ -40,9 +41,11 @@ export default function WorkspacesIndex() {
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
       <View className="h-13 flex-row items-center justify-between gap-3 px-4">
         <View className="flex-row items-center gap-3 flex-1">
-          <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="返回">
-            <ArrowLeft color={colors.foreground} size={22} />
-          </Pressable>
+          {canGoBack ? (
+            <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="返回">
+              <ArrowLeft color={colors.foreground} size={22} />
+            </Pressable>
+          ) : null}
           <Text className="text-[16px] font-semibold text-foreground">工作区</Text>
         </View>
         <Pressable onPress={openCreate} hitSlop={12} accessibilityLabel="新建工作区">
@@ -90,6 +93,10 @@ export default function WorkspacesIndex() {
             ))
           )}
         </Section>
+
+        <Text className="px-1 text-center text-[11px] text-muted-foreground">
+          工作区存储在应用空间，卸载 App 时会被清除。
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -208,13 +215,13 @@ function WorkspaceRow({
 function EmptyListSlot() {
   const colors = useThemeColors();
   return (
-    <View className="items-center gap-2 py-8 px-4">
-      <View className="h-12 w-12 items-center justify-center rounded-2xl border border-dashed border-border">
-        <Inbox color={colors.mutedForeground} size={22} />
+    <View className="items-center gap-2.5 px-5 pt-8 pb-7">
+      <View className="h-14 w-14 items-center justify-center rounded-full bg-muted">
+        <Inbox color={colors.mutedForeground} size={26} />
       </View>
-      <Text className="text-[13px] font-medium text-foreground">还没有工作区</Text>
-      <Text className="text-[11px] text-muted-foreground text-center">
-        点击右上角 + 创建你的第一个工作区
+      <Text className="text-[14px] font-semibold text-foreground">还没有工作区</Text>
+      <Text className="text-center text-[12px] text-muted-foreground">
+        通过上方操作添加你的第一个工作区
       </Text>
     </View>
   );

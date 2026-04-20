@@ -7,7 +7,6 @@ export default function SettingsLayout() {
       <Stack.Screen name="general" />
       <Stack.Screen name="network" />
       <Stack.Screen name="devices" />
-      <Stack.Screen name="workspaces" />
       <Stack.Screen name="about" />
     </Stack>
   );

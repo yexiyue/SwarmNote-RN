@@ -13,6 +13,10 @@ registerTransferHandlers(Comlink);
 interface UseEditorBridgeOptions {
   onRuntimeReady?: () => void;
   onEditorEvent?: (event: EditorEvent) => void;
+  /** Receives Y.Doc local updates as a top-level Uint8Array. Lives outside
+   *  `onEditorEvent` because the Comlink transferHandler only fires for
+   *  top-level RPC arguments — see HostApi docs in editor-web/src/types.ts. */
+  onCollaborationUpdate?: (update: Uint8Array) => void;
 }
 
 interface EditorBridge {
@@ -51,6 +55,9 @@ export function useEditorBridge(options: UseEditorBridgeOptions = {}): EditorBri
       },
       onEditorEvent(event) {
         optionsRef.current.onEditorEvent?.(event);
+      },
+      onCollaborationUpdate(update) {
+        optionsRef.current.onCollaborationUpdate?.(update);
       },
       log(message: string) {
         console.log("[Editor WebView]", message);

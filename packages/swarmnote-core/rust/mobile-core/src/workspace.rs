@@ -350,14 +350,22 @@ impl UniffiWorkspaceCore {
 
     /// Apply a local Y.Doc update (originated by CodeMirror in the WebView).
     /// Triggers debounced writeback to disk + DB; flush completion fires
-    /// [`UniffiAppEvent::DocFlushed`].
+    /// [`UniffiAppEvent::DocFlushed`]. Also broadcasts to the workspace
+    /// GossipSub topic when sync is up so paired peers receive the update —
+    /// mirrors the desktop `apply_ydoc_update` Tauri command. Safe from loops:
+    /// remote updates land via the gossip handler on a different code path.
     pub async fn apply_update(&self, doc_uuid: String, update: Vec<u8>) -> Result<(), FfiError> {
         let uuid = parse_uuid("doc_uuid", &doc_uuid)?;
         self.inner
             .ydoc()
             .apply_update(uuid, &update)
             .await
-            .map_err(Into::into)
+            .map_err(FfiError::from)?;
+
+        if let Some(ws_sync) = self.inner.sync().await {
+            ws_sync.publish_doc_update(uuid, update).await;
+        }
+        Ok(())
     }
 
     /// Drop the in-memory Y.Doc. Flushes dirty state first. Safe to call

@@ -3,6 +3,8 @@ import {
   type UniffiAppEvent,
   UniffiAppEvent_Tags,
 } from "react-native-swarmnote-core";
+import { getActive as getActiveEditorBridge } from "@/core/editor-bridge-registry";
+import { useFileTreeStore } from "@/stores/file-tree-store";
 import { useNotificationStore } from "@/stores/notification-store";
 import { syncKey, useSwarmStore } from "@/stores/swarm-store";
 
@@ -97,12 +99,30 @@ export class EventBus implements ForeignEventBus {
         break;
       }
 
-      // Editor / fs events are consumed elsewhere (WebView bridge, workspace
-      // file-tree hook) — no store dispatch here for now.
-      case UniffiAppEvent_Tags.DocFlushed:
-      case UniffiAppEvent_Tags.ExternalUpdate:
-      case UniffiAppEvent_Tags.ExternalConflict:
       case UniffiAppEvent_Tags.FileTreeChanged:
+        // Mobile has no FileWatcher, so this only fires on `move_node` and
+        // (future) P2P-driven fs changes. Create/delete via Rust CRUD is
+        // handled by the caller refreshing manually — see D8 in design.md.
+        useFileTreeStore
+          .getState()
+          .refresh()
+          .catch((err: unknown) => {
+            console.warn("[event-bus] FileTreeChanged refresh failed:", err);
+          });
+        break;
+
+      case UniffiAppEvent_Tags.ExternalUpdate: {
+        const active = getActiveEditorBridge();
+        if (active === null) break;
+        const { docId, update } = event.inner;
+        if (active.docUuid !== docId) break;
+        active.applyRemoteUpdate(new Uint8Array(update));
+        break;
+      }
+
+      // Editor-related events still consumed elsewhere (WebView bridge).
+      case UniffiAppEvent_Tags.DocFlushed:
+      case UniffiAppEvent_Tags.ExternalConflict:
         break;
 
       default: {

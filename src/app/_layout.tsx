@@ -59,6 +59,7 @@ export default function RootLayout() {
               <Stack.Screen name="index" />
               <Stack.Screen name="onboarding" />
               <Stack.Screen name="(main)" />
+              <Stack.Screen name="workspaces" options={{ animation: "slide_from_right" }} />
               <Stack.Screen
                 name="settings"
                 options={{ presentation: "modal", animation: "slide_from_bottom" }}

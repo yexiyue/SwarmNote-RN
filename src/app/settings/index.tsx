@@ -101,7 +101,7 @@ export default function SettingsIndex() {
           <NavRow
             icon={FolderClosed}
             label="工作区"
-            onPress={() => router.push("/settings/workspaces" as never)}
+            onPress={() => router.push("/workspaces" as never)}
           />
           <SettingDivider />
           <NavRow

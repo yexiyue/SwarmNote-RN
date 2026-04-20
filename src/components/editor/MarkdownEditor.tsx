@@ -6,39 +6,57 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme, View } from "react-native";
 import type { WebViewMessageEvent } from "react-native-webview";
 import WebView from "react-native-webview";
+import { clear as clearBridge, register as registerBridge } from "@/core/editor-bridge-registry";
 import { useEditorBridge } from "./useEditorBridge";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const EDITOR_HTML_MODULE = require("@swarmnote/editor-web/dist/index.html");
 
 interface MarkdownEditorProps {
+  /** Fallback text-mode content. Used only when `docUuid` is not provided. */
   initialText?: string;
-  enableYjs?: boolean;
+  /** When provided together with `initialState`, switches to collaboration
+   *  mode backed by a Y.Doc seeded with `initialState`. */
+  docUuid?: string;
+  /** Full Y.Doc v1 update bytes returned by `workspace.openDoc`. Applied to
+   *  the in-WebView Y.Doc via `applyRemoteCollaborationUpdate` (REMOTE origin,
+   *  so it will NOT fire back as a local CollaborationUpdate). */
+  initialState?: Uint8Array;
+  /** Called with each local Y.Doc update the editor produces. Caller forwards
+   *  to `workspace.applyUpdate(docUuid, update)` for writeback. */
+  onCollabUpdate?: (update: Uint8Array) => void;
+  /** Non-collab editor events (Change, Focus, Blur, SearchStateChange …).
+   *  CollaborationUpdate is filtered out — it goes through `onCollabUpdate`. */
   onEditorEvent?: (event: EditorEvent) => void;
+  /** Legacy toggle for callers that want a Y.Doc without a seeded state
+   *  (editor-test.tsx). Ignored when `docUuid` is provided. */
+  enableYjs?: boolean;
 }
 
 export function MarkdownEditor({
   initialText = "",
-  enableYjs = false,
+  docUuid,
+  initialState,
+  onCollabUpdate,
   onEditorEvent,
+  enableYjs = false,
 }: MarkdownEditorProps) {
   const webviewRef = useRef<WebView>(null);
   const [htmlUri, setHtmlUri] = useState<string | null>(null);
   const [runtimeReady, setRuntimeReady] = useState(false);
   const [editorCreated, setEditorCreated] = useState(false);
 
-  // 加载 HTML 资源到本地文件系统（每次强制重新下载）
+  const collabMode = docUuid !== undefined && initialState !== undefined;
+
   useEffect(() => {
     let cancelled = false;
     const asset = Asset.fromModule(EDITOR_HTML_MODULE);
-    // 强制重新下载，忽略缓存
     asset.localUri = null;
     (asset as unknown as { downloaded: boolean }).downloaded = false;
     asset
       .downloadAsync()
       .then(() => {
         if (!cancelled && asset.localUri) {
-          console.log("[Editor] HTML asset loaded:", asset.localUri);
           setHtmlUri(asset.localUri);
         }
       })
@@ -50,30 +68,29 @@ export function MarkdownEditor({
     };
   }, []);
 
+  const handleCollaborationUpdate = useCallback(
+    (update: Uint8Array) => {
+      onCollabUpdate?.(update);
+    },
+    [onCollabUpdate],
+  );
+
   const { editorApi, setWebViewRef, onWebViewMessage } = useEditorBridge({
     onRuntimeReady() {
-      console.log("[Editor] onRuntimeReady called, setting runtimeReady=true");
       setRuntimeReady(true);
     },
     onEditorEvent,
+    onCollaborationUpdate: handleCollaborationUpdate,
   });
 
   const handleRef = useCallback(
     (ref: WebView | null) => {
-      console.log("[Editor] handleRef:", ref ? "WebView mounted" : "WebView unmounted");
       if (!ref) {
         setRuntimeReady(false);
         setEditorCreated(false);
       }
-
       (webviewRef as React.MutableRefObject<WebView | null>).current = ref;
-      setWebViewRef(
-        ref
-          ? {
-              injectJavaScript: (js: string) => ref.injectJavaScript(js),
-            }
-          : null,
-      );
+      setWebViewRef(ref ? { injectJavaScript: (js: string) => ref.injectJavaScript(js) } : null);
     },
     [setWebViewRef],
   );
@@ -83,50 +100,48 @@ export function MarkdownEditor({
 
   const options: EditorInitOptions = useMemo(
     () => ({
-      initialText,
+      // In collab mode the initial text comes from Y.Doc state (applied just
+      // after createEditor), so seed an empty string.
+      initialText: collabMode ? "" : initialText,
       settings: {
         ...DEFAULT_SETTINGS,
         theme: { appearance },
       },
-      collaboration: enableYjs
-        ? {
-            ydoc: {},
-            fragmentName: "document",
-          }
-        : undefined,
+      collaboration:
+        collabMode || enableYjs
+          ? {
+              ydoc: {},
+              fragmentName: "document",
+            }
+          : undefined,
     }),
-    [appearance, enableYjs, initialText],
+    [appearance, collabMode, enableYjs, initialText],
   );
 
-  // Sync theme when color scheme changes at runtime
   useEffect(() => {
     if (!editorApi || !editorCreated) return;
     void editorApi.updateSettings({ theme: { appearance } });
   }, [appearance, editorApi, editorCreated]);
 
   useEffect(() => {
-    console.log("[Editor] createEditor effect:", {
-      hasApi: !!editorApi,
-      runtimeReady,
-      editorCreated,
-    });
-    if (!editorApi || !runtimeReady || editorCreated) {
-      return;
-    }
+    if (!editorApi || !runtimeReady || editorCreated) return;
 
     let cancelled = false;
-
     void (async () => {
       try {
-        console.log("[Editor] calling createEditor...");
         await editorApi.createEditor(options);
-        if (cancelled) {
-          return;
+        if (cancelled) return;
+
+        // Seed Y.Doc from `open_doc`'s yjs_state. Using the REMOTE origin
+        // ensures y-codemirror.next does NOT fire a CollaborationUpdate back
+        // to us for this initial application (see editor-runtime.ts:88-91).
+        if (collabMode && initialState) {
+          await editorApi.applyRemoteCollaborationUpdate(initialState);
+          if (cancelled) return;
         }
-        console.log("[Editor] editor created successfully");
+
         setEditorCreated(true);
         await editorApi.focus();
-        console.log("[Editor] editor focused");
       } catch (err) {
         console.error("[Editor] createEditor failed:", err);
       }
@@ -135,21 +150,30 @@ export function MarkdownEditor({
     return () => {
       cancelled = true;
     };
-  }, [editorApi, editorCreated, options, runtimeReady]);
+  }, [editorApi, editorCreated, options, runtimeReady, collabMode, initialState]);
+
+  // Register with the bridge registry so `event-bus` can push remote updates
+  // into this editor. Only meaningful in collab mode.
+  useEffect(() => {
+    if (!collabMode || !editorCreated || !editorApi || docUuid === undefined) return;
+    const apply = (update: Uint8Array) => {
+      void editorApi.applyRemoteCollaborationUpdate(update);
+    };
+    registerBridge(docUuid, apply);
+    return () => {
+      clearBridge(docUuid);
+    };
+  }, [collabMode, editorCreated, editorApi, docUuid]);
 
   useEffect(() => {
     return () => {
-      if (!editorApi) {
-        return;
-      }
-
+      if (!editorApi) return;
       void editorApi.destroyEditor();
     };
   }, [editorApi]);
 
   const handleMessage = useCallback(
     (event: WebViewMessageEvent) => {
-      console.log("[Editor] onMessage:", event.nativeEvent.data?.substring(0, 150));
       onWebViewMessage(event);
     },
     [onWebViewMessage],

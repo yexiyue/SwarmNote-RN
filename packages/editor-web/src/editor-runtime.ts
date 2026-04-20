@@ -86,13 +86,12 @@ export function createEditorRuntime(host: HostApi): EditorApi {
       options.collaboration.remoteOrigin ?? REMOTE_COLLABORATION_ORIGIN;
 
     const listener = (update: Uint8Array, origin: unknown) => {
-      if (origin === remoteOrigin) {
-        return;
-      }
-      emitEditorEvent({
-        kind: EditorEventType.CollaborationUpdate,
-        update,
-      });
+      if (origin === remoteOrigin) return;
+      // Use the dedicated host method, NOT onEditorEvent — Comlink's
+      // transferHandler only fires for top-level RPC arguments, so a
+      // Uint8Array nested inside an event object loses its type during
+      // JSON envelope serialization (RN side sees byteLength=undefined).
+      host.onCollaborationUpdate(update);
     };
 
     state.ydoc = ydoc;

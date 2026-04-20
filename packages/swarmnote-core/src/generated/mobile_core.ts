@@ -5471,7 +5471,10 @@ export interface UniffiWorkspaceCoreLike {
     /**
      * Apply a local Y.Doc update (originated by CodeMirror in the WebView).
      * Triggers debounced writeback to disk + DB; flush completion fires
-     * [`UniffiAppEvent::DocFlushed`].
+     * [`UniffiAppEvent::DocFlushed`]. Also broadcasts to the workspace
+     * GossipSub topic when sync is up so paired peers receive the update —
+     * mirrors the desktop `apply_ydoc_update` Tauri command. Safe from loops:
+     * remote updates land via the gossip handler on a different code path.
      */
     applyUpdate(docUuid: string, update: ArrayBuffer, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
     /**
@@ -5597,7 +5600,10 @@ private constructor(pointer: UniffiHandle) {
     /**
      * Apply a local Y.Doc update (originated by CodeMirror in the WebView).
      * Triggers debounced writeback to disk + DB; flush completion fires
-     * [`UniffiAppEvent::DocFlushed`].
+     * [`UniffiAppEvent::DocFlushed`]. Also broadcasts to the workspace
+     * GossipSub topic when sync is up so paired peers receive the update —
+     * mirrors the desktop `apply_ydoc_update` Tauri command. Safe from loops:
+     * remote updates land via the gossip handler on a different code path.
      */
 async  applyUpdate(docUuid: string, update: ArrayBuffer, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
     const __stack = uniffiIsDebug ? new Error().stack : undefined;
@@ -6741,7 +6747,7 @@ function uniffiEnsureInitialized() {
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair() !== 43990) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair");
     }
-    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update() !== 42247) {
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update() !== 39794) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close() !== 15034) {

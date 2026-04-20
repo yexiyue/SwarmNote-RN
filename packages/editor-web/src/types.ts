@@ -36,6 +36,14 @@ export interface EditorApi {
 export interface HostApi {
   onRuntimeReady(): void;
   onEditorEvent(event: EditorEvent): void;
+  /** Dedicated channel for Y.Doc updates. Lives outside `onEditorEvent`
+   *  because Comlink's transferHandler only fires on top-level RPC
+   *  arguments — when the binary is nested inside an event object the
+   *  custom JSON envelope strips its `Uint8Array` type, leaving the host
+   *  with `{"0":N,"1":N,...}` and an undefined `byteLength`. Passing the
+   *  update as a top-level argument keeps the `uint8array` transferHandler
+   *  effective. */
+  onCollaborationUpdate(update: Uint8Array): void;
   log(message: string): void;
 }
 

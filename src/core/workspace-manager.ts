@@ -1,6 +1,9 @@
 import { Directory, Paths } from "expo-file-system";
 import type { UniffiWorkspaceCoreLike } from "react-native-swarmnote-core";
 import { validateWorkspaceName, workspaceNameToDirUri } from "@/lib/workspace-naming";
+import { useCurrentDocStore } from "@/stores/current-doc-store";
+import { useFileTreeStore } from "@/stores/file-tree-store";
+import { useFilesUiStore } from "@/stores/files-ui-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { getAppCore } from "./app-core";
 
@@ -117,12 +120,19 @@ export async function switchWorkspace(path: string): Promise<UniffiWorkspaceCore
 
 /** Close the active workspace handle and drop the cached reference.
  *  Must be called before the app unmounts (or before switching to another
- *  workspace) to flush dirty docs. */
+ *  workspace) to flush dirty docs. Also tears down workspace-scoped UI
+ *  state (file tree, current open doc, selection/expand/draft) so a
+ *  subsequent open starts clean — nothing leaks across workspaces. */
 export async function closeWorkspace(): Promise<void> {
   if (activeWorkspace === null) return;
   const ws = activeWorkspace;
   activeWorkspace = null;
   useWorkspaceStore.getState().setInfo(null);
+  // Reset stores BEFORE Rust close so any stale subscriber can't query a
+  // dead handle mid-teardown.
+  useCurrentDocStore.getState().reset();
+  useFileTreeStore.getState().reset();
+  useFilesUiStore.getState().reset();
   try {
     await ws.close();
     await getAppCore().closeWorkspace(ws.id());
