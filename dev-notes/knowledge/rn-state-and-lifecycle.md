@@ -93,6 +93,97 @@ export const useNetworkPreferenceStore = create<State>()(
 
 Onboarding 4 步是强制顺序流（`gestureEnabled: false`），最后一步 `markCompleted()` + `router.replace('/(tabs)')`。
 
+### "无工作区"是路由级 redirect，不是叶子页面的特殊分支
+
+`(main)/_layout.tsx` 在 `openLastOrDefault()` resolve 为 `null` 时返回 `<Redirect href="/workspaces" />`，让用户落到独立的 [`/workspaces`](../../src/app/workspaces/) 顶级 stack（与 `(main)`、`settings` 平级）。
+
+**不要**在 `(main)/index.tsx` 内联渲染"还没有工作区"的空态屏幕——这种写法的隐患是：在 modal/兄弟 stack 里创建完工作区返回时，`(main)/_layout` 已经挂载且 `useEffect` 不会再跑，新工作区不会被 `openLastOrDefault` 拾取，CTA 看起来"按了没用"。
+
+**正确模式**：
+
+1. 资源缺失 → 路由级 `<Redirect>` 到对应管理页
+2. 创建/切换资源后 → `router.dismissAll() + router.replace("/(main)")`
+3. `replace("/(main)")` 强制 `(main)/_layout` 重新挂载 → `useEffect` 重新跑 boot probe → 拿到刚创建的资源
+
+`createWorkspace` / `switchWorkspace` 内部已经 `openWorkspaceAt`（[workspace-manager.ts](../../src/core/workspace-manager.ts)）写了 `activeWorkspace` 模块状态和 `useWorkspaceStore.setInfo`，新挂载的 `(main)/_layout` 走 `openLastOrDefault → openWorkspaceAt` 时会命中"同 path 已激活"的快路径，不会重复 hydrate。
+
+### `router.canGoBack()` 用于顶层页面的返回按钮条件渲染
+
+如果一个页面既可能作为顶层 redirect 落点（无返回历史），也可能从其他页面 push 进来，header 的返回按钮要按 `router.canGoBack()` 条件渲染，避免出现"按了没反应的返回按钮"。
+
+参考 [`workspaces/index.tsx`](../../src/app/workspaces/index.tsx) header 区，从 `(main)` 或 settings push 时显示返回按钮，作为首次启动的 redirect 落点时不显示。`router.canGoBack()` 是同步方法，组件渲染时直接读即可。
+
+## 文件树 / 笔记的 store 边界
+
+文件面板涉及 3 个独立 store，**不要**合并：
+
+| Store | 内容 | 持久化 |
+|---|---|---|
+| [`file-tree-store`](../../src/stores/file-tree-store.ts) | `tree: UniffiFileTreeNode[] \| null` + `loading` + `refresh()` | ❌ |
+| [`current-doc-store`](../../src/stores/current-doc-store.ts) | `docUuid? / relPath? / initialState? / openState` + `open(relPath) / close() / reset()` | ❌ |
+| [`files-ui-store`](../../src/stores/files-ui-store.ts) | `selectedNodeId / expandedFolderIds: Set / draft` + 全套 actions | ❌ |
+
+**关键点**：
+
+- 三个 store 的更新频率/订阅者完全不同：tree 数据变化稀疏；当前文档常变；UI 选中态最频繁。合并会带来无关 re-render。
+- `current-doc-store.open(relPath)` 内部用一个**模块级 `openSeq` 计数器**抢占快速点击：每次 `open()` 自增；async 流程拿到结果时若 `seq !== openSeq` 则丢弃并 `closeDoc` 释放。`close()` 与 `reset()` 也 bump 该 seq。这套模式比"AbortController + race"实现起来简单很多。
+- `tree` 不要持有 Y.Doc 或 native handle。Yjs 实例由 Rust 侧持有（`workspace.openDoc → {docUuid, yjsState}`），RN 侧只缓存元数据。
+
+### 移动端无 FileWatcher，创建后必须手动 refresh
+
+`FileTreeChanged` 事件在移动端**仅** `move_node` 显式 emit；纯 DB 操作（`createFolder` / `upsertDocument`）不会触发。同时 `scan_tree` 是物理 fs 扫描，所以新建流程必须按"fs 操作 → DB 操作 → 手动 refresh"的顺序：
+
+```
+新建文件夹: workspace.createDir(relPath)
+         → workspace.createFolder({parentFolderId: undefined, name, relPath})
+         → useFileTreeStore.refresh()
+
+新建笔记:   workspace.writeText(relPath, "")
+         → workspace.upsertDocument({folderId: undefined, title, relPath, fileHash: undefined})
+         → useFileTreeStore.refresh()
+```
+
+[`src/core/files-actions.ts`](../../src/core/files-actions.ts) 封装了这两条流程，store 不直接调 Rust（保持 setter-only 约定）。
+
+MVP 设计：DB 层的 `parent_folder_id` / `folder_id` 一律传 `undefined`（虚拟根），因为 `scan_tree` 走物理路径渲染树，DB folder 行只是元数据。等出现"按文件夹过滤文档"等场景再补 UUID 索引。
+
+### Inline rename 状态机
+
+[`files-ui-store`](../../src/stores/files-ui-store.ts) 维护单一 `draft`：
+
+```
+idle ──startDraft({kind, parentRelPath})──▶ creating(submitting=false)
+                                              │
+                              setDraftName(name) ──▶ creating(name)
+                              onSubmit:  trim()=='' ──▶ idle (取消)
+                                         else ──▶ submitting=true
+                                                   ├─ ok  ─▶ idle (FileTreeChanged or 手动 refresh)
+                                                   └─ err ─▶ creating + setDraftError
+                              ✕ / cancelDraft() ───────▶ idle
+```
+
+**parentRelPath 派生（按 selection）**：
+
+| selection | parentRelPath |
+|---|---|
+| 文件夹 | 该文件夹的 relPath（= 其 id） |
+| 文件 | 文件的 dirname（lastIndexOf('/')） |
+| null | null（根） |
+
+详见 [`files-panel.tsx`](../../src/components/files-panel.tsx) 的 `deriveParentRelPath`。
+
+### 工作区切换时的 store 重置
+
+[`workspace-manager.closeWorkspace()`](../../src/core/workspace-manager.ts) 在 `await ws.close()` **前**依序调用：
+
+```ts
+useCurrentDocStore.getState().reset();
+useFileTreeStore.getState().reset();
+useFilesUiStore.getState().reset();
+```
+
+这样一来切换工作区后没有任何脏数据带到下一个 workspace。reset 在 close 之前执行，避免任何订阅者在 teardown 中途仍尝试用已死的 handle 触发刷新。
+
 ## Expo 依赖使用注意
 
 - **`expo-file-system` v55** 砍掉了 `FileSystem.documentDirectory` 字符串常量，改用 `Paths.document.uri` —— 代码里统一用后者，会返回 `file://...` URI，Rust 侧 `strip_file_uri` 自动剥前缀

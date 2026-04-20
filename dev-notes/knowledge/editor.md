@@ -123,6 +123,84 @@ RN 宿主层与 bridge 代码应从 `@swarmnote/editor-web` 读取 `EditorApi` /
 
 **相关文件**：`packages/editor-web/src/editor-runtime.ts`
 
+## RN 宿主集成 Yjs Doc
+
+### 打开笔记的初始化流程
+
+Rust 是 Y.Doc 的权威拥有方。RN 侧打开笔记的链路：
+
+```
+点击树节点
+  │
+  ▼
+useCurrentDocStore.open(relPath)
+  │  workspace.openDoc(relPath) → { docUuid, yjsState: ArrayBuffer }
+  ▼
+<MarkdownEditor key={docUuid} docUuid initialState={yjsState} onCollabUpdate={...} />
+  │
+  │  内部按顺序：
+  │  1. editorApi.createEditor({ collaboration: { ydoc: {}, fragmentName: 'document' } })
+  │     ↳ editor-runtime 内部 new Y.Doc() 并绑定 y-codemirror.next
+  │  2. editorApi.applyRemoteCollaborationUpdate(initialState)
+  │     ↳ 用 REMOTE_COLLABORATION_ORIGIN 灌入 → 不触发 outbound CollaborationUpdate（防回环）
+  │  3. registerBridge(docUuid, applyRemoteCollaborationUpdate)
+  │
+  ▼
+本地编辑 → CollaborationUpdate event → onCollabUpdate(update)
+  │  workspace.applyUpdate(docUuid, update.buffer.slice(...))
+  │  ↳ 注意 Uint8Array 转 ArrayBuffer 时必须 slice，buffer 可能宽于 view
+  ▼
+Rust 落盘 + 必要时广播给其他设备
+```
+
+**关键约束**：
+
+- `MarkdownEditor` 用 `key={docUuid}` 切笔记 — 整个 WebView 重建（200-500ms 加载），换来代码极简。后续可升级为 swap-Y.Text 内部 API。
+- `current-doc-store.open()` 用 `openSeq` 抢占保护快速点击；过期请求会主动 close_doc 释放资源。
+- 切 doc 之前 store action 已经把旧 docUuid 的 `closeDoc` 调过；MarkdownEditor unmount 不需要再次 close。
+- 切工作区时 `workspace-manager.closeWorkspace()` 会先 reset 三个 store，再 `await ws.close()`，Rust 端 close 会 flush 所有打开的 doc。
+
+### editor-bridge-registry — event-bus 与编辑器的桥
+
+[`event-bus.ts`](../../src/core/event-bus.ts) 是普通模块（不是 React 组件），但 `ExternalUpdate` 事件需要 push update 给当前活跃编辑器。解决方案：[`src/core/editor-bridge-registry.ts`](../../src/core/editor-bridge-registry.ts) 单例容器。
+
+```ts
+register(docUuid, applyRemoteUpdate);  // MarkdownEditor mount + collab 模式时
+clear(docUuid);                         // unmount 时；仅当 active.docUuid 匹配才清
+getActive();                            // event-bus 在 ExternalUpdate 中读取
+```
+
+**关键约束**：
+
+- `clear` 必须传 docUuid 并校验匹配。React strict mode 下 effect 会双 fire，简单清空会误把第二次 register 干掉。
+- 切笔记时新 mount 在旧 unmount **前**触发 register 是正常的（key 切换时 React 会先创建新 instance）；registry 自然被新值覆盖。
+- 同时只允许一个活跃编辑器 — MVP 简化设计。
+- ExternalUpdate payload 是 `{ docId: string, update: ArrayBuffer }`，registry 用 docId 索引（不是 relPath）。
+
+### 防回环靠 origin 标记，无需额外 dedupe
+
+[`editor-runtime.ts:88-91`](../../packages/editor-web/src/editor-runtime.ts#L88-L91) 已经写：
+
+```ts
+const listener = (update: Uint8Array, origin: unknown) => {
+  if (origin === remoteOrigin) {
+    return;
+  }
+  emitEditorEvent({ kind: EditorEventType.CollaborationUpdate, update });
+};
+```
+
+`applyRemoteCollaborationUpdate` 内部用 `Y.applyUpdate(ydoc, update, REMOTE_COLLABORATION_ORIGIN)`，所以远端灌入的 update **不会**触发 outbound CollaborationUpdate 事件，自然不会回写 Rust。RN 侧不需要再做 dedupe。
+
+### MarkdownEditor 双模式
+
+| 模式 | 触发条件 | 用途 |
+|---|---|---|
+| `collaboration` | `docUuid && initialState` 都存在 | 真实笔记（(main)/index.tsx） |
+| `text` (legacy) | 仅 `initialText` | editor-test.tsx 调试入口 |
+
+`enableYjs` 旧 prop 保留兼容，新代码不要使用。
+
 ## Live Preview 扩展体系
 
 ### Inline Rendering 框架
