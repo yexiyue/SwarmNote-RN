@@ -44,6 +44,34 @@ JSON.stringify(Uint8Array) 会丢失类型变成 `{"0":1,"1":2,...}`。两端都
 
 - 不要在新增跨 bridge 的二进制数据类型时忘记双端注册
 
+### transferHandler 仅对**顶层 RPC 参数**生效，不递归到嵌套字段
+
+Comlink 的 `transferHandler.canHandle` 只在 marshal 单个 RPC 参数时检查；嵌套在对象字段里的 `Uint8Array` 不会被递归触发。在我们的自定义 endpoint 下整条 message 走 `JSON.stringify`，嵌套 `Uint8Array` 直接被 JSON 打散成 `{"0":N,"1":N,...}`，对端拿到的是 plain object（`.byteLength === undefined`）。
+
+**症状**：编辑后 `[handler] CollaborationUpdate received bytes=undefined`。本地编辑表面上"触发了事件"，但 binary payload 全部丢失，落盘 / 同步全废。
+
+**正确做法**：把 binary payload 作为**顶层 RPC 参数**单独走一个 method。例如把 `EditorEvent.CollaborationUpdate { update: Uint8Array }` 拆成：
+
+```ts
+// HostApi (packages/editor-web/src/types.ts)
+interface HostApi {
+  onEditorEvent(event: EditorEvent): void;       // 不带 binary 字段的事件
+  onCollaborationUpdate(update: Uint8Array): void; // 顶层 Uint8Array → transferHandler 生效
+  // ...
+}
+```
+
+editor-runtime 侧不再 `emitEditorEvent({kind: 'collab-update', update})`，而是直接 `host.onCollaborationUpdate(update)`。
+
+反方向（RN → WebView）的 `applyRemoteCollaborationUpdate(update)` 一直是顶层参数，所以从来没出过这个问题——这条规则只有在**新增 host callback 携带 binary** 时才会再被踩到。
+
+**不要做**：
+
+- 不要把 `Uint8Array` / `ArrayBuffer` 塞进事件对象 / record / map 等嵌套结构通过 Comlink RPC 传递
+- 不要试图改 transferHandler 来"递归处理嵌套"——那是重写 Comlink 的序列化层，不值得；扁平 RPC 签名是更小的成本
+
+**相关文件**：[`packages/editor-web/src/types.ts`](../../packages/editor-web/src/types.ts)、[`packages/editor-web/src/editor-runtime.ts`](../../packages/editor-web/src/editor-runtime.ts)、[`src/components/editor/useEditorBridge.ts`](../../src/components/editor/useEditorBridge.ts)、[`src/components/editor/MarkdownEditor.tsx`](../../src/components/editor/MarkdownEditor.tsx)
+
 ### Ready 握手
 
 WebView 加载完成后通过 Comlink 调用 `runtime.host.onRuntimeReady()` 通知 RN 侧。RN 侧通过 `Comlink.expose(hostApi)` 接收。不再使用 raw `postMessage` 的 `__editorReady` 信号。

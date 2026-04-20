@@ -173,6 +173,79 @@ use swarmnote_core::config::{save_config, RecentWorkspace};
 
 **不要**再写 `swarmnote_core::api::X` 或 `swarmnote_core::internal::Y`——这两个模块根本不存在，编译器会直接报 `could not find \`api\` / \`internal\` in \`swarmnote_core\``。
 
+### mobile-core wrap 不要只代理 core，必须对照桌面 Tauri command 的"额外副作用"
+
+mobile-core 的 wrap 方法默认会写成"对 `self.inner.xxx()` 的一行透传"。这是**陷阱**——桌面端的 Tauri command（`src-tauri/src/commands/*.rs`）经常在 core 调用之外**还**做了关键的副作用，比如发布到 P2P / 触发额外事件。如果 wrap 只代理 core 调用，编译通过、单端工作正常，但跨端协作 / 远端 sync / 状态广播会**静默失效**。
+
+**已经栽过的坑**：
+
+`apply_update` mobile 端最初只调 `self.inner.ydoc().apply_update(uuid, &update)`，落盘正常，但跨设备协同永远不工作。原因是桌面端的 `apply_ydoc_update` (`src-tauri/src/commands/yjs.rs`) 在 core 调用之后还有：
+
+```rust
+if let Some(ws_sync) = ws.sync().await {
+    ws_sync.publish_doc_update(uuid, update).await;  // ← mobile 漏了这个
+}
+```
+
+修复后 mobile-core 的 `apply_update` 也要带上这个 publish：
+
+```rust
+pub async fn apply_update(&self, doc_uuid: String, update: Vec<u8>) -> Result<(), FfiError> {
+    let uuid = parse_uuid("doc_uuid", &doc_uuid)?;
+    self.inner.ydoc().apply_update(uuid, &update).await.map_err(FfiError::from)?;
+    if let Some(ws_sync) = self.inner.sync().await {
+        ws_sync.publish_doc_update(uuid, update).await;
+    }
+    Ok(())
+}
+```
+
+**正确做法**：每加一个 wrap 方法，**必读**桌面端同名 Tauri command 的完整实现，把里面 `if let Some(...)` / `event_bus().emit(...)` / 多步组合等副作用也搬到 mobile 上。如果桌面端没有对应 command（核心方法只在 sync 内部调用），这条不适用。
+
+**症状识别**：本端编辑一切正常但远端收不到 / 远端事件本端不响应 → 大概率是 wrap 缺失某个 broadcast / emit 调用。
+
+**相关文件**：[`packages/swarmnote-core/rust/mobile-core/src/workspace.rs::apply_update`](../../packages/swarmnote-core/rust/mobile-core/src/workspace.rs)、`SwarmNote/src-tauri/src/commands/yjs.rs::apply_ydoc_update`
+
+### 临时切 swarmnote-core 为本地 path 依赖快速迭代
+
+当需要在 mobile-core 的 wrap 层试用 / 调试 swarmnote-core 还没推到 git develop 的新 API（或者反过来：先在本地试改 swarmnote-core 看 mobile-core 调起来对不对），临时把 git 依赖切成 path 依赖最快。
+
+**前提**：本地有 `SwarmNote` 仓库（桌面端工作树）`/Users/yexiyue/workspace/SwarmNote/`，包含 `crates/core` 与 `crates/entity`。
+
+**1. 改 [packages/swarmnote-core/rust/mobile-core/Cargo.toml](../../packages/swarmnote-core/rust/mobile-core/Cargo.toml)**：注释掉 git 行，加 path 行（保留 git 行作为还原参考）：
+
+```toml
+# swarmnote-core = { git = "https://github.com/yexiyue/swarmnote.git", branch = "develop" }
+# entity = { git = "https://github.com/yexiyue/swarmnote.git", branch = "develop" }
+swarmnote-core = { path = "/Users/yexiyue/workspace/SwarmNote/crates/core" }
+entity = { path = "/Users/yexiyue/workspace/SwarmNote/crates/entity" }
+```
+
+**2. 直接 cargo check** —— path 依赖会沿父目录找到 `SwarmNote` 根 `Cargo.toml` 的 `workspace.dependencies`，自动解析 swarmnote-core 内部的 `tokio = { workspace = true }` 等条目，不需要额外配置。首次会编译整个核心树（约 1 分钟），后续增量编译秒级。
+
+**3. 还原 = 反向编辑 + cargo update**：
+
+```bash
+# 把 path 行注释、解开 git 行注释
+cargo update -p swarmnote-core -p entity   # 让 lockfile 重新指向 git revision
+cargo check                                # 验证 git 版本编译通过
+```
+
+**4. 跑 ubrn 重新生成产物**：只在 wrap 层签名（uniffi `pub` 方法）有变更时需要；纯实现内调整不影响 TS bindings。
+
+```bash
+pnpm --filter react-native-swarmnote-core ubrn:ios     # 或 :android
+```
+
+**坑**：
+
+- **不要忘记还原 path → git 就 commit**：CI / 别人 clone 后 cargo 会找不到 `/Users/yexiyue/workspace/SwarmNote`。Cargo.toml 顶部留一段注释提醒"TEMPORARY"，commit 前 grep 一下。
+- **lockfile 同步**：path 模式下 Cargo.lock 会写成 `swarmnote-core = "0.1.0"`（无 source URL）；切回 git 时 `cargo update -p swarmnote-core -p entity` 重写为 `git+https://...?branch=develop#<commit>`。如果忘了 update，下次别人 clone 会看到 lockfile 没 git source 报错。
+- **submodule 自动归位**：cargo update 拉 git develop branch 时，会把 SwarmNote 仓库的 `libs/` submodule pointer 重置为 develop HEAD 引用的 commit。如果你之前手动在 SwarmNote 仓库 bump 过 libs（GossipSub 那种 case），改 path 时不会被影响，但还原后 cargo 会按 git 拉，本地 SwarmNote 仓库的 libs 会被恢复到 develop branch 引用的 commit——**任何对 libs 的改动应该先在 SwarmNote 仓库 commit + 推 develop**，才不会被还原步骤吞掉。
+- **path 模式不能用于真机分发**：path 引用是绝对路径，只对当前开发机有效。CI / 其他开发者 clone 后会编译失败。把这个看成"本地 spike 工具"，spike 完一定要还原。
+
+**相关 commit 经验**：本次 `apply_update + publish_doc_update` 修复就是用这条流程在 mobile-core wrap 层迭代验证后才推回 git。
+
 ### 给 mobile-core 加一个新 FFI API 的模板
 
 每次要给 RN 暴露一个新能力时，按这五步走，避免漏步：
