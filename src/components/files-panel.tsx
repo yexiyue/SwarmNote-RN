@@ -5,6 +5,7 @@ import {
   ChevronsUpDown,
   FileText,
   Folder,
+  Inbox,
   type LucideIcon,
   Settings,
 } from "lucide-react-native";
@@ -132,9 +133,13 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
     }
     if (tree.length === 0 && draft === null) {
       return (
-        <View className="py-6 px-4 items-center">
-          <Text className="text-[12px] text-muted-foreground text-center">
-            还没有笔记，点击下方工具栏新建
+        <View className="items-center gap-2.5 px-5 pt-8 pb-7">
+          <View className="h-14 w-14 items-center justify-center rounded-full bg-muted">
+            <Inbox color={colors.mutedForeground} size={26} />
+          </View>
+          <Text className="text-[14px] font-semibold text-foreground">还没有笔记</Text>
+          <Text className="text-center text-[12px] text-muted-foreground">
+            点击下方工具栏新建你的第一条笔记
           </Text>
         </View>
       );
