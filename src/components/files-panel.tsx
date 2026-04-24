@@ -434,8 +434,8 @@ const FileTreeNode = memo(function FileTreeNode({
   const childCount = isFolder ? (node.children?.length ?? 0) : 0;
 
   const rowClassName = cn(
-    "h-9 flex-row items-center gap-1.5 pr-3 rounded-md",
-    isCurrent && "border border-primary bg-primary/10",
+    "h-9 flex-row items-center gap-1.5 pr-3 rounded-lg",
+    isCurrent && "border border-primary bg-primary/15",
     !isCurrent && selected && "bg-muted",
     !isCurrent && !selected && "active:bg-muted",
   );
