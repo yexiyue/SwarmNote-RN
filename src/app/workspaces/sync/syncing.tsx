@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { ExternalLink, Info } from "lucide-react-native";
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SyncItemStatusRow } from "@/components/sync/sync-item-status-row";
@@ -10,7 +10,16 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 import { WARNING_FG, WARNING_TINT_SOFT } from "@/lib/theme-tokens";
 import { errorMessage } from "@/lib/utils";
 import { workspacesBaseDirUri } from "@/lib/workspace-naming";
-import { useSyncWizardStore } from "@/stores/sync-wizard-store";
+import { syncKey, useSwarmStore } from "@/stores/swarm-store";
+import { useSyncWizardStore, type WizardItem } from "@/stores/sync-wizard-store";
+
+/** `SyncCompleted` is written to swarmStore as `{completed:0, total:0, cancelled}`;
+ *  `cancelled === false` is the signal that a full_sync landed successfully. */
+function isSyncCompletedOk(
+  entry: { completed: number; total: number; cancelled?: boolean } | undefined,
+): boolean {
+  return entry !== undefined && entry.cancelled === false;
+}
 
 export default function SyncWizardSyncing() {
   const router = useRouter();
@@ -36,9 +45,19 @@ export default function SyncWizardSyncing() {
     const run = async () => {
       const core = getAppCore();
       const base = workspacesBaseDirUri();
+      const swarmState = useSwarmStore.getState();
       await Promise.allSettled(
         snapshot.map(async (wi, i) => {
           if (cancelledRef.current) return;
+
+          // Race guard: SyncCompleted may have landed before Wizard mount
+          // (e.g. user re-entered the wizard while a prior sync was wrapping up).
+          const existing = swarmState.syncProgress[syncKey(wi.ws.uuid, wi.ws.peerId)];
+          if (isSyncCompletedOk(existing)) {
+            updateItem(i, { status: "done" });
+            return;
+          }
+
           updateItem(i, { status: "syncing" });
           let localPath: string | undefined;
           try {
@@ -49,18 +68,20 @@ export default function SyncWizardSyncing() {
             }
             return;
           }
+          // Remember localPath so a failed triggerSyncWithPeer still lets the
+          // Done screen open the (empty-but-registered) workspace.
+          updateItem(i, { localPath });
           try {
             await core.triggerSyncWithPeer(wi.ws.uuid, wi.ws.peerId);
-            if (!cancelledRef.current) updateItem(i, { status: "done", localPath });
+            // Keep status:"syncing" — SyncItemCompletedWatcher flips to done
+            // once SyncCompleted{cancelled:false} lands on swarmStore.
           } catch (err) {
             if (!cancelledRef.current) {
-              // localPath preserved so Done screen can still open the empty workspace
               updateItem(i, { status: "error", error: errorMessage(err), localPath });
             }
           }
         }),
       );
-      if (!cancelledRef.current) router.replace("/workspaces/sync/done" as never);
     };
 
     void run();
@@ -68,6 +89,16 @@ export default function SyncWizardSyncing() {
       cancelledRef.current = true;
     };
   }, []);
+
+  // Advance to Done only when every item reaches a terminal UI state.
+  // Items start at "pending" so this doesn't fire before `run()` kicks off.
+  useEffect(() => {
+    if (items.length === 0) return;
+    const allSettled = items.every((it) => it.status === "done" || it.status === "error");
+    if (allSettled && !cancelledRef.current) {
+      router.replace("/workspaces/sync/done" as never);
+    }
+  }, [items, router]);
 
   const title = items.length === 1 ? "正在同步" : `正在同步 ${items.length} 个工作区`;
 
@@ -81,8 +112,11 @@ export default function SyncWizardSyncing() {
         contentContainerClassName="gap-2.5 px-4 pt-2 pb-4"
         showsVerticalScrollIndicator={false}
       >
-        {items.map((item) => (
-          <SyncItemStatusRow key={item.ws.uuid} item={item} live />
+        {items.map((item, idx) => (
+          <Fragment key={item.ws.uuid}>
+            <SyncItemStatusRow item={item} live />
+            <SyncItemCompletedWatcher index={idx} item={item} cancelledRef={cancelledRef} />
+          </Fragment>
         ))}
 
         <View
@@ -111,4 +145,26 @@ export default function SyncWizardSyncing() {
       </View>
     </SafeAreaView>
   );
+}
+
+interface WatcherProps {
+  index: number;
+  item: WizardItem;
+  cancelledRef: React.RefObject<boolean>;
+}
+
+/** Headless per-item listener: flips the wizard item to `done` once the
+ *  backend `full_sync` emits `SyncCompleted{cancelled:false}`. Cancelled
+ *  completions are ignored — no user-facing cancel path exists today. */
+function SyncItemCompletedWatcher({ index, item, cancelledRef }: WatcherProps) {
+  const entry = useSwarmStore((s) => s.syncProgress[syncKey(item.ws.uuid, item.ws.peerId)]);
+  const updateItem = useSyncWizardStore((s) => s.updateItem);
+  useEffect(() => {
+    if (cancelledRef.current) return;
+    if (item.status !== "syncing") return;
+    if (isSyncCompletedOk(entry)) {
+      updateItem(index, { status: "done" });
+    }
+  }, [entry, item.status, index, updateItem, cancelledRef]);
+  return null;
 }

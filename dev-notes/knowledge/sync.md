@@ -74,26 +74,51 @@ select → syncing 传选中 items；syncing 原位 updateItem；done 从 items 
 
 **不要**：不要 JSON.stringify 大对象塞进 router.push params —— URL-encode 成本、类型丢失、嵌套对象反序列化脆弱。
 
-## 触发命令串行 + 后端并发
+## 触发命令并行 + done 语义事件驱动
 
-`createWorkspaceForSync` / `triggerSyncWithPeer` 都是毫秒级 RPC（Rust 侧 `spawn_full_sync` 立即 return，真正传输在 spawn 里异步跑）。所以 Wizard 的 for-await：
+`createWorkspaceForSync` / `triggerSyncWithPeer` 都是毫秒级 RPC（Rust 侧 `spawn_full_sync` 立即 return，真正传输在 spawn 里异步跑）。Wizard 用 `Promise.allSettled` 并行触发所有选中项，每项内部状态机：
 
-```ts
-for (let i = 0; i < items.length; i++) {
-  updateItem(i, { status: "syncing" });
-  try {
-    const localPath = await core.createWorkspaceForSync(uuid, name, basePath);
-    await core.triggerSyncWithPeer(uuid, peerId);
-    updateItem(i, { status: "done", localPath });
-  } catch (err) { ... }
-}
+```text
+ pending
+    │ onStart
+    ▼
+ syncing ── createWorkspaceForSync / triggerSyncWithPeer RPC
+    │
+    │ ✅ SyncCompleted{cancelled:false} 事件到达 → done
+    │ ❌ RPC reject → error（保留 localPath 方便 Done 屏打开空工作区）
+    │ ⚠️ SyncCompleted{cancelled:true} → 保持 syncing（当前没有用户可达取消路径）
 ```
 
-**循环是"触发串行"，实际数据传输是后端并发**。多行进度条独立订阅 `swarmStore.syncProgress[syncKey(wsId, peerId)]`，符合后端并发模型。
+**关键：`triggerSyncWithPeer` RPC 返回 ≠ item done**。RPC 返回只代表请求已投递给后端 `spawn_full_sync`，后台可能还在跑 DocList diff / 拉 Yjs update。Wizard 必须订阅 `swarmStore.syncProgress[syncKey]`，等 event-bus 收到 `SyncCompleted{cancelled:false}` 再把 item 标 done。否则 Done 屏点"打开"的瞬间切入工作区，文件树还是空的。
+
+**Mount race 守卫**：Wizard mount 时先读 `useSwarmStore.getState().syncProgress[key]`，若已是 cancelled:false 终态直接标 done，避免漏事件。
+
+**不设超时兜底**：慢工作区 / 慢网络下用户可以点"后台运行"逃生，后端完成时 event-bus 仍会正确落地到 `syncPersist` 和文件树（见下一条）。
 
 **不要**：不要画"大号全局百分比"（把多个并发 session 的 `completed/total` 加权平均）—— 慢项会让数字跳动，用户困惑。桌面端 `WorkspaceSyncDialog.SyncProgressRow` 是多行独立模式，移动端沿用。
 
-**相关文件**：`src/app/workspaces/sync/syncing.tsx`, `d:/workspace/swarmnote/src/components/workspace/WorkspaceSyncDialog.tsx`
+**相关文件**：`src/app/workspaces/sync/syncing.tsx`, `d:/workspace/swarmnote/src/components/workspace/WorkspaceSyncDialog.tsx`, `d:/workspace/swarmnote/crates/core/src/workspace/sync/full_sync.rs`
+
+## 同步完成事件 → UI 反应链
+
+mobile 没有 FileWatcher，后端 `full_sync.rs` 完成时只 emit `SyncCompleted`，不 emit `FileTreeChanged`。所以 `SyncCompleted{cancelled:false}` 是 mobile 侧唯一的"工作区内容可能变了"信号，event-bus 要自己兜住：
+
+```ts
+// src/core/event-bus.ts::SyncCompleted
+if (!cancelled) {
+  useSyncPersistStore.getState().setLastSyncedAt(workspaceId, Date.now());
+  const active = useWorkspaceStore.getState().info;
+  if (active?.id === workspaceId) {
+    useFileTreeStore.getState().refresh().catch((err) => { /* warn */ });
+  }
+}
+```
+
+**只刷 active workspace**：后台工作区收到 SyncCompleted 不触发前台 refresh —— 用户下次 `switchWorkspace` 时 `openWorkspaceAt` 的初次 refresh 会拉到最新 DB 状态。
+
+**`cancelled:true` 不刷**：无落地变更，避免无谓的 DB 扫描。
+
+**相关文件**：`src/core/event-bus.ts`, `src/stores/file-tree-store.ts::refresh`
 
 ## 破坏性操作按钮规格
 
