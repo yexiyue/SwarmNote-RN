@@ -8,6 +8,7 @@ import { useFileTreeStore } from "@/stores/file-tree-store";
 import { useNotificationStore } from "@/stores/notification-store";
 import { syncKey, useSwarmStore } from "@/stores/swarm-store";
 import { useSyncPersistStore } from "@/stores/sync-persist-store";
+import { useWorkspaceStore } from "@/stores/workspace-store";
 
 /** `ForeignEventBus` implementation: switches on `event.tag` and writes
  *  directly into the appropriate Zustand store. `emit` is called from the
@@ -99,6 +100,18 @@ export class EventBus implements ForeignEventBus {
         });
         if (!cancelled) {
           useSyncPersistStore.getState().setLastSyncedAt(workspaceId, Date.now());
+          // If the finished workspace is the one the user currently has open,
+          // pull newly synced docs into the file tree. Non-active workspaces
+          // rely on `openWorkspaceAt`'s initial refresh on next switch.
+          const active = useWorkspaceStore.getState().info;
+          if (active?.id === workspaceId) {
+            useFileTreeStore
+              .getState()
+              .refresh()
+              .catch((err: unknown) => {
+                console.warn("[event-bus] file tree refresh after SyncCompleted failed:", err);
+              });
+          }
         }
         break;
       }
