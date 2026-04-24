@@ -1,3 +1,4 @@
+import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import {
   ChevronDown,
@@ -9,15 +10,23 @@ import {
   type LucideIcon,
   Settings,
 } from "lucide-react-native";
-import { memo, useCallback, useEffect, useMemo } from "react";
-import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { UniffiFileTreeNode } from "react-native-swarmnote-core";
+import { FileActionSheet, type FileActionSheetRef } from "@/components/files/FileActionSheet";
 import { InlineNameInput } from "@/components/files/InlineNameInput";
 import { FilesToolbar } from "@/components/files-toolbar";
 import { Text } from "@/components/ui/text";
-import { createFolderAt, createNoteAt } from "@/core/files-actions";
+import {
+  basenameForEdit,
+  createFolderAt,
+  createNoteAt,
+  deleteNode,
+  renameNode,
+} from "@/core/files-actions";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { cn, errorMessage } from "@/lib/utils";
 import { useCurrentDocStore } from "@/stores/current-doc-store";
 import { useFileTreeStore } from "@/stores/file-tree-store";
 import { type Draft, useFilesUiStore } from "@/stores/files-ui-store";
@@ -39,6 +48,10 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
   const selectedNodeId = useFilesUiStore((s) => s.selectedNodeId);
   const expandedFolderIds = useFilesUiStore((s) => s.expandedFolderIds);
   const draft = useFilesUiStore((s) => s.draft);
+  const currentRelPath = useCurrentDocStore((s) => s.relPath);
+
+  const sheetRef = useRef<FileActionSheetRef>(null);
+  const [_actionTarget, setActionTarget] = useState<UniffiFileTreeNode | null>(null);
 
   useEffect(() => {
     refresh();
@@ -53,19 +66,72 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
     };
   }, []);
 
-  const handleNodePress = useCallback((node: UniffiFileTreeNode) => {
+  const handleNodePress = useCallback(
+    (node: UniffiFileTreeNode) => {
+      const isFolder = node.children !== undefined && node.children !== null;
+      useFilesUiStore.getState().select(node.id);
+      if (isFolder) {
+        useFilesUiStore.getState().toggleExpand(node.id);
+      } else {
+        // Fire the open in the background and let the pager switch happen
+        // immediately. The editor page renders from currentDocStore so it
+        // shows a spinner (opening → open) while the doc loads.
+        useCurrentDocStore
+          .getState()
+          .open(node.id)
+          .catch((err: unknown) => {
+            console.warn("[files-panel] open doc failed:", err);
+          });
+        onClose();
+      }
+    },
+    [onClose],
+  );
+
+  const openActionSheet = useCallback((node: UniffiFileTreeNode) => {
+    setActionTarget(node);
+    sheetRef.current?.present(node);
+  }, []);
+
+  const handleRename = useCallback((node: UniffiFileTreeNode) => {
     const isFolder = node.children !== undefined && node.children !== null;
-    useFilesUiStore.getState().select(node.id);
-    if (isFolder) {
-      useFilesUiStore.getState().toggleExpand(node.id);
-    } else {
-      useCurrentDocStore
-        .getState()
-        .open(node.id)
-        .catch((err: unknown) => {
-          console.warn("[files-panel] open doc failed:", err);
-        });
-    }
+    const parentIdx = node.id.lastIndexOf("/");
+    const parentRelPath = parentIdx === -1 ? null : node.id.slice(0, parentIdx);
+    useFilesUiStore.getState().startDraft({
+      kind: isFolder ? "folder" : "document",
+      parentRelPath,
+      name: basenameForEdit(node),
+      renameTarget: node,
+    });
+  }, []);
+
+  const handleDelete = useCallback((node: UniffiFileTreeNode) => {
+    const isFolder = node.children !== undefined && node.children !== null;
+    const childCount = countDescendants(node);
+    const title = isFolder ? "删除文件夹" : "删除笔记";
+    const message = isFolder
+      ? childCount > 0
+        ? `『${node.name}』包含 ${childCount} 项，将一并删除。此操作无法撤销。`
+        : `确定删除『${node.name}』？此操作无法撤销。`
+      : `确定删除『${node.name}』？此操作无法撤销。`;
+    Alert.alert(title, message, [
+      { text: "取消", style: "cancel" },
+      {
+        text: "删除",
+        style: "destructive",
+        onPress: () => {
+          deleteNode(node).catch((err: unknown) => {
+            Alert.alert("删除失败", errorMessage(err));
+          });
+        },
+      },
+    ]);
+  }, []);
+
+  const handleCopyPath = useCallback((node: UniffiFileTreeNode) => {
+    Clipboard.setStringAsync(node.id).catch((err: unknown) => {
+      console.warn("[files-panel] copy path failed:", err);
+    });
   }, []);
 
   const deriveParentRelPath = useCallback((): string | null => {
@@ -101,15 +167,16 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
     }
     useFilesUiStore.getState().setDraftSubmitting(true);
     try {
-      if (current.kind === "folder") {
+      if (current.renameTarget !== null) {
+        await renameNode(current.renameTarget, name);
+      } else if (current.kind === "folder") {
         await createFolderAt(current.parentRelPath, name);
       } else {
         await createNoteAt(current.parentRelPath, name);
       }
       useFilesUiStore.getState().cancelDraft();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      useFilesUiStore.getState().setDraftError(msg);
+      useFilesUiStore.getState().setDraftError(errorMessage(err));
     }
   }, []);
 
@@ -149,11 +216,13 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
         nodes={tree}
         depth={0}
         selectedNodeId={selectedNodeId}
+        currentRelPath={currentRelPath}
         expandedFolderIds={expandedFolderIds}
         colors={colors}
         draft={draft}
         parentRelPath={null}
         onNodePress={handleNodePress}
+        onNodeLongPress={openActionSheet}
         onSubmitDraft={onSubmitDraft}
         onCancelDraft={onCancelDraft}
         onChangeDraftName={onChangeDraftName}
@@ -163,10 +232,12 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
     tree,
     loading,
     selectedNodeId,
+    currentRelPath,
     expandedFolderIds,
     colors,
     draft,
     handleNodePress,
+    openActionSheet,
     onSubmitDraft,
     onCancelDraft,
     onChangeDraftName,
@@ -212,8 +283,24 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
           <Settings color={colors.mutedForeground} size={18} />
         </Pressable>
       </View>
+
+      <FileActionSheet
+        ref={sheetRef}
+        onRename={handleRename}
+        onDelete={handleDelete}
+        onCopyPath={handleCopyPath}
+      />
     </SafeAreaView>
   );
+}
+
+function countDescendants(node: UniffiFileTreeNode): number {
+  if (node.children === undefined || node.children === null) return 0;
+  let total = 0;
+  for (const child of node.children) {
+    total += 1 + countDescendants(child);
+  }
+  return total;
 }
 
 type ThemeColors = ReturnType<typeof useThemeColors>;
@@ -222,6 +309,7 @@ interface TreeListProps {
   nodes: UniffiFileTreeNode[];
   depth: number;
   selectedNodeId: string | null;
+  currentRelPath: string | null;
   expandedFolderIds: Set<string>;
   colors: ThemeColors;
   draft: Draft | null;
@@ -229,6 +317,7 @@ interface TreeListProps {
    *  decide where to drop the inline draft input. */
   parentRelPath: string | null;
   onNodePress: (node: UniffiFileTreeNode) => void;
+  onNodeLongPress: (node: UniffiFileTreeNode) => void;
   onSubmitDraft: () => void;
   onCancelDraft: () => void;
   onChangeDraftName: (name: string) => void;
@@ -238,11 +327,13 @@ function TreeList({
   nodes,
   depth,
   selectedNodeId,
+  currentRelPath,
   expandedFolderIds,
   colors,
   draft,
   parentRelPath,
   onNodePress,
+  onNodeLongPress,
   onSubmitDraft,
   onCancelDraft,
   onChangeDraftName,
@@ -250,23 +341,44 @@ function TreeList({
   const showDraftHere = draft !== null && draft.parentRelPath === parentRelPath;
   return (
     <View>
-      {nodes.map((node) => (
-        <FileTreeNode
-          key={node.id}
-          node={node}
-          depth={depth}
-          selected={selectedNodeId === node.id}
-          expandedFolderIds={expandedFolderIds}
-          colors={colors}
-          draft={draft}
-          onNodePress={onNodePress}
-          onSubmitDraft={onSubmitDraft}
-          onCancelDraft={onCancelDraft}
-          onChangeDraftName={onChangeDraftName}
-          selectedNodeId={selectedNodeId}
-        />
-      ))}
-      {showDraftHere && draft !== null ? (
+      {nodes.map((node) => {
+        // Replace the row with the inline input when a rename draft targets it.
+        if (draft !== null && draft.renameTarget?.id === node.id) {
+          return (
+            <InlineNameInput
+              key={node.id}
+              kind={draft.kind}
+              value={draft.name}
+              submitting={draft.submitting}
+              error={draft.error}
+              depth={depth}
+              onChangeText={onChangeDraftName}
+              onSubmit={onSubmitDraft}
+              onCancel={onCancelDraft}
+            />
+          );
+        }
+        return (
+          <FileTreeNode
+            key={node.id}
+            node={node}
+            depth={depth}
+            selected={selectedNodeId === node.id}
+            isCurrent={currentRelPath !== null && node.id === currentRelPath}
+            expandedFolderIds={expandedFolderIds}
+            colors={colors}
+            draft={draft}
+            onNodePress={onNodePress}
+            onNodeLongPress={onNodeLongPress}
+            onSubmitDraft={onSubmitDraft}
+            onCancelDraft={onCancelDraft}
+            onChangeDraftName={onChangeDraftName}
+            selectedNodeId={selectedNodeId}
+            currentRelPath={currentRelPath}
+          />
+        );
+      })}
+      {showDraftHere && draft !== null && draft.renameTarget === null ? (
         <InlineNameInput
           kind={draft.kind}
           value={draft.name}
@@ -286,11 +398,14 @@ interface FileTreeNodeProps {
   node: UniffiFileTreeNode;
   depth: number;
   selected: boolean;
+  isCurrent: boolean;
   selectedNodeId: string | null;
+  currentRelPath: string | null;
   expandedFolderIds: Set<string>;
   colors: ThemeColors;
   draft: Draft | null;
   onNodePress: (node: UniffiFileTreeNode) => void;
+  onNodeLongPress: (node: UniffiFileTreeNode) => void;
   onSubmitDraft: () => void;
   onCancelDraft: () => void;
   onChangeDraftName: (name: string) => void;
@@ -300,11 +415,14 @@ const FileTreeNode = memo(function FileTreeNode({
   node,
   depth,
   selected,
+  isCurrent,
   selectedNodeId,
+  currentRelPath,
   expandedFolderIds,
   colors,
   draft,
   onNodePress,
+  onNodeLongPress,
   onSubmitDraft,
   onCancelDraft,
   onChangeDraftName,
@@ -315,14 +433,20 @@ const FileTreeNode = memo(function FileTreeNode({
   const Chevron = isOpen ? ChevronDown : ChevronRight;
   const childCount = isFolder ? (node.children?.length ?? 0) : 0;
 
+  const rowClassName = cn(
+    "h-9 flex-row items-center gap-1.5 pr-3 rounded-md",
+    isCurrent && "border border-primary bg-primary/10",
+    !isCurrent && selected && "bg-muted",
+    !isCurrent && !selected && "active:bg-muted",
+  );
+
   return (
     <View>
       <Pressable
         onPress={() => onNodePress(node)}
+        onLongPress={() => onNodeLongPress(node)}
         style={{ paddingLeft: 8 + depth * 16 }}
-        className={`h-9 flex-row items-center gap-1.5 pr-3 rounded-md ${
-          selected ? "bg-muted" : "active:bg-muted"
-        }`}
+        className={rowClassName}
         accessibilityLabel={node.name}
       >
         {isFolder ? (
@@ -347,11 +471,13 @@ const FileTreeNode = memo(function FileTreeNode({
           nodes={node.children}
           depth={depth + 1}
           selectedNodeId={selectedNodeId}
+          currentRelPath={currentRelPath}
           expandedFolderIds={expandedFolderIds}
           colors={colors}
           draft={draft}
           parentRelPath={node.id}
           onNodePress={onNodePress}
+          onNodeLongPress={onNodeLongPress}
           onSubmitDraft={onSubmitDraft}
           onCancelDraft={onCancelDraft}
           onChangeDraftName={onChangeDraftName}
