@@ -49,6 +49,7 @@ import {
   FfiConverterArrayBuffer, 
   FfiConverterBool, 
   FfiConverterInt32, 
+  FfiConverterInt64, 
   FfiConverterObject, 
   FfiConverterObjectWithCallbacks, 
   FfiConverterOptional, 
@@ -104,6 +105,8 @@ export function generateKeypairBytes(): ArrayBuffer /*throws*/ {
             /*liftString:*/ FfiConverterString.lift,
     ));
     }
+
+
 
 
 
@@ -1015,13 +1018,95 @@ const FfiConverterTypeUniffiRecentWorkspace = (() => {
 })();
 
 
+/**
+ * Workspace shared by a paired, online peer. Mirrors the desktop
+ * `RemoteWorkspaceInfo` shape 1:1 (see `src-tauri/src/commands/pairing.rs`).
+ * `is_local` is pre-joined against this device's active workspace UUIDs so
+ * the RN host doesn't have to.
+ */
+export type UniffiRemoteWorkspaceInfo = {
+    uuid: string,
+    name: string,
+    docCount: /*u32*/number,
+    /**
+     * Milliseconds since the Unix epoch — matches the desktop wire format.
+     * Not a `SystemTime` because the core's `WorkspaceMeta.updated_at` is
+     * already an `i64` ms timestamp.
+     */
+    updatedAt: /*i64*/bigint,
+    peerId: string,
+    peerName: string,
+    isLocal: boolean
+}
+
+/**
+ * Generated factory for {@link UniffiRemoteWorkspaceInfo} record objects.
+ */
+export const UniffiRemoteWorkspaceInfo = (() => {
+    const defaults = () => ({
+    });
+    const create = (() => {
+        return uniffiCreateRecord<UniffiRemoteWorkspaceInfo, ReturnType<typeof defaults>>(defaults);
+    })();
+    return Object.freeze({
+        create,
+        new: create,
+        defaults: () => Object.freeze(defaults()) as Partial<UniffiRemoteWorkspaceInfo>,
+
+    });
+})();
+
+const FfiConverterTypeUniffiRemoteWorkspaceInfo = (() => {
+    type TypeName = UniffiRemoteWorkspaceInfo;
+    class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+        read(from: RustBuffer): TypeName {
+            return {
+                uuid: FfiConverterString.read(from), 
+                name: FfiConverterString.read(from), 
+                docCount: FfiConverterUInt32.read(from), 
+                updatedAt: FfiConverterInt64.read(from), 
+                peerId: FfiConverterString.read(from), 
+                peerName: FfiConverterString.read(from), 
+                isLocal: FfiConverterBool.read(from)
+            };
+        }
+        write(value: TypeName, into: RustBuffer): void {
+            FfiConverterString.write(value.uuid, into);
+            FfiConverterString.write(value.name, into);
+            FfiConverterUInt32.write(value.docCount, into);
+            FfiConverterInt64.write(value.updatedAt, into);
+            FfiConverterString.write(value.peerId, into);
+            FfiConverterString.write(value.peerName, into);
+            FfiConverterBool.write(value.isLocal, into);
+        }
+        allocationSize(value: TypeName): number {
+            return FfiConverterString.allocationSize(value.uuid) + 
+            FfiConverterString.allocationSize(value.name) + 
+            FfiConverterUInt32.allocationSize(value.docCount) + 
+            FfiConverterInt64.allocationSize(value.updatedAt) + 
+            FfiConverterString.allocationSize(value.peerId) + 
+            FfiConverterString.allocationSize(value.peerName) + 
+            FfiConverterBool.allocationSize(value.isLocal);
+            
+        }
+    };
+    return new FFIConverter();
+})();
+
+
 export type UniffiWorkspaceInfo = {
     id: string,
     name: string,
     path: string,
     createdBy: string,
     createdAt: UniffiTimestamp,
-    updatedAt: UniffiTimestamp
+    updatedAt: UniffiTimestamp,
+    /**
+     * Number of document rows in this workspace. Populated via
+     * `WorkspaceCore::fresh_info` at the FFI call site; the cached `info()`
+     * getter returns 0.
+     */
+    docCount: /*u32*/number
 }
 
 /**
@@ -1051,7 +1136,8 @@ const FfiConverterTypeUniffiWorkspaceInfo = (() => {
                 path: FfiConverterString.read(from), 
                 createdBy: FfiConverterString.read(from), 
                 createdAt: FfiConverterTimestamp.read(from), 
-                updatedAt: FfiConverterTimestamp.read(from)
+                updatedAt: FfiConverterTimestamp.read(from), 
+                docCount: FfiConverterUInt32.read(from)
             };
         }
         write(value: TypeName, into: RustBuffer): void {
@@ -1061,6 +1147,7 @@ const FfiConverterTypeUniffiWorkspaceInfo = (() => {
             FfiConverterString.write(value.createdBy, into);
             FfiConverterTimestamp.write(value.createdAt, into);
             FfiConverterTimestamp.write(value.updatedAt, into);
+            FfiConverterUInt32.write(value.docCount, into);
         }
         allocationSize(value: TypeName): number {
             return FfiConverterString.allocationSize(value.id) + 
@@ -1068,7 +1155,8 @@ const FfiConverterTypeUniffiWorkspaceInfo = (() => {
             FfiConverterString.allocationSize(value.path) + 
             FfiConverterString.allocationSize(value.createdBy) + 
             FfiConverterTimestamp.allocationSize(value.createdAt) + 
-            FfiConverterTimestamp.allocationSize(value.updatedAt);
+            FfiConverterTimestamp.allocationSize(value.updatedAt) + 
+            FfiConverterUInt32.allocationSize(value.docCount);
             
         }
     };
@@ -4567,14 +4655,39 @@ export interface UniffiAppCoreLike {
      */
     closeWorkspace(workspaceId: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
     /**
+     * Create an empty local workspace with a caller-assigned UUID, ready to
+     * receive documents from a paired peer's full sync. Mirrors the desktop
+     * `commands::workspace::create_workspace_for_sync`.
+     *
+     * - `base_path` may be a raw path or `file://` URI; the latter is common
+     * from Expo's `FileSystem.documentDirectory`.
+     * - Registers the new workspace in `AppCore.workspaces` (as a `Weak`) and
+     * pushes it onto the recent-workspaces list.
+     * - Returns the absolute path of the newly created workspace directory.
+     */
+    createWorkspaceForSync(uuid: string, name: string, basePath: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<string>;
+    /**
      * Snapshot of the device identity — peer id + user-facing metadata.
      */
     deviceInfo()  /*throws*/: UniffiDeviceInfo;
     /**
+     * Query all paired-and-online peers in parallel for their workspace
+     * lists, merge the results, and mark entries whose UUID is already
+     * open locally. Mirrors the desktop `commands::pairing::get_remote_workspaces`.
+     *
+     * - 5s timeout per peer; slow peers are silently dropped.
+     * - Returns `Ok(vec![])` when no paired peer is online.
+     * - `FfiError::NetworkNotRunning` if P2P is not up.
+     */
+    getRemoteWorkspaces(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<Array<UniffiRemoteWorkspaceInfo>>;
+    /**
      * Snapshot of every currently-open workspace. On mobile there is at
      * most one; exposed primarily for diagnostic / debugging surfaces.
+     *
+     * Calls `WorkspaceCore::fresh_info` so `doc_count` reflects the current
+     * DB row count instead of the cached 0 from the `info()` getter.
      */
-    listWorkspaces(asyncOpts_?: { signal: AbortSignal }) : Promise<Array<UniffiWorkspaceInfo>>;
+    listWorkspaces(asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<Array<UniffiWorkspaceInfo>>;
     /**
      * Current P2P node status. `NodeStarted` / `NodeStopped` also fire on
      * the event bus when lifecycle transitions.
@@ -4646,6 +4759,9 @@ export interface UniffiAppCoreLike {
      * Look up a workspace's info by UUID without forcing the caller to
      * hold the `UniffiWorkspaceCore`. Returns `None` if the workspace is
      * not currently open.
+     *
+     * Uses `WorkspaceCore::fresh_info` so `doc_count` is populated from a
+     * live DB count rather than the 0 cached on the snapshot.
      */
     workspaceInfo(workspaceId: string, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<UniffiWorkspaceInfo | undefined>;
     /**
@@ -4786,6 +4902,45 @@ async  closeWorkspace(workspaceId: string, asyncOpts_?: { signal: AbortSignal })
     }
     
     /**
+     * Create an empty local workspace with a caller-assigned UUID, ready to
+     * receive documents from a paired peer's full sync. Mirrors the desktop
+     * `commands::workspace::create_workspace_for_sync`.
+     *
+     * - `base_path` may be a raw path or `file://` URI; the latter is common
+     * from Expo's `FileSystem.documentDirectory`.
+     * - Registers the new workspace in `AppCore.workspaces` (as a `Weak`) and
+     * pushes it onto the recent-workspaces list.
+     * - Returns the absolute path of the newly created workspace directory.
+     */
+async  createWorkspaceForSync(uuid: string, name: string, basePath: string, asyncOpts_?: { signal: AbortSignal }): Promise<string> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_create_workspace_for_sync(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(uuid),FfiConverterString.lower(name),FfiConverterString.lower(basePath)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterString.lift.bind(FfiConverterString),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
      * Snapshot of the device identity — peer id + user-facing metadata.
      */
  deviceInfo(): UniffiDeviceInfo /*throws*/ {
@@ -4801,10 +4956,50 @@ async  closeWorkspace(workspaceId: string, asyncOpts_?: { signal: AbortSignal })
     }
     
     /**
+     * Query all paired-and-online peers in parallel for their workspace
+     * lists, merge the results, and mark entries whose UUID is already
+     * open locally. Mirrors the desktop `commands::pairing::get_remote_workspaces`.
+     *
+     * - 5s timeout per peer; slow peers are silently dropped.
+     * - Returns `Ok(vec![])` when no paired peer is online.
+     * - `FfiError::NetworkNotRunning` if P2P is not up.
+     */
+async  getRemoteWorkspaces(asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiRemoteWorkspaceInfo>> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiappcore_get_remote_workspaces(
+                    uniffiTypeUniffiAppCoreObjectFactory.clonePointer(this)
+                    
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_rust_buffer,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_rust_buffer,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_rust_buffer,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_rust_buffer,
+            /*liftFunc:*/ FfiConverterArrayTypeUniffiRemoteWorkspaceInfo.lift.bind(FfiConverterArrayTypeUniffiRemoteWorkspaceInfo),
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
      * Snapshot of every currently-open workspace. On mobile there is at
      * most one; exposed primarily for diagnostic / debugging surfaces.
+     *
+     * Calls `WorkspaceCore::fresh_info` so `doc_count` reflects the current
+     * DB row count instead of the cached 0 from the `info()` getter.
      */
-async  listWorkspaces(asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiWorkspaceInfo>> {
+async  listWorkspaces(asyncOpts_?: { signal: AbortSignal }): Promise<Array<UniffiWorkspaceInfo>> /*throws*/ {
     const __stack = uniffiIsDebug ? new Error().stack : undefined;
     try {
         return await uniffiRustCallAsync(
@@ -4822,7 +5017,7 @@ async  listWorkspaces(asyncOpts_?: { signal: AbortSignal }): Promise<Array<Uniff
             /*liftFunc:*/ FfiConverterArrayTypeUniffiWorkspaceInfo.lift.bind(FfiConverterArrayTypeUniffiWorkspaceInfo),
             /*liftString:*/ FfiConverterString.lift,
             /*asyncOpts:*/ asyncOpts_,
-            
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
         );
     } catch (__error: any) {
         if (uniffiIsDebug && __error instanceof Error) {
@@ -5130,6 +5325,9 @@ async  triggerSyncWithPeer(workspaceId: string, peerId: string, asyncOpts_?: { s
      * Look up a workspace's info by UUID without forcing the caller to
      * hold the `UniffiWorkspaceCore`. Returns `None` if the workspace is
      * not currently open.
+     *
+     * Uses `WorkspaceCore::fresh_info` so `doc_count` is populated from a
+     * live DB count rather than the 0 cached on the snapshot.
      */
 async  workspaceInfo(workspaceId: string, asyncOpts_?: { signal: AbortSignal }): Promise<UniffiWorkspaceInfo | undefined> /*throws*/ {
     const __stack = uniffiIsDebug ? new Error().stack : undefined;
@@ -6645,6 +6843,10 @@ const FfiConverterArrayTypeUniffiPairedDeviceInfo = new FfiConverterArray(FfiCon
 const FfiConverterArrayTypeUniffiRecentWorkspace = new FfiConverterArray(FfiConverterTypeUniffiRecentWorkspace);
 
 
+// FfiConverter for Array<UniffiRemoteWorkspaceInfo>
+const FfiConverterArrayTypeUniffiRemoteWorkspaceInfo = new FfiConverterArray(FfiConverterTypeUniffiRemoteWorkspaceInfo);
+
+
 // FfiConverter for Array<UniffiWorkspaceInfo>
 const FfiConverterArrayTypeUniffiWorkspaceInfo = new FfiConverterArray(FfiConverterTypeUniffiWorkspaceInfo);
 
@@ -6684,10 +6886,16 @@ function uniffiEnsureInitialized() {
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace() !== 15040) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace");
     }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_create_workspace_for_sync() !== 37860) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_create_workspace_for_sync");
+    }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_device_info() !== 36704) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_device_info");
     }
-    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces() !== 48632) {
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_get_remote_workspaces() !== 9189) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_get_remote_workspaces");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces() !== 19973) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_network_status() !== 41814) {
@@ -6717,7 +6925,7 @@ function uniffiEnsureInitialized() {
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer() !== 92) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_trigger_sync_with_peer");
     }
-    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info() !== 6310) {
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info() !== 13980) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiappcore_workspace_info");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_devices() !== 47353) {
@@ -6884,6 +7092,7 @@ export default Object.freeze({
     FfiConverterTypeUniffiPairingRefuseReason,
     FfiConverterTypeUniffiPairingResponse,
     FfiConverterTypeUniffiRecentWorkspace,
+    FfiConverterTypeUniffiRemoteWorkspaceInfo,
     FfiConverterTypeUniffiWorkspaceCore,
     FfiConverterTypeUniffiWorkspaceInfo,
     FfiConverterTypeUpsertDocInput,

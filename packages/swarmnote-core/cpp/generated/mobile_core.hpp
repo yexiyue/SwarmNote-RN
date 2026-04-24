@@ -25,7 +25,9 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_fn_free_uniffiappcore(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_constructor_uniffiappcore_new(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_close_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_create_workspace_for_sync(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_device_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_get_remote_workspaces(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_network_status(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
@@ -138,7 +140,9 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_ffi_mobile_core_rust_future_complete_void(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_func_generate_keypair_bytes(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_create_workspace_for_sync(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_device_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_get_remote_workspaces(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_network_status(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);

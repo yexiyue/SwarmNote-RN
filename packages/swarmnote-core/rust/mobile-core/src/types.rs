@@ -30,6 +30,10 @@ pub struct UniffiWorkspaceInfo {
     pub created_by: String,
     pub created_at: SystemTime,
     pub updated_at: SystemTime,
+    /// Number of document rows in this workspace. Populated via
+    /// `WorkspaceCore::fresh_info` at the FFI call site; the cached `info()`
+    /// getter returns 0.
+    pub doc_count: u32,
 }
 
 impl From<WorkspaceInfo> for UniffiWorkspaceInfo {
@@ -41,8 +45,27 @@ impl From<WorkspaceInfo> for UniffiWorkspaceInfo {
             created_by: w.created_by,
             created_at: w.created_at.into(),
             updated_at: w.updated_at.into(),
+            doc_count: w.doc_count,
         }
     }
+}
+
+/// Workspace shared by a paired, online peer. Mirrors the desktop
+/// `RemoteWorkspaceInfo` shape 1:1 (see `src-tauri/src/commands/pairing.rs`).
+/// `is_local` is pre-joined against this device's active workspace UUIDs so
+/// the RN host doesn't have to.
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct UniffiRemoteWorkspaceInfo {
+    pub uuid: String,
+    pub name: String,
+    pub doc_count: u32,
+    /// Milliseconds since the Unix epoch — matches the desktop wire format.
+    /// Not a `SystemTime` because the core's `WorkspaceMeta.updated_at` is
+    /// already an `i64` ms timestamp.
+    pub updated_at: i64,
+    pub peer_id: String,
+    pub peer_name: String,
+    pub is_local: bool,
 }
 
 /// Persistent MRU entry from `GlobalConfig.recent_workspaces`. Unlike

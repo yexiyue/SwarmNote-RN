@@ -5,16 +5,27 @@
 //! responsible for keeping exactly one instance alive (stash it in a context
 //! / store) and calling `uniffiDestroy()` on teardown.
 
+use std::collections::HashSet;
+use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 use swarmnote_core::libp2p::PeerId;
-use swarmnote_core::{config::save_config, AppCore, AppCoreBuilder, NodeStatus};
+use swarmnote_core::protocol::{AppRequest, AppResponse, WorkspaceRequest, WorkspaceResponse};
+use swarmnote_core::{
+    config::save_config, ensure_workspace_row, AppCore, AppCoreBuilder, DeviceFilter,
+    DeviceStatus, NodeStatus,
+};
+use tokio::task::JoinSet;
 
 use crate::error::{FfiError, parse_uuid};
 use crate::events::{ForeignEventBus, UniffiEventBusAdapter};
 use crate::keychain::{ForeignKeychainProvider, UniffiKeychainAdapter};
 use crate::path::strip_file_uri;
-use crate::types::{UniffiDeviceInfo, UniffiNodeStatus, UniffiRecentWorkspace, UniffiWorkspaceInfo};
+use crate::types::{
+    UniffiDeviceInfo, UniffiNodeStatus, UniffiRecentWorkspace, UniffiRemoteWorkspaceInfo,
+    UniffiWorkspaceInfo,
+};
 use crate::workspace::UniffiWorkspaceCore;
 
 /// Device-level core, wrapping [`swarmnote_core::AppCore`].
@@ -136,13 +147,16 @@ impl UniffiAppCore {
 
     /// Snapshot of every currently-open workspace. On mobile there is at
     /// most one; exposed primarily for diagnostic / debugging surfaces.
-    pub async fn list_workspaces(&self) -> Vec<UniffiWorkspaceInfo> {
-        self.inner
-            .list_workspaces()
-            .await
-            .into_iter()
-            .map(|ws| ws.info().clone().into())
-            .collect()
+    ///
+    /// Calls `WorkspaceCore::fresh_info` so `doc_count` reflects the current
+    /// DB row count instead of the cached 0 from the `info()` getter.
+    pub async fn list_workspaces(&self) -> Result<Vec<UniffiWorkspaceInfo>, FfiError> {
+        let workspaces = self.inner.list_workspaces().await;
+        let mut out = Vec::with_capacity(workspaces.len());
+        for ws in workspaces {
+            out.push(ws.fresh_info().await?.into());
+        }
+        Ok(out)
     }
 
     /// Persistent MRU list of workspaces the user has opened on this device
@@ -173,12 +187,18 @@ impl UniffiAppCore {
     /// Look up a workspace's info by UUID without forcing the caller to
     /// hold the `UniffiWorkspaceCore`. Returns `None` if the workspace is
     /// not currently open.
+    ///
+    /// Uses `WorkspaceCore::fresh_info` so `doc_count` is populated from a
+    /// live DB count rather than the 0 cached on the snapshot.
     pub async fn workspace_info(
         &self,
         workspace_id: String,
     ) -> Result<Option<UniffiWorkspaceInfo>, FfiError> {
         let uuid = parse_uuid("workspace_id", &workspace_id)?;
-        Ok(self.inner.workspace_info(&uuid).await.map(Into::into))
+        match self.inner.get_workspace(&uuid).await {
+            Some(ws) => Ok(Some(ws.fresh_info().await?.into())),
+            None => Ok(None),
+        }
     }
 
     /// Kick off a full sync session between this device and a specific paired
@@ -202,5 +222,156 @@ impl UniffiAppCore {
         let coordinator = self.inner.sync_coordinator_or_err().await?;
         coordinator.spawn_full_sync(pid, workspace_uuid).await;
         Ok(())
+    }
+
+    /// Query all paired-and-online peers in parallel for their workspace
+    /// lists, merge the results, and mark entries whose UUID is already
+    /// open locally. Mirrors the desktop `commands::pairing::get_remote_workspaces`.
+    ///
+    /// - 5s timeout per peer; slow peers are silently dropped.
+    /// - Returns `Ok(vec![])` when no paired peer is online.
+    /// - `FfiError::NetworkNotRunning` if P2P is not up.
+    pub async fn get_remote_workspaces(
+        &self,
+    ) -> Result<Vec<UniffiRemoteWorkspaceInfo>, FfiError> {
+        let client = self.inner.client().await?;
+        let dm = self.inner.devices().await?;
+
+        let paired_online: Vec<_> = dm
+            .get_devices(DeviceFilter::Paired)
+            .into_iter()
+            .filter(|d| d.status == DeviceStatus::Online)
+            .collect();
+
+        if paired_online.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let mut tasks = JoinSet::new();
+        for device in &paired_online {
+            let peer_id_str = device.peer_id.clone();
+            let peer_name = device.hostname.clone();
+            let client = client.clone();
+            tasks.spawn(async move {
+                let Ok(peer_id) = peer_id_str.parse::<PeerId>() else {
+                    return (peer_id_str, peer_name, None);
+                };
+                let result = tokio::time::timeout(
+                    Duration::from_secs(5),
+                    client.send_request(
+                        peer_id,
+                        AppRequest::Workspace(WorkspaceRequest::ListWorkspaces),
+                    ),
+                )
+                .await;
+                let workspaces = match result {
+                    Ok(Ok(AppResponse::Workspace(WorkspaceResponse::WorkspaceList {
+                        workspaces,
+                    }))) => Some(workspaces),
+                    _ => None,
+                };
+                (peer_id_str, peer_name, workspaces)
+            });
+        }
+
+        let local_uuids: HashSet<uuid::Uuid> = self
+            .inner
+            .list_workspaces()
+            .await
+            .into_iter()
+            .map(|w| w.info().id)
+            .collect();
+
+        let mut results = Vec::new();
+        while let Some(Ok((peer_id, peer_name, Some(workspaces)))) = tasks.join_next().await {
+            for ws in workspaces {
+                results.push(UniffiRemoteWorkspaceInfo {
+                    is_local: local_uuids.contains(&ws.uuid),
+                    uuid: ws.uuid.to_string(),
+                    name: ws.name,
+                    doc_count: ws.doc_count,
+                    updated_at: ws.updated_at,
+                    peer_id: peer_id.clone(),
+                    peer_name: peer_name.clone(),
+                });
+            }
+        }
+
+        Ok(results)
+    }
+
+    /// Create an empty local workspace with a caller-assigned UUID, ready to
+    /// receive documents from a paired peer's full sync. Mirrors the desktop
+    /// `commands::workspace::create_workspace_for_sync`.
+    ///
+    /// - `base_path` may be a raw path or `file://` URI; the latter is common
+    ///   from Expo's `FileSystem.documentDirectory`.
+    /// - Registers the new workspace in `AppCore.workspaces` (as a `Weak`) and
+    ///   pushes it onto the recent-workspaces list.
+    /// - Returns the absolute path of the newly created workspace directory.
+    pub async fn create_workspace_for_sync(
+        self: &Arc<Self>,
+        uuid: String,
+        name: String,
+        base_path: String,
+    ) -> Result<String, FfiError> {
+        let ws_uuid = parse_uuid("uuid", &uuid)?;
+
+        if name.is_empty()
+            || name.contains('/')
+            || name.contains('\\')
+            || name.contains("..")
+            || name == "."
+        {
+            return Err(FfiError::InvalidInput {
+                field: "name".into(),
+                reason: format!("invalid workspace name: {name}"),
+            });
+        }
+
+        let base_path = strip_file_uri(base_path);
+        let base = PathBuf::from(&base_path);
+        if !base.is_dir() {
+            tokio::fs::create_dir_all(&base)
+                .await
+                .map_err(|e| FfiError::Io(format!("failed to create base directory: {e}")))?;
+        }
+
+        let ws_path = base.join(&name);
+        let ws_path_str = ws_path
+            .to_str()
+            .ok_or_else(|| FfiError::InvalidPath("workspace path is not valid UTF-8".into()))?
+            .to_owned();
+
+        tokio::fs::create_dir_all(&ws_path)
+            .await
+            .map_err(|e| FfiError::Io(format!("failed to create workspace directory: {e}")))?;
+
+        // Wrap the DB init + row insert so a single rollback covers all three
+        // failure points; otherwise we'd leave a half-initialized workspace dir.
+        let init: Result<(), FfiError> = async {
+            let conn = swarmnote_core::workspace::db::init_workspace_db(&ws_path).await?;
+            let peer_id = self.inner.identity().peer_id()?;
+            ensure_workspace_row(&conn, ws_uuid, &name, &peer_id).await?;
+            drop(conn);
+            Ok(())
+        }
+        .await;
+
+        if let Err(e) = init {
+            let _ = tokio::fs::remove_dir_all(&ws_path).await;
+            return Err(e);
+        }
+
+        let _ws_core = self.inner.clone().open_workspace(ws_path.clone()).await?;
+
+        // touch_recent_workspace failing only costs a missing MRU entry; the
+        // workspace itself is already registered, so we swallow the error.
+        let _ = self
+            .inner
+            .touch_recent_workspace(&ws_path_str, &name, Some(&ws_uuid.to_string()))
+            .await;
+
+        Ok(ws_path_str)
     }
 }

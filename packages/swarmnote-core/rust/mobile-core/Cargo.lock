@@ -1270,7 +1270,7 @@ dependencies = [
 [[package]]
 name = "entity"
 version = "0.1.0"
-source = "git+https://github.com/yexiyue/swarmnote.git?branch=develop#6c6803e1cacfffc85c7ca3419acd0306d2fb2103"
+source = "git+https://github.com/yexiyue/swarmnote.git?branch=develop#2128a15fad18bc0d4b1ed697b7d342a6fff84edb"
 dependencies = [
  "async-trait",
  "chrono",
@@ -2877,7 +2877,7 @@ dependencies = [
 [[package]]
 name = "migration"
 version = "0.1.0"
-source = "git+https://github.com/yexiyue/swarmnote.git?branch=develop#6c6803e1cacfffc85c7ca3419acd0306d2fb2103"
+source = "git+https://github.com/yexiyue/swarmnote.git?branch=develop#2128a15fad18bc0d4b1ed697b7d342a6fff84edb"
 dependencies = [
  "entity",
  "sea-orm",
@@ -4650,7 +4650,7 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 [[package]]
 name = "swarm-p2p-core"
 version = "0.1.0"
-source = "git+https://github.com/yexiyue/swarmnote.git?branch=develop#6c6803e1cacfffc85c7ca3419acd0306d2fb2103"
+source = "git+https://github.com/yexiyue/swarmnote.git?branch=develop#2128a15fad18bc0d4b1ed697b7d342a6fff84edb"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4668,7 +4668,7 @@ dependencies = [
 [[package]]
 name = "swarmnote-core"
 version = "0.1.0"
-source = "git+https://github.com/yexiyue/swarmnote.git?branch=develop#6c6803e1cacfffc85c7ca3419acd0306d2fb2103"
+source = "git+https://github.com/yexiyue/swarmnote.git?branch=develop#2128a15fad18bc0d4b1ed697b7d342a6fff84edb"
 dependencies = [
  "async-trait",
  "blake3",

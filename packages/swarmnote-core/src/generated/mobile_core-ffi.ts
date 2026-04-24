@@ -22,7 +22,9 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_fn_free_uniffiappcore(handle: bigint, uniffi_out_err: UniffiRustCallStatus): void;
     ubrn_uniffi_mobile_core_fn_constructor_uniffiappcore_new(keychain: bigint, eventBus: bigint, appDataDir: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_close_workspace(ptr: bigint, workspaceId: Uint8Array): bigint;
+    ubrn_uniffi_mobile_core_fn_method_uniffiappcore_create_workspace_for_sync(ptr: bigint, uuid: Uint8Array, name: Uint8Array, basePath: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_device_info(ptr: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
+    ubrn_uniffi_mobile_core_fn_method_uniffiappcore_get_remote_workspaces(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_list_workspaces(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_network_status(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiappcore_open_workspace(ptr: bigint, path: Uint8Array): bigint;
@@ -135,7 +137,9 @@ interface NativeModuleInterface {
     ubrn_ffi_mobile_core_rust_future_complete_void(handle: bigint, uniffi_out_err: UniffiRustCallStatus): void;
     ubrn_uniffi_mobile_core_checksum_func_generate_keypair_bytes(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_close_workspace(): number;
+    ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_create_workspace_for_sync(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_device_info(): number;
+    ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_get_remote_workspaces(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_list_workspaces(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_network_status(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiappcore_open_workspace(): number;
