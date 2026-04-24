@@ -15,6 +15,7 @@ import type { UniffiRecentWorkspace } from "react-native-swarmnote-core";
 import { SettingDivider } from "@/components/setting-row";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { formatRelativeTime } from "@/lib/time-format";
 import { useRecentWorkspacesStore } from "@/stores/recent-workspaces-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -69,7 +70,7 @@ export default function WorkspacesIndex() {
             icon={CloudDownload}
             label="从设备同步"
             description="从已配对的设备拉取工作区"
-            badge="即将推出"
+            onPress={() => router.push("/workspaces/sync/select" as never)}
           />
         </Section>
 
@@ -204,7 +205,7 @@ function WorkspaceRow({
           ) : null}
         </View>
         <Text className="text-[11px] text-muted-foreground">
-          {formatLastOpened(workspace.lastOpenedAt)}
+          {formatLastOpenedLabel(workspace.lastOpenedAt)}
         </Text>
       </View>
       <ChevronRight color={colors.mutedForeground} size={16} />
@@ -227,21 +228,8 @@ function EmptyListSlot() {
   );
 }
 
-/** Lightweight ISO-8601 → "刚刚 / N 分钟前 / N 小时前 / YYYY-MM-DD" formatter.
- *  Avoids pulling a full i18n lib for one display string. */
-function formatLastOpened(iso: string): string {
+function formatLastOpenedLabel(iso: string): string {
   const opened = new Date(iso);
   if (Number.isNaN(opened.getTime())) return iso;
-  const diffMs = Date.now() - opened.getTime();
-  const min = 60_000;
-  const hour = 60 * min;
-  const day = 24 * hour;
-  if (diffMs < min) return "刚刚打开";
-  if (diffMs < hour) return `${Math.floor(diffMs / min)} 分钟前`;
-  if (diffMs < day) return `${Math.floor(diffMs / hour)} 小时前`;
-  if (diffMs < 7 * day) return `${Math.floor(diffMs / day)} 天前`;
-  const y = opened.getFullYear();
-  const m = String(opened.getMonth() + 1).padStart(2, "0");
-  const d = String(opened.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  return formatRelativeTime(opened);
 }

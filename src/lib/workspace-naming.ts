@@ -26,10 +26,14 @@ export function validateWorkspaceName(raw: string): NameValidation {
   return { ok: true };
 }
 
+/** Root directory containing every local workspace; `${document}/workspaces`. */
+export function workspacesBaseDirUri(): string {
+  return `${Paths.document.uri.replace(/\/$/, "")}/${WORKSPACES_SUBDIR}`;
+}
+
 /** Build the on-disk path for a workspace directory under the app sandbox.
  *  Always `${document}/workspaces/<name>`; caller is responsible for running
  *  `validateWorkspaceName` first. */
 export function workspaceNameToDirUri(name: string): string {
-  const base = Paths.document.uri.replace(/\/$/, "");
-  return `${base}/${WORKSPACES_SUBDIR}/${name}`;
+  return `${workspacesBaseDirUri()}/${name}`;
 }

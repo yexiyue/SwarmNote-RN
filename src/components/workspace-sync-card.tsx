@@ -1,0 +1,126 @@
+import { Pause, RefreshCw, WifiOff } from "lucide-react-native";
+import { useMemo, useState } from "react";
+import { ActivityIndicator, Alert, Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
+import { getAppCore } from "@/core/app-core";
+import { useThemeColors } from "@/hooks/useThemeColors";
+import { formatLastSyncedAt } from "@/lib/time-format";
+import { errorMessage } from "@/lib/utils";
+import { syncKey, useSwarmStore } from "@/stores/swarm-store";
+import { useSyncPersistStore } from "@/stores/sync-persist-store";
+
+interface WorkspaceSyncCardProps {
+  workspaceId: string;
+}
+
+export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
+  const colors = useThemeColors();
+  const pairedDevices = useSwarmStore((s) => s.pairedDevices);
+  const syncProgress = useSwarmStore((s) => s.syncProgress);
+  const lastSyncedAt = useSyncPersistStore((s) => s.lastSyncedAt[workspaceId]);
+  const [triggering, setTriggering] = useState(false);
+
+  const onlineDevices = useMemo(
+    () => pairedDevices.filter((d) => d.isOnline === true),
+    [pairedDevices],
+  );
+  const onlineCount = onlineDevices.length;
+
+  const activeSync = useMemo(() => {
+    for (const device of onlineDevices) {
+      const entry = syncProgress[syncKey(workspaceId, device.peerId)];
+      if (entry === undefined || entry.cancelled !== undefined) continue;
+      if (entry.total > 0 || entry.completed > 0) return entry;
+    }
+    return null;
+  }, [syncProgress, workspaceId, onlineDevices]);
+
+  const offline = onlineCount === 0;
+  const syncing = activeSync !== null;
+
+  const handleSyncNow = async () => {
+    if (triggering || offline) return;
+    setTriggering(true);
+    const core = getAppCore();
+    const results = await Promise.allSettled(
+      onlineDevices.map((device) => core.triggerSyncWithPeer(workspaceId, device.peerId)),
+    );
+    const failures = results.flatMap((r, i) =>
+      r.status === "rejected"
+        ? [`${onlineDevices[i].name ?? onlineDevices[i].hostname}: ${errorMessage(r.reason)}`]
+        : [],
+    );
+    setTriggering(false);
+    if (failures.length === onlineDevices.length) {
+      Alert.alert("同步失败", failures.join("\n"));
+    } else if (failures.length > 0) {
+      Alert.alert("部分设备同步失败", failures.join("\n"));
+    }
+  };
+
+  const dotColor = offline ? colors.mutedForeground : colors.success;
+  let statusLabel: string;
+  if (offline) statusLabel = "暂无在线设备";
+  else if (syncing) statusLabel = "同步中";
+  else statusLabel = "已同步";
+
+  const metaParts: string[] = [];
+  if (!offline) metaParts.push(`与 ${onlineCount} 台设备保持同步`);
+  if (!syncing && lastSyncedAt !== undefined) {
+    metaParts.push(`最后同步 ${formatLastSyncedAt(lastSyncedAt)}`);
+  }
+  const metaLine = metaParts.join(" · ");
+
+  return (
+    <View className="rounded-xl border border-border bg-card p-4 gap-3">
+      <View className="flex-row items-center gap-2">
+        <View style={{ backgroundColor: dotColor }} className="h-2 w-2 rounded-full" />
+        <Text className="text-[14px] font-semibold text-foreground">{statusLabel}</Text>
+        {syncing && activeSync !== null && activeSync.total > 0 ? (
+          <Text className="text-[11px] text-muted-foreground">
+            {activeSync.completed}/{activeSync.total}
+          </Text>
+        ) : null}
+      </View>
+
+      {metaLine.length > 0 ? (
+        <Text className="text-[11px] text-muted-foreground">{metaLine}</Text>
+      ) : offline ? (
+        <View className="flex-row items-center gap-1.5">
+          <WifiOff color={colors.mutedForeground} size={12} />
+          <Text className="text-[11px] text-muted-foreground">
+            请先配对设备或等待已配对设备上线
+          </Text>
+        </View>
+      ) : null}
+
+      <View className="flex-row items-center gap-2">
+        <Pressable
+          onPress={handleSyncNow}
+          disabled={offline || triggering}
+          accessibilityLabel="立即同步"
+          className="flex-1 h-10 flex-row items-center justify-center gap-2 rounded-lg border border-border bg-background active:bg-muted disabled:opacity-50"
+        >
+          {triggering ? (
+            <ActivityIndicator size="small" color={colors.foreground} />
+          ) : (
+            <RefreshCw color={colors.foreground} size={14} />
+          )}
+          <Text className="text-[13px] font-medium text-foreground">立即同步</Text>
+        </Pressable>
+
+        <View className="items-center gap-1">
+          <Pressable
+            disabled
+            accessibilityLabel="暂停 · 即将推出"
+            accessibilityState={{ disabled: true }}
+            className="h-10 w-10 items-center justify-center rounded-lg border border-border bg-background opacity-50"
+          >
+            <Pause color={colors.mutedForeground} size={16} />
+          </Pressable>
+          <Text className="text-[9px] text-muted-foreground">即将推出</Text>
+        </View>
+      </View>
+    </View>
+  );
+}

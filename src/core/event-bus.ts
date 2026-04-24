@@ -7,6 +7,7 @@ import { getActive as getActiveEditorBridge } from "@/core/editor-bridge-registr
 import { useFileTreeStore } from "@/stores/file-tree-store";
 import { useNotificationStore } from "@/stores/notification-store";
 import { syncKey, useSwarmStore } from "@/stores/swarm-store";
+import { useSyncPersistStore } from "@/stores/sync-persist-store";
 
 /** `ForeignEventBus` implementation: switches on `event.tag` and writes
  *  directly into the appropriate Zustand store. `emit` is called from the
@@ -96,6 +97,9 @@ export class EventBus implements ForeignEventBus {
           total: 0,
           cancelled,
         });
+        if (!cancelled) {
+          useSyncPersistStore.getState().setLastSyncedAt(workspaceId, Date.now());
+        }
         break;
       }
 

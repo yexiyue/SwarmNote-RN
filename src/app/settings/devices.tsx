@@ -1,5 +1,12 @@
 import { useRouter } from "expo-router";
-import { Check, X as CloseIcon, Radar, RefreshCw, Smartphone } from "lucide-react-native";
+import {
+  Check,
+  ChevronRight,
+  X as CloseIcon,
+  Radar,
+  RefreshCw,
+  Smartphone,
+} from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -131,7 +138,14 @@ export default function DevicesSettings() {
                     : `${d.os} · ${d.platform}`;
                 return (
                   <View key={d.peerId}>
-                    <View className="flex-row items-center gap-3 px-3.5 py-3">
+                    <Pressable
+                      onPress={() =>
+                        router.push(`/settings/devices/${encodeURIComponent(d.peerId)}` as never)
+                      }
+                      accessibilityRole="button"
+                      accessibilityLabel={`${d.name ?? d.hostname} 详情`}
+                      className="flex-row items-center gap-3 px-3.5 py-3 active:bg-muted"
+                    >
                       <Icon color={colors.mutedForeground} size={18} />
                       <View className="flex-1 gap-0.5">
                         <Text className="text-[13px] font-medium text-foreground" numberOfLines={1}>
@@ -155,7 +169,8 @@ export default function DevicesSettings() {
                           {isOnline ? "在线" : "离线"}
                         </Text>
                       </View>
-                    </View>
+                      <ChevronRight color={colors.mutedForeground} size={16} />
+                    </Pressable>
                     {i < pairedDevices.length - 1 ? <View className="h-px bg-border" /> : null}
                   </View>
                 );

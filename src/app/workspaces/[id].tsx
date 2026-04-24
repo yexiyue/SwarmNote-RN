@@ -15,8 +15,11 @@ import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-nat
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { UniffiRecentWorkspace } from "react-native-swarmnote-core";
 import { Text } from "@/components/ui/text";
-import { getActiveWorkspaceOrNull, switchWorkspace } from "@/core/workspace-manager";
+import { WorkspaceSyncCard } from "@/components/workspace-sync-card";
+import { getAppCore } from "@/core/app-core";
+import { switchWorkspace } from "@/core/workspace-manager";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { errorMessage, truncateMiddle } from "@/lib/utils";
 import { useRecentWorkspacesStore } from "@/stores/recent-workspaces-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -58,7 +61,7 @@ export default function WorkspaceDetail() {
       router.dismissAll();
       router.replace("/(main)" as never);
     } catch (err) {
-      Alert.alert("打开失败", err instanceof Error ? err.message : String(err));
+      Alert.alert("打开失败", errorMessage(err));
     } finally {
       setSwitching(false);
     }
@@ -90,6 +93,10 @@ export default function WorkspaceDetail() {
         ) : (
           <>
             <InfoCard workspace={workspace} isActive={isActive} onCopyId={handleCopyId} />
+
+            {workspace.uuid !== undefined && workspace.uuid !== null ? (
+              <WorkspaceSyncCard workspaceId={workspace.uuid} />
+            ) : null}
 
             <View className="gap-2">
               <Text className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -134,24 +141,24 @@ function InfoCard({
       setDocCount(null);
       return;
     }
-    const active = getActiveWorkspaceOrNull();
-    if (active === null) return;
+    const uuid = workspace.uuid;
+    if (uuid === undefined || uuid === null) return;
     let cancelled = false;
-    active
-      .listDocuments()
-      .then((docs) => {
-        if (!cancelled) setDocCount(docs.length);
+    getAppCore()
+      .workspaceInfo(uuid)
+      .then((info) => {
+        if (!cancelled) setDocCount(info?.docCount ?? null);
       })
       .catch((err: unknown) => {
-        console.warn("[workspace-detail] listDocuments failed:", err);
+        console.warn("[workspace-detail] workspaceInfo failed:", err);
       });
     return () => {
       cancelled = true;
     };
-  }, [isActive]);
+  }, [isActive, workspace.uuid]);
 
   const displayId = workspace.uuid ?? "—";
-  const truncatedId = truncateUuid(displayId);
+  const truncatedId = displayId === "—" ? displayId : truncateMiddle(displayId, 8, 4);
 
   return (
     <View className="rounded-xl border border-border bg-card overflow-hidden">
@@ -273,9 +280,4 @@ function MissingWorkspace({ message, onBack }: { message: string; onBack: () => 
       </View>
     </SafeAreaView>
   );
-}
-
-function truncateUuid(uuid: string): string {
-  if (uuid.length <= 14) return uuid;
-  return `${uuid.slice(0, 8)}…${uuid.slice(-4)}`;
 }
