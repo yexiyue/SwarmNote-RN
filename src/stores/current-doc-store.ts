@@ -19,6 +19,11 @@ interface CurrentDocState {
 interface CurrentDocActions {
   open(relPath: string): Promise<void>;
   close(): Promise<void>;
+  /** Update the tracked `relPath` without reopening the doc. Used when the
+   *  current doc is renamed/moved on disk — the `docUuid` and Y.Doc handle
+   *  stay valid, only the path changed. Caller is responsible for the
+   *  underlying FFI rename (e.g. `moveNode`). No-op if `relPath` is null. */
+  rebindRelPath(newRelPath: string): void;
   /** Hard reset, called on workspace switch. Does NOT call close_doc — the
    *  workspace close is expected to drop all in-memory docs on the Rust side. */
   reset(): void;
@@ -97,6 +102,12 @@ export const useCurrentDocStore = create<CurrentDocState & CurrentDocActions>()(
     } finally {
       set({ docUuid: null, relPath: null, initialState: null, openState: "idle" });
     }
+  },
+
+  rebindRelPath: (newRelPath) => {
+    const { relPath } = get();
+    if (relPath === null) return;
+    set({ relPath: newRelPath });
   },
 
   reset: () => {

@@ -1,3 +1,4 @@
+import type { UniffiFileTreeNode } from "react-native-swarmnote-core";
 import { create } from "zustand";
 
 /** UI-only state for the left FilesPanel. Lifetime = workspace. Not
@@ -12,6 +13,10 @@ export interface Draft {
   name: string;
   submitting: boolean;
   error: string | null;
+  /** When set, this draft is a rename of the given node rather than a new
+   *  node creation. Submit path dispatches to `renameNode(target, name)`
+   *  instead of `createNoteAt/createFolderAt`. */
+  renameTarget: UniffiFileTreeNode | null;
 }
 
 interface FilesUiState {
@@ -25,7 +30,12 @@ interface FilesUiActions {
   toggleExpand(folderId: string): void;
   setExpanded(folderId: string, expanded: boolean): void;
   collapseAll(): void;
-  startDraft(input: { kind: DraftKind; parentRelPath: string | null }): void;
+  startDraft(input: {
+    kind: DraftKind;
+    parentRelPath: string | null;
+    name?: string;
+    renameTarget?: UniffiFileTreeNode | null;
+  }): void;
   setDraftName(name: string): void;
   setDraftSubmitting(submitting: boolean): void;
   setDraftError(error: string | null): void;
@@ -59,7 +69,7 @@ export const useFilesUiStore = create<FilesUiState & FilesUiActions>()((set, get
 
   collapseAll: () => set({ expandedFolderIds: new Set<string>() }),
 
-  startDraft: ({ kind, parentRelPath }) => {
+  startDraft: ({ kind, parentRelPath, name = "", renameTarget = null }) => {
     // Auto-expand the parent so the inline input is visible.
     if (parentRelPath !== null) {
       const next = new Set(get().expandedFolderIds);
@@ -67,7 +77,7 @@ export const useFilesUiStore = create<FilesUiState & FilesUiActions>()((set, get
       set({ expandedFolderIds: next });
     }
     set({
-      draft: { kind, parentRelPath, name: "", submitting: false, error: null },
+      draft: { kind, parentRelPath, name, submitting: false, error: null, renameTarget },
     });
   },
 
