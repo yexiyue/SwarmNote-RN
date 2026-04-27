@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Circle, CircleCheck, LoaderCircle, type LucideIcon, XCircle } from "lucide-react-native";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
@@ -15,6 +16,7 @@ interface Props {
 
 export function SyncItemStatusRow({ item, live }: Props) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const entry = useSwarmStore((s) =>
     live ? s.syncProgress[syncKey(item.ws.uuid, item.ws.peerId)] : undefined,
   );
@@ -27,7 +29,23 @@ export function SyncItemStatusRow({ item, live }: Props) {
   const percent = hasProgress ? Math.round((entry.completed / entry.total) * 100) : 0;
 
   const { Icon, iconColor } = statusVisual(item.status, colors);
-  const subtitle = subtitleForItem(item, hasProgress, entry);
+  const subtitle = (() => {
+    switch (item.status) {
+      case "error":
+        return item.error ?? t`同步失败`;
+      case "done": {
+        const count = item.ws.docCount;
+        return t`同步完成 · ${count} 篇笔记`;
+      }
+      case "syncing":
+        if (hasProgress && entry !== undefined) {
+          return `${entry.completed} / ${entry.total}`;
+        }
+        return t`准备同步 · ${item.ws.docCount} 篇笔记`;
+      default:
+        return t`${item.ws.docCount} 篇笔记`;
+    }
+  })();
 
   return (
     <View className="gap-2.5 rounded-xl border border-border bg-card px-4 py-3.5">
@@ -79,24 +97,5 @@ function statusVisual(
       return { Icon: LoaderCircle, iconColor: colors.primary };
     default:
       return { Icon: Circle, iconColor: colors.mutedForeground };
-  }
-}
-
-function subtitleForItem(
-  item: WizardItem,
-  hasProgress: boolean,
-  entry: { completed: number; total: number } | undefined,
-): string {
-  switch (item.status) {
-    case "error":
-      return item.error ?? "同步失败";
-    case "done":
-      return `同步完成 · ${item.ws.docCount} 篇笔记`;
-    case "syncing":
-      return hasProgress && entry !== undefined
-        ? `${entry.completed} / ${entry.total}`
-        : `准备同步 · ${item.ws.docCount} 篇笔记`;
-    default:
-      return `${item.ws.docCount} 篇笔记`;
   }
 }

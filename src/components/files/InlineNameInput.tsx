@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { FileText, Folder, X } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, Pressable, TextInput, View } from "react-native";
@@ -27,6 +28,7 @@ export function InlineNameInput({
   onCancel,
 }: InlineNameInputProps) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const Icon = kind === "folder" ? Folder : FileText;
   const ref = useRef<TextInput>(null);
   const [focused, setFocused] = useState(false);
@@ -75,7 +77,7 @@ export function InlineNameInput({
           onFocus={() => setFocused(true)}
           onBlur={handleBlur}
           editable={!submitting}
-          placeholder={kind === "folder" ? "文件夹名称" : "笔记标题"}
+          placeholder={kind === "folder" ? t`文件夹名称` : t`笔记标题`}
           placeholderTextColor={colors.mutedForeground}
           autoCapitalize="none"
           autoCorrect={false}
@@ -101,7 +103,7 @@ export function InlineNameInput({
             }}
             onPress={onCancel}
             hitSlop={6}
-            accessibilityLabel="取消"
+            accessibilityLabel={t`取消`}
             className="h-7 w-7 items-center justify-center rounded-md active:bg-muted"
           >
             <X color={colors.mutedForeground} size={14} />

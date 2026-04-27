@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { ArrowLeft, Check, Hexagon } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -13,6 +14,7 @@ import { useOnboardingStore } from "@/stores/onboarding-store";
 export default function Complete() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
   const [info, setInfo] = useState<UniffiDeviceInfo | null>(null);
 
@@ -35,7 +37,7 @@ export default function Complete() {
         <Pressable
           onPress={() => router.back()}
           hitSlop={12}
-          accessibilityLabel="返回"
+          accessibilityLabel={t`返回`}
           className="h-11 w-11 -ml-2 items-start justify-center"
         >
           <ArrowLeft color={colors.foreground} size={24} />
@@ -46,15 +48,19 @@ export default function Complete() {
             <View className="h-22 w-22 items-center justify-center rounded-full bg-muted">
               <Check color={colors.primary} size={40} strokeWidth={2.5} />
             </View>
-            <Text className="text-[28px] font-bold text-foreground">一切就绪！</Text>
+            <Text className="text-[28px] font-bold text-foreground">
+              <Trans>一切就绪！</Trans>
+            </Text>
             <Text className="text-center text-[16px] text-muted-foreground">
-              你的设备已准备好加入蜂群网络
+              <Trans>你的设备已准备好加入蜂群网络</Trans>
             </Text>
           </View>
 
           <View className="gap-3.5 rounded-xl border border-border bg-muted p-5">
             <View className="flex-row items-center justify-between">
-              <Text className="text-[14px] text-muted-foreground">设备名称</Text>
+              <Text className="text-[14px] text-muted-foreground">
+                <Trans>设备名称</Trans>
+              </Text>
               <Text
                 className="max-w-[60%] text-[14px] font-medium text-foreground"
                 numberOfLines={1}
@@ -64,7 +70,9 @@ export default function Complete() {
             </View>
             <View className="h-px bg-border" />
             <View className="flex-row items-center justify-between">
-              <Text className="text-[14px] text-muted-foreground">设备 ID</Text>
+              <Text className="text-[14px] text-muted-foreground">
+                <Trans>设备 ID</Trans>
+              </Text>
               <Text className="text-[14px] font-medium text-foreground">
                 {info ? truncatePeerId(info.peerId) : "—"}
               </Text>
@@ -75,12 +83,12 @@ export default function Complete() {
         <View className="gap-4">
           <Pressable
             onPress={onEnter}
-            accessibilityLabel="进入 SwarmNote"
+            accessibilityLabel={t`进入 SwarmNote`}
             className="h-13 flex-row items-center justify-center gap-2 rounded-xl bg-primary"
           >
             <Hexagon color={colors.foreground} size={20} />
             <Text className="text-[17px] font-semibold text-primary-foreground">
-              进入 SwarmNote
+              <Trans>进入 SwarmNote</Trans>
             </Text>
           </Pressable>
 

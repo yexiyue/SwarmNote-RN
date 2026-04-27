@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
 import { View } from "react-native";
 import {
@@ -19,6 +20,7 @@ import { useNotificationStore } from "@/stores/notification-store";
  *  `AlertDialog` for the topmost pending request. Mounts once in the root
  *  layout; reads `current` from `notificationStore` (queue behind it). */
 export function PairingRequestHost() {
+  const { t } = useLingui();
   const current = useNotificationStore((s) => s.current);
   const respond = useNotificationStore((s) => s.respond);
 
@@ -50,9 +52,11 @@ export function PairingRequestHost() {
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>收到配对请求</AlertDialogTitle>
+          <AlertDialogTitle>
+            <Trans>收到配对请求</Trans>
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            {payload ? `来自 "${payload.deviceName}" (${payload.os})` : ""}
+            {payload ? t`来自 "${payload.deviceName}" (${payload.os})` : ""}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <View className="gap-1">
@@ -60,15 +64,19 @@ export function PairingRequestHost() {
             peer {payload?.peerId.slice(0, 12)}…
           </Text>
           <Text className="text-xs text-muted-foreground">
-            {remaining > 0 ? `${remaining} 秒后过期` : "已过期"}
+            {remaining > 0 ? t`${remaining} 秒后过期` : t`已过期`}
           </Text>
         </View>
         <AlertDialogFooter>
           <AlertDialogCancel onPress={() => respondToRequest(false)}>
-            <Text>拒绝</Text>
+            <Text>
+              <Trans>拒绝</Trans>
+            </Text>
           </AlertDialogCancel>
           <AlertDialogAction onPress={() => respondToRequest(true)}>
-            <Text>接受</Text>
+            <Text>
+              <Trans>接受</Trans>
+            </Text>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

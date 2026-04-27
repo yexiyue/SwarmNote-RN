@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { ArrowLeft, Radar } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -14,19 +15,20 @@ import { useNetworkPreferenceStore } from "@/stores/network-preference-store";
 import { useOnboardingStore } from "@/stores/onboarding-store";
 import { useSwarmStore } from "@/stores/swarm-store";
 
-function deviceMeta(device: UniffiDevice): string {
-  const os = device.os ? device.os : "未知";
-  return `${os} · 局域网`;
-}
-
 export default function Pairing() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const userWantsNetwork = useNetworkPreferenceStore((s) => s.userWantsNetwork);
   const online = useSwarmStore((s) => s.online);
   const devices = useSwarmStore((s) => s.devices);
   const nextStep = useOnboardingStore((s) => s.nextStep);
   const { code, expiresAt, generating, generate, reset } = usePairingCodeGenerator();
+
+  const deviceMeta = (device: UniffiDevice): string => {
+    const os = device.os ? device.os : t`未知`;
+    return t`${os} · 局域网`;
+  };
 
   useEffect(() => {
     if (!userWantsNetwork || online) return;
@@ -62,7 +64,7 @@ export default function Pairing() {
         },
       );
       if (resp.tag === "Refused") {
-        setPairError("配对被拒绝");
+        setPairError(t`配对被拒绝`);
       } else {
         router.push({
           pathname: "/pairing/success",
@@ -89,20 +91,24 @@ export default function Pairing() {
           <Pressable
             onPress={() => router.back()}
             hitSlop={12}
-            accessibilityLabel="返回"
+            accessibilityLabel={t`返回`}
             className="h-11 w-11 -ml-2 items-start justify-center"
           >
             <ArrowLeft color={colors.foreground} size={24} />
           </Pressable>
-          <Pressable onPress={gotoComplete} hitSlop={12} accessibilityLabel="跳过配对">
-            <Text className="text-[15px] font-medium text-muted-foreground">跳过</Text>
+          <Pressable onPress={gotoComplete} hitSlop={12} accessibilityLabel={t`跳过配对`}>
+            <Text className="text-[15px] font-medium text-muted-foreground">
+              <Trans>跳过</Trans>
+            </Text>
           </Pressable>
         </View>
 
         <View className="gap-2.5">
-          <Text className="text-[28px] font-bold text-foreground">配对设备</Text>
+          <Text className="text-[28px] font-bold text-foreground">
+            <Trans>配对设备</Trans>
+          </Text>
           <Text className="text-[15px] leading-6 text-muted-foreground">
-            与其他设备配对后即可同步笔记。{"\n"}你也可以跳过，稍后在 Swarm 中配对。
+            <Trans>与其他设备配对后即可同步笔记。{"\n"}你也可以跳过，稍后在 Swarm 中配对。</Trans>
           </Text>
         </View>
 
@@ -117,15 +123,17 @@ export default function Pairing() {
           <Pressable
             onPress={() => router.push("/pairing/input-code" as never)}
             hitSlop={8}
-            accessibilityLabel="输入配对码"
+            accessibilityLabel={t`输入配对码`}
           >
-            <Text className="text-center text-[13px] text-primary">有配对码？点击输入</Text>
+            <Text className="text-center text-[13px] text-primary">
+              <Trans>有配对码？点击输入</Trans>
+            </Text>
           </Pressable>
         </View>
 
         <View className="flex-1 gap-3">
           <Text className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">
-            附近的设备
+            <Trans>附近的设备</Trans>
           </Text>
           {pairError !== null ? (
             <Text className="text-[13px] text-destructive">{pairError}</Text>
@@ -155,14 +163,14 @@ export default function Pairing() {
                     <Pressable
                       onPress={() => onPairNearby(d)}
                       disabled={pairingPeerId !== null}
-                      accessibilityLabel={`配对 ${d.name ?? d.hostname}`}
+                      accessibilityLabel={t`配对 ${d.name ?? d.hostname}`}
                       className="h-9 min-w-16 items-center justify-center rounded-lg bg-primary px-4 disabled:opacity-60"
                     >
                       {pairingPeerId === d.peerId ? (
                         <ActivityIndicator color={colors.foreground} size="small" />
                       ) : (
                         <Text className="text-[13px] font-semibold text-primary-foreground">
-                          配对
+                          <Trans>配对</Trans>
                         </Text>
                       )}
                     </Pressable>
@@ -174,10 +182,10 @@ export default function Pairing() {
             <View className="flex-1 items-center justify-center gap-2 px-4">
               <Radar color={colors.mutedForeground} size={40} strokeWidth={1.5} />
               <Text className="text-center text-[15px] font-medium text-foreground">
-                暂无附近设备
+                <Trans>暂无附近设备</Trans>
               </Text>
               <Text className="text-center text-[13px] leading-5 text-muted-foreground">
-                请确保另一台设备已连接同一局域网{"\n"}并打开 SwarmNote
+                <Trans>请确保另一台设备已连接同一局域网{"\n"}并打开 SwarmNote</Trans>
               </Text>
             </View>
           )}
@@ -186,10 +194,12 @@ export default function Pairing() {
         <View className="gap-4">
           <Pressable
             onPress={gotoComplete}
-            accessibilityLabel="继续"
+            accessibilityLabel={t`继续`}
             className="h-13 items-center justify-center rounded-xl bg-primary"
           >
-            <Text className="text-[17px] font-semibold text-primary-foreground">继续</Text>
+            <Text className="text-[17px] font-semibold text-primary-foreground">
+              <Trans>继续</Trans>
+            </Text>
           </Pressable>
 
           <View className="flex-row items-center justify-center gap-2">

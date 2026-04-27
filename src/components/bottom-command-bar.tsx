@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Menu, Plus, Search } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,6 +16,7 @@ interface BottomCommandBarProps {
  */
 export function BottomCommandBar({ onSearch, onNew, onMenu }: BottomCommandBarProps) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const insets = useSafeAreaInsets();
 
   return (
@@ -33,13 +35,13 @@ export function BottomCommandBar({ onSearch, onNew, onMenu }: BottomCommandBarPr
           elevation: 4,
         }}
       >
-        <PillButton onPress={onSearch} label="搜索">
+        <PillButton onPress={onSearch} label={t`搜索`}>
           <Search color={colors.mutedForeground} size={20} />
         </PillButton>
-        <PillButton onPress={onNew} label="新建">
+        <PillButton onPress={onNew} label={t`新建`}>
           <Plus color={colors.mutedForeground} size={22} />
         </PillButton>
-        <PillButton onPress={onMenu} label="命令">
+        <PillButton onPress={onMenu} label={t`命令`}>
           <Menu color={colors.mutedForeground} size={20} />
         </PillButton>
       </View>

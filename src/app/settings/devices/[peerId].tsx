@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, CloudOff, Copy, Download, FolderClosed, Unlink } from "lucide-react-native";
@@ -29,6 +30,7 @@ import { useSwarmStore } from "@/stores/swarm-store";
 export default function PairedDeviceDetail() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const params = useLocalSearchParams<{ peerId: string }>();
   const targetPeerId = useMemo(
     () => (typeof params.peerId === "string" ? decodeURIComponent(params.peerId) : null),
@@ -55,10 +57,12 @@ export default function PairedDeviceDetail() {
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
       <View className="h-13 flex-row items-center gap-3 px-4">
-        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="返回">
+        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel={t`返回`}>
           <ArrowLeft color={colors.foreground} size={22} />
         </Pressable>
-        <Text className="text-[16px] font-semibold text-foreground">设备详情</Text>
+        <Text className="text-[16px] font-semibold text-foreground">
+          <Trans>设备详情</Trans>
+        </Text>
       </View>
 
       <DeviceDetailBody
@@ -83,6 +87,7 @@ function DeviceDetailBody({
   onUnpaired: () => void;
 }) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const [remoteWorkspaces, setRemoteWorkspaces] = useState<UniffiRemoteWorkspaceInfo[] | null>(
     null,
   );
@@ -127,12 +132,12 @@ function DeviceDetailBody({
 
   const confirmUnpair = () => {
     Alert.alert(
-      "取消配对",
-      "已下载的笔记仍保留在本地，只是不再与此设备同步。",
+      t`取消配对`,
+      t`已下载的笔记仍保留在本地，只是不再与此设备同步。`,
       [
-        { text: "取消", style: "cancel" },
+        { text: t`取消`, style: "cancel" },
         {
-          text: "确认取消配对",
+          text: t`确认取消配对`,
           style: "destructive",
           onPress: async () => {
             setUnpairing(true);
@@ -140,7 +145,7 @@ function DeviceDetailBody({
               await getAppCore().unpairDevice(device.peerId);
               onUnpaired();
             } catch (err) {
-              Alert.alert("取消配对失败", errorMessage(err));
+              Alert.alert(t`取消配对失败`, errorMessage(err));
             } finally {
               setUnpairing(false);
             }
@@ -179,7 +184,7 @@ function DeviceDetailBody({
       <Pressable
         onPress={confirmUnpair}
         disabled={unpairing}
-        accessibilityLabel="取消配对"
+        accessibilityLabel={t`取消配对`}
         className="h-[50px] flex-row items-center justify-center gap-2 rounded-[14px] bg-destructive disabled:opacity-60"
       >
         {unpairing ? (
@@ -187,7 +192,9 @@ function DeviceDetailBody({
         ) : (
           <Unlink color={colors.background} size={18} />
         )}
-        <Text className="text-[16px] font-semibold text-destructive-foreground">取消配对</Text>
+        <Text className="text-[16px] font-semibold text-destructive-foreground">
+          <Trans>取消配对</Trans>
+        </Text>
       </Pressable>
     </ScrollView>
   );
@@ -195,13 +202,14 @@ function DeviceDetailBody({
 
 function HeroCard({ device, isOnline }: { device: UniffiPairedDeviceInfo; isOnline: boolean }) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const Icon = devicePlatformIcon(device.platform);
 
   let statusText: string;
-  if (isOnline) statusText = "在线";
+  if (isOnline) statusText = t`在线`;
   else if (device.lastSeen !== undefined)
-    statusText = `最后在线 ${formatRelativeTime(device.lastSeen)}`;
-  else statusText = "离线";
+    statusText = t`最后在线 ${formatRelativeTime(device.lastSeen)}`;
+  else statusText = t`离线`;
 
   return (
     <View className="items-center gap-3 rounded-xl border border-border bg-card p-5">
@@ -247,12 +255,13 @@ function DeviceMetaCard({
   onCopyPeerId: () => void;
 }) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const rtt = device.rttMs !== undefined ? Number(device.rttMs) : undefined;
   const pill = isOnline ? connectionPillProps(connection) : null;
 
   return (
     <View className="rounded-xl border border-border bg-card overflow-hidden">
-      <MetaRow label="连接方式">
+      <MetaRow label={t`连接方式`}>
         {pill !== null ? (
           <View
             className="flex-row items-center gap-1 rounded-md px-2 py-0.5"
@@ -267,7 +276,7 @@ function DeviceMetaCard({
         )}
       </MetaRow>
       <RowDivider />
-      <MetaRow label="延迟">
+      <MetaRow label={t`延迟`}>
         <Text className={`text-[12px] ${isOnline ? "text-foreground" : "text-muted-foreground"}`}>
           {isOnline && rtt !== undefined ? `${rtt} ms` : "—"}
         </Text>
@@ -280,14 +289,14 @@ function DeviceMetaCard({
         <Pressable
           onPress={onCopyPeerId}
           hitSlop={8}
-          accessibilityLabel="复制 Peer ID"
+          accessibilityLabel={t`复制 Peer ID`}
           className="h-7 w-7 items-center justify-center rounded-md active:bg-muted"
         >
           <Copy color={colors.mutedForeground} size={14} />
         </Pressable>
       </MetaRow>
       <RowDivider />
-      <MetaRow label="首次配对">
+      <MetaRow label={t`首次配对`}>
         <Text className="text-[12px] text-foreground">{formatAbsoluteDate(device.pairedAt)}</Text>
       </MetaRow>
     </View>
@@ -307,14 +316,16 @@ function SharedWorkspacesSection({
     return (
       <View className="gap-2">
         <Text className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          共享的工作区
+          <Trans>共享的工作区</Trans>
         </Text>
         <View className="items-center gap-2 rounded-xl border border-dashed border-border bg-card/40 px-4 py-6">
           <CloudOff color={colors.mutedForeground} size={24} strokeWidth={1.5} />
           <Text className="text-center text-[12px] text-muted-foreground">
-            工作区列表来自对方设备
+            <Trans>工作区列表来自对方设备</Trans>
           </Text>
-          <Text className="text-center text-[11px] text-muted-foreground">设备离线时无法刷新</Text>
+          <Text className="text-center text-[11px] text-muted-foreground">
+            <Trans>设备离线时无法刷新</Trans>
+          </Text>
         </View>
       </View>
     );
@@ -323,7 +334,7 @@ function SharedWorkspacesSection({
   return (
     <View className="gap-2">
       <Text className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-        共享的工作区
+        <Trans>共享的工作区</Trans>
         {remoteWorkspaces !== null && remoteWorkspaces.length > 0
           ? `  ·  ${remoteWorkspaces.length}`
           : ""}
@@ -335,7 +346,7 @@ function SharedWorkspacesSection({
       ) : remoteWorkspaces.length === 0 ? (
         <View className="rounded-xl border border-dashed border-border bg-card/40 px-4 py-5">
           <Text className="text-center text-[12px] text-muted-foreground">
-            对方设备暂未打开任何工作区
+            <Trans>对方设备暂未打开任何工作区</Trans>
           </Text>
         </View>
       ) : (
@@ -363,13 +374,15 @@ function RemoteWorkspaceRow({ workspace }: { workspace: UniffiRemoteWorkspaceInf
         <Text className="text-[13px] font-medium text-foreground" numberOfLines={1}>
           {workspace.name}
         </Text>
-        <Text className="text-[11px] text-muted-foreground">{workspace.docCount} 篇笔记</Text>
+        <Text className="text-[11px] text-muted-foreground">
+          <Trans>{workspace.docCount} 篇笔记</Trans>
+        </Text>
       </View>
       {workspace.isLocal ? (
         <View className="flex-row items-center gap-1">
           <View style={{ backgroundColor: colors.success }} className="h-1.5 w-1.5 rounded-full" />
           <Text style={{ color: colors.success }} className="text-[11px] font-medium">
-            已在本地
+            <Trans>已在本地</Trans>
           </Text>
         </View>
       ) : (
@@ -396,15 +409,18 @@ function RowDivider() {
 
 function MissingDevice({ onBack }: { onBack: () => void }) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
       <View className="h-13 flex-row items-center gap-3 px-4">
-        <Pressable onPress={onBack} hitSlop={12} accessibilityLabel="返回">
+        <Pressable onPress={onBack} hitSlop={12} accessibilityLabel={t`返回`}>
           <ArrowLeft color={colors.foreground} size={22} />
         </Pressable>
       </View>
       <View className="flex-1 items-center justify-center px-8">
-        <Text className="text-[13px] text-muted-foreground">设备不存在或已取消配对</Text>
+        <Text className="text-[13px] text-muted-foreground">
+          <Trans>设备不存在或已取消配对</Trans>
+        </Text>
       </View>
     </SafeAreaView>
   );

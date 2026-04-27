@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { CircleCheck, ExternalLink, XCircle } from "lucide-react-native";
 import { useMemo, useState } from "react";
@@ -13,6 +14,7 @@ import { useSyncWizardStore, type WizardItem } from "@/stores/sync-wizard-store"
 export default function SyncWizardDone() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const items = useSyncWizardStore((s) => s.items);
   const reset = useSyncWizardStore((s) => s.reset);
   const [opening, setOpening] = useState(false);
@@ -32,16 +34,16 @@ export default function SyncWizardDone() {
       reset();
       router.dismissAll();
     } catch (err) {
-      Alert.alert("打开失败", errorMessage(err));
+      Alert.alert(t`打开失败`, errorMessage(err));
     } finally {
       setOpening(false);
     }
   };
 
   let title: string;
-  if (errorCount === 0) title = "同步完成";
-  else if (doneCount === 0) title = "同步失败";
-  else title = "同步完成（部分失败）";
+  if (errorCount === 0) title = t`同步完成`;
+  else if (doneCount === 0) title = t`同步失败`;
+  else title = t`同步完成（部分失败）`;
 
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top", "bottom"]}>
@@ -60,7 +62,7 @@ export default function SyncWizardDone() {
             <XCircle color={colors.destructive} size={48} strokeWidth={1.5} />
           )}
           <Text className="text-[13px] text-muted-foreground">
-            {doneCount} 个成功 · {errorCount} 个失败
+            {t`${doneCount} 个成功 · ${errorCount} 个失败`}
           </Text>
         </View>
 
@@ -76,7 +78,7 @@ export default function SyncWizardDone() {
           <Pressable
             onPress={handleOpen}
             disabled={opening}
-            accessibilityLabel="打开工作区"
+            accessibilityLabel={t`打开工作区`}
             className="h-10 flex-row items-center justify-center gap-2 rounded-lg bg-primary disabled:opacity-60"
           >
             {opening ? (
@@ -85,16 +87,18 @@ export default function SyncWizardDone() {
               <ExternalLink color={colors.background} size={14} />
             )}
             <Text className="text-[13px] font-semibold text-primary-foreground">
-              打开 {firstDone.ws.name}
+              {t`打开 ${firstDone.ws.name}`}
             </Text>
           </Pressable>
         ) : null}
         <Pressable
           onPress={handleDismiss}
-          accessibilityLabel="完成"
+          accessibilityLabel={t`完成`}
           className="h-10 flex-row items-center justify-center rounded-lg border border-border bg-background active:bg-muted"
         >
-          <Text className="text-[13px] font-medium text-foreground">完成</Text>
+          <Text className="text-[13px] font-medium text-foreground">
+            <Trans>完成</Trans>
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>

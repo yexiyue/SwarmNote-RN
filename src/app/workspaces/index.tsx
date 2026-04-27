@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import {
   ArrowLeft,
@@ -22,6 +23,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 export default function WorkspacesIndex() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const items = useRecentWorkspacesStore((s) => s.items);
   const refresh = useRecentWorkspacesStore((s) => s.refresh);
   const activeInfo = useWorkspaceStore((s) => s.info);
@@ -43,13 +45,15 @@ export default function WorkspacesIndex() {
       <View className="h-13 flex-row items-center justify-between gap-3 px-4">
         <View className="flex-row items-center gap-3 flex-1">
           {canGoBack ? (
-            <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="返回">
+            <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel={t`返回`}>
               <ArrowLeft color={colors.foreground} size={22} />
             </Pressable>
           ) : null}
-          <Text className="text-[16px] font-semibold text-foreground">工作区</Text>
+          <Text className="text-[16px] font-semibold text-foreground">
+            <Trans>工作区</Trans>
+          </Text>
         </View>
-        <Pressable onPress={openCreate} hitSlop={12} accessibilityLabel="新建工作区">
+        <Pressable onPress={openCreate} hitSlop={12} accessibilityLabel={t`新建工作区`}>
           <Plus color={colors.foreground} size={22} />
         </Pressable>
       </View>
@@ -58,26 +62,28 @@ export default function WorkspacesIndex() {
         contentContainerClassName="gap-4 px-5 pt-2 pb-8"
         showsVerticalScrollIndicator={false}
       >
-        <Section label="添加工作区">
+        <Section label={t`添加工作区`}>
           <AddRow
             icon={FolderPlus}
-            label="新建工作区"
-            description="在 App 空间创建一个新的工作区"
+            label={t`新建工作区`}
+            description={t`在 App 空间创建一个新的工作区`}
             onPress={openCreate}
           />
           <SettingDivider />
           <AddRow
             icon={CloudDownload}
-            label="从设备同步"
-            description="从已配对的设备拉取工作区"
+            label={t`从设备同步`}
+            description={t`从已配对的设备拉取工作区`}
             onPress={() => router.push("/workspaces/sync/select" as never)}
           />
         </Section>
 
-        <Section label={`我的工作区${count > 0 ? `  ·  ${count}` : ""}`}>
+        <Section label={count > 0 ? t`我的工作区  ·  ${count}` : t`我的工作区`}>
           {items === null ? (
             <View className="h-24 items-center justify-center">
-              <Text className="text-[12px] text-muted-foreground">加载中…</Text>
+              <Text className="text-[12px] text-muted-foreground">
+                <Trans>加载中…</Trans>
+              </Text>
             </View>
           ) : items.length === 0 ? (
             <EmptyListSlot />
@@ -96,7 +102,7 @@ export default function WorkspacesIndex() {
         </Section>
 
         <Text className="px-1 text-center text-[11px] text-muted-foreground">
-          工作区存储在应用空间，卸载 App 时会被清除。
+          <Trans>工作区存储在应用空间，卸载 App 时会被清除。</Trans>
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -200,7 +206,9 @@ function WorkspaceRow({
           </Text>
           {isActive ? (
             <View className="rounded-md bg-primary/10 px-1.5 py-0.5">
-              <Text className="text-[10px] font-medium text-primary">当前</Text>
+              <Text className="text-[10px] font-medium text-primary">
+                <Trans>当前</Trans>
+              </Text>
             </View>
           ) : null}
         </View>
@@ -220,9 +228,11 @@ function EmptyListSlot() {
       <View className="h-14 w-14 items-center justify-center rounded-full bg-muted">
         <Inbox color={colors.mutedForeground} size={26} />
       </View>
-      <Text className="text-[14px] font-semibold text-foreground">还没有工作区</Text>
+      <Text className="text-[14px] font-semibold text-foreground">
+        <Trans>还没有工作区</Trans>
+      </Text>
       <Text className="text-center text-[12px] text-muted-foreground">
-        通过上方操作添加你的第一个工作区
+        <Trans>通过上方操作添加你的第一个工作区</Trans>
       </Text>
     </View>
   );

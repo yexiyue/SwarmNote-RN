@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Copy, KeyRound } from "lucide-react-native";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
@@ -22,6 +23,7 @@ export function CodePairingCard({
   onCopy,
 }: CodePairingCardProps) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const generated = code !== undefined && code !== null;
   const remaining = useExpiresCountdown(generated ? expiresAt : null, onExpire);
 
@@ -31,48 +33,57 @@ export function CodePairingCard({
         <View className="flex-1 gap-1">
           <View className="flex-row items-center gap-1.5">
             <KeyRound color={colors.primary} size={14} />
-            <Text className="text-[13px] font-semibold text-foreground">配对码</Text>
+            <Text className="text-[13px] font-semibold text-foreground">
+              <Trans>配对码</Trans>
+            </Text>
           </View>
           <Text className="text-[11px] text-muted-foreground">
-            生成 6 位码，在另一台设备输入即可配对
+            <Trans>生成 6 位码，在另一台设备输入即可配对</Trans>
           </Text>
         </View>
         <Pressable
           onPress={onGenerate}
           disabled={loading}
           className="h-8.5 items-center justify-center rounded-lg bg-primary px-3.5 disabled:opacity-60"
-          accessibilityLabel="生成配对码"
+          accessibilityLabel={t`生成配对码`}
         >
           {loading ? (
             <ActivityIndicator color={colors.foreground} size="small" />
           ) : (
-            <Text className="text-[13px] font-semibold text-primary-foreground">生成</Text>
+            <Text className="text-[13px] font-semibold text-primary-foreground">
+              <Trans>生成</Trans>
+            </Text>
           )}
         </Pressable>
       </View>
     );
   }
 
+  const expiryLabel =
+    remaining > 0 ? t`${formatRemaining(remaining)} 后过期 · 在另一台设备输入此码` : t`已过期`;
+
   return (
     <View className="flex-row items-center gap-3 rounded-xl border border-primary bg-muted/60 p-4">
       <View className="flex-1 gap-1">
         <View className="flex-row items-center gap-2">
           <KeyRound color={colors.primary} size={14} />
-          <Text className="text-[13px] font-semibold text-primary">配对码</Text>
+          <Text className="text-[13px] font-semibold text-primary">
+            <Trans>配对码</Trans>
+          </Text>
           <Text className="text-[15px] font-bold tracking-[2px] text-foreground">{code}</Text>
         </View>
-        <Text className="text-[11px] text-muted-foreground">
-          {remaining > 0 ? `${formatRemaining(remaining)} 后过期 · 在另一台设备输入此码` : "已过期"}
-        </Text>
+        <Text className="text-[11px] text-muted-foreground">{expiryLabel}</Text>
       </View>
       <Pressable
         onPress={onCopy}
         hitSlop={8}
         className="h-7.5 flex-row items-center justify-center gap-1 rounded-md border border-border px-2.5"
-        accessibilityLabel="复制配对码"
+        accessibilityLabel={t`复制配对码`}
       >
         <Copy color={colors.mutedForeground} size={12} />
-        <Text className="text-[11px] text-muted-foreground">复制</Text>
+        <Text className="text-[11px] text-muted-foreground">
+          <Trans>复制</Trans>
+        </Text>
       </Pressable>
     </View>
   );

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import {
   AlertTriangle,
@@ -25,6 +26,7 @@ import { useSwarmStore } from "@/stores/swarm-store";
 export default function SettingsIndex() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const [info, setInfo] = useState<UniffiDeviceInfo | null>(null);
   const keychainEphemeral = useSwarmStore((s) => s.keychainEphemeral);
 
@@ -43,8 +45,10 @@ export default function SettingsIndex() {
       </View>
       <View className="h-13 flex-row items-center justify-between px-5">
         <View className="w-6" />
-        <Text className="text-[16px] font-semibold text-foreground">设置</Text>
-        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="关闭">
+        <Text className="text-[16px] font-semibold text-foreground">
+          <Trans>设置</Trans>
+        </Text>
+        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel={t`关闭`}>
           <X color={colors.foreground} size={22} />
         </Pressable>
       </View>
@@ -56,13 +60,15 @@ export default function SettingsIndex() {
         {keychainEphemeral ? (
           <View className="flex-row items-center gap-2 rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2.5">
             <AlertTriangle color={colors.destructive} size={14} />
-            <Text className="text-[12px] text-destructive">密钥链不可用，身份为临时状态</Text>
+            <Text className="text-[12px] text-destructive">
+              <Trans>密钥链不可用，身份为临时状态</Trans>
+            </Text>
           </View>
         ) : null}
 
         <Pressable
           onPress={() => router.push("/settings/devices" as never)}
-          accessibilityLabel="我的设备"
+          accessibilityLabel={t`我的设备`}
           className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-4"
         >
           <View className="h-10 w-10 items-center justify-center rounded-xl bg-muted">
@@ -82,31 +88,31 @@ export default function SettingsIndex() {
         <View className="rounded-xl border border-border bg-card overflow-hidden">
           <NavRow
             icon={Settings}
-            label="通用"
+            label={t`通用`}
             onPress={() => router.push("/settings/general" as never)}
           />
           <SettingDivider />
           <NavRow
             icon={Globe}
-            label="网络"
+            label={t`网络`}
             onPress={() => router.push("/settings/network" as never)}
           />
           <SettingDivider />
           <NavRow
             icon={MonitorSmartphone}
-            label="设备"
+            label={t`设备`}
             onPress={() => router.push("/settings/devices" as never)}
           />
           <SettingDivider />
           <NavRow
             icon={FolderClosed}
-            label="工作区"
+            label={t`工作区`}
             onPress={() => router.push("/workspaces" as never)}
           />
           <SettingDivider />
           <NavRow
             icon={Info}
-            label="关于"
+            label={t`关于`}
             onPress={() => router.push("/settings/about" as never)}
           />
         </View>

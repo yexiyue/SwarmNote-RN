@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import {
@@ -39,6 +40,7 @@ interface FilesPanelProps {
 export function FilesPanel({ onClose }: FilesPanelProps) {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const workspaceInfo = useWorkspaceStore((s) => s.info);
 
   const tree = useFileTreeStore((s) => s.tree);
@@ -105,28 +107,31 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
     });
   }, []);
 
-  const handleDelete = useCallback((node: UniffiFileTreeNode) => {
-    const isFolder = node.children !== undefined && node.children !== null;
-    const childCount = countDescendants(node);
-    const title = isFolder ? "删除文件夹" : "删除笔记";
-    const message = isFolder
-      ? childCount > 0
-        ? `『${node.name}』包含 ${childCount} 项，将一并删除。此操作无法撤销。`
-        : `确定删除『${node.name}』？此操作无法撤销。`
-      : `确定删除『${node.name}』？此操作无法撤销。`;
-    Alert.alert(title, message, [
-      { text: "取消", style: "cancel" },
-      {
-        text: "删除",
-        style: "destructive",
-        onPress: () => {
-          deleteNode(node).catch((err: unknown) => {
-            Alert.alert("删除失败", errorMessage(err));
-          });
+  const handleDelete = useCallback(
+    (node: UniffiFileTreeNode) => {
+      const isFolder = node.children !== undefined && node.children !== null;
+      const childCount = countDescendants(node);
+      const title = isFolder ? t`删除文件夹` : t`删除笔记`;
+      const message = isFolder
+        ? childCount > 0
+          ? t`『${node.name}』包含 ${childCount} 项，将一并删除。此操作无法撤销。`
+          : t`确定删除『${node.name}』？此操作无法撤销。`
+        : t`确定删除『${node.name}』？此操作无法撤销。`;
+      Alert.alert(title, message, [
+        { text: t`取消`, style: "cancel" },
+        {
+          text: t`删除`,
+          style: "destructive",
+          onPress: () => {
+            deleteNode(node).catch((err: unknown) => {
+              Alert.alert(t`删除失败`, errorMessage(err));
+            });
+          },
         },
-      },
-    ]);
-  }, []);
+      ]);
+    },
+    [t],
+  );
 
   const handleCopyPath = useCallback((node: UniffiFileTreeNode) => {
     Clipboard.setStringAsync(node.id).catch((err: unknown) => {
@@ -193,7 +198,9 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
           {loading ? (
             <ActivityIndicator color={colors.mutedForeground} />
           ) : (
-            <Text className="text-[12px] text-muted-foreground">加载中…</Text>
+            <Text className="text-[12px] text-muted-foreground">
+              <Trans>加载中…</Trans>
+            </Text>
           )}
         </View>
       );
@@ -204,9 +211,11 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
           <View className="h-14 w-14 items-center justify-center rounded-full bg-muted">
             <Inbox color={colors.mutedForeground} size={26} />
           </View>
-          <Text className="text-[14px] font-semibold text-foreground">还没有笔记</Text>
+          <Text className="text-[14px] font-semibold text-foreground">
+            <Trans>还没有笔记</Trans>
+          </Text>
           <Text className="text-center text-[12px] text-muted-foreground">
-            点击下方工具栏新建你的第一条笔记
+            <Trans>点击下方工具栏新建你的第一条笔记</Trans>
           </Text>
         </View>
       );
@@ -265,18 +274,18 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
       <View className="flex-row items-center justify-between border-t border-border px-3 py-2.5">
         <Pressable
           onPress={() => router.push("/workspaces" as never)}
-          accessibilityLabel="切换工作区"
+          accessibilityLabel={t`切换工作区`}
           className="flex-row items-center gap-1.5 h-9 rounded-lg bg-muted px-3"
         >
           <Folder color={colors.primary} size={14} />
           <Text className="text-[13px] font-medium text-foreground">
-            {workspaceInfo?.name ?? "默认工作区"}
+            {workspaceInfo?.name ?? t`默认工作区`}
           </Text>
           <ChevronsUpDown color={colors.mutedForeground} size={12} />
         </Pressable>
         <Pressable
           onPress={() => router.push("/settings" as never)}
-          accessibilityLabel="设置"
+          accessibilityLabel={t`设置`}
           hitSlop={6}
           className="h-9 w-9 items-center justify-center rounded-lg active:bg-muted"
         >

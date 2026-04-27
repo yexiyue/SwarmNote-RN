@@ -4,6 +4,7 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { useLingui } from "@lingui/react/macro";
 import { FolderPlus, Info, type LucideIcon, Search, Settings } from "lucide-react-native";
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { Pressable, View } from "react-native";
@@ -34,6 +35,7 @@ export const CommandSheet = forwardRef<CommandSheetRef, CommandSheetProps>(funct
   ref,
 ) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const sheetRef = useRef<BottomSheetModal>(null);
 
   useImperativeHandle(ref, () => ({
@@ -55,10 +57,10 @@ export const CommandSheet = forwardRef<CommandSheetRef, CommandSheetProps>(funct
   );
 
   const items: CommandItem[] = [
-    { id: "switch", label: "快速切换笔记", icon: Search, onPress: onQuickSwitch },
-    { id: "folder", label: "新建文件夹", icon: FolderPlus, onPress: onNewFolder },
-    { id: "settings", label: "设置", icon: Settings, onPress: onOpenSettings },
-    { id: "about", label: "关于", icon: Info, onPress: onOpenAbout },
+    { id: "switch", label: t`快速切换笔记`, icon: Search, onPress: onQuickSwitch },
+    { id: "folder", label: t`新建文件夹`, icon: FolderPlus, onPress: onNewFolder },
+    { id: "settings", label: t`设置`, icon: Settings, onPress: onOpenSettings },
+    { id: "about", label: t`关于`, icon: Info, onPress: onOpenAbout },
   ];
 
   const dismissThen = (cb: () => void) => {

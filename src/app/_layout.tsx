@@ -13,6 +13,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { PairingRequestHost } from "@/components/pairing-request-host";
 import { initAppCore } from "@/core/app-core";
 import { useNavTheme } from "@/hooks/useThemeColors";
+import { LinguiProvider } from "@/i18n/LinguiProvider";
+import { initI18n } from "@/i18n/lingui";
 import { restoreThemePreference } from "@/lib/theme-persistence";
 import { waitForOnboardingHydration } from "@/stores/onboarding-store";
 
@@ -28,7 +30,12 @@ export default function RootLayout() {
   useEffect(() => {
     (async () => {
       try {
-        await Promise.all([restoreThemePreference(), waitForOnboardingHydration(), initAppCore()]);
+        await Promise.all([
+          restoreThemePreference(),
+          waitForOnboardingHydration(),
+          initAppCore(),
+          initI18n(),
+        ]);
       } catch (err) {
         console.error("[boot] initAppCore failed:", err);
         setBootError(String(err));
@@ -53,32 +60,37 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider value={navTheme}>
-          <BottomSheetModalProvider>
-            <StatusBar style={isDark ? "light" : "dark"} />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="onboarding" />
-              <Stack.Screen name="(main)" />
-              <Stack.Screen name="workspaces" options={{ animation: "slide_from_right" }} />
-              <Stack.Screen
-                name="settings"
-                options={{ presentation: "modal", animation: "slide_from_bottom" }}
-              />
-              <Stack.Screen name="pairing/input-code" options={{ animation: "slide_from_right" }} />
-              <Stack.Screen
-                name="pairing/found-device"
-                options={{ animation: "slide_from_right" }}
-              />
-              <Stack.Screen
-                name="pairing/success"
-                options={{ animation: "slide_from_right", gestureEnabled: false }}
-              />
-              <Stack.Screen name="editor-test" />
-              <Stack.Screen name="explore" />
-            </Stack>
-            <PairingRequestHost />
-            <PortalHost />
-          </BottomSheetModalProvider>
+          <LinguiProvider>
+            <BottomSheetModalProvider>
+              <StatusBar style={isDark ? "light" : "dark"} />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="onboarding" />
+                <Stack.Screen name="(main)" />
+                <Stack.Screen name="workspaces" options={{ animation: "slide_from_right" }} />
+                <Stack.Screen
+                  name="settings"
+                  options={{ presentation: "modal", animation: "slide_from_bottom" }}
+                />
+                <Stack.Screen
+                  name="pairing/input-code"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="pairing/found-device"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="pairing/success"
+                  options={{ animation: "slide_from_right", gestureEnabled: false }}
+                />
+                <Stack.Screen name="editor-test" />
+                <Stack.Screen name="explore" />
+              </Stack>
+              <PairingRequestHost />
+              <PortalHost />
+            </BottomSheetModalProvider>
+          </LinguiProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

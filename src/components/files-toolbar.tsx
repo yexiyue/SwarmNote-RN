@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   ArrowUpNarrowWide,
   ChevronsDownUp,
@@ -24,13 +25,14 @@ export function FilesToolbar({
   onCollapseAll,
   onClose,
 }: FilesToolbarProps) {
+  const { t } = useLingui();
   return (
     <View className="h-13 flex-row items-center justify-around border-t border-border px-5">
-      <ToolButton icon={SquarePen} label="新建笔记" onPress={onNewNote} />
-      <ToolButton icon={FolderPlus} label="新建文件夹" onPress={onNewFolder} />
-      <ToolButton icon={ArrowUpNarrowWide} label="排序" onPress={onSort} />
-      <ToolButton icon={ChevronsDownUp} label="折叠全部" onPress={onCollapseAll} />
-      <ToolButton icon={X} label="关闭" onPress={onClose} />
+      <ToolButton icon={SquarePen} label={t`新建笔记`} onPress={onNewNote} />
+      <ToolButton icon={FolderPlus} label={t`新建文件夹`} onPress={onNewFolder} />
+      <ToolButton icon={ArrowUpNarrowWide} label={t`排序`} onPress={onSort} />
+      <ToolButton icon={ChevronsDownUp} label={t`折叠全部`} onPress={onCollapseAll} />
+      <ToolButton icon={X} label={t`关闭`} onPress={onClose} />
     </View>
   );
 }

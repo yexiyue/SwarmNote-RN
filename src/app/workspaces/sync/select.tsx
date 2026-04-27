@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { ArrowLeft, Check, FolderClosed, Monitor } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -19,6 +20,7 @@ interface PeerGroupData {
 export default function SyncWizardSelect() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const [remoteWorkspaces, setRemoteWorkspaces] = useState<UniffiRemoteWorkspaceInfo[] | null>(
     null,
   );
@@ -69,10 +71,12 @@ export default function SyncWizardSelect() {
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top", "bottom"]}>
       <View className="h-13 flex-row items-center gap-3 px-4">
-        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="返回">
+        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel={t`返回`}>
           <ArrowLeft color={colors.foreground} size={22} />
         </Pressable>
-        <Text className="text-[16px] font-semibold text-foreground">从设备同步</Text>
+        <Text className="text-[16px] font-semibold text-foreground">
+          <Trans>从设备同步</Trans>
+        </Text>
       </View>
 
       <ScrollView
@@ -91,14 +95,18 @@ export default function SyncWizardSelect() {
 
       {groupedPeers.length > 0 && loadError === null ? (
         <View className="border-t border-border px-5 py-3 flex-row items-center gap-3 bg-background">
-          <Text className="flex-1 text-[12px] text-muted-foreground">已选 {selectedCount} 个</Text>
+          <Text className="flex-1 text-[12px] text-muted-foreground">
+            {t`已选 ${selectedCount} 个`}
+          </Text>
           <Pressable
             onPress={handleStart}
             disabled={selectedCount === 0}
-            accessibilityLabel="开始同步"
+            accessibilityLabel={t`开始同步`}
             className="h-10 rounded-lg bg-primary px-5 justify-center disabled:opacity-50"
           >
-            <Text className="text-[13px] font-semibold text-primary-foreground">开始同步</Text>
+            <Text className="text-[13px] font-semibold text-primary-foreground">
+              <Trans>开始同步</Trans>
+            </Text>
           </Pressable>
         </View>
       ) : null}
@@ -124,12 +132,15 @@ function SelectBody({
   onRetry,
 }: SelectBodyProps) {
   const colors = useThemeColors();
+  const { t } = useLingui();
 
   if (remoteWorkspaces === null) {
     return (
       <View className="h-48 items-center justify-center gap-3">
         <ActivityIndicator color={colors.primary} />
-        <Text className="text-[12px] text-muted-foreground">正在获取可同步的工作区…</Text>
+        <Text className="text-[12px] text-muted-foreground">
+          <Trans>正在获取可同步的工作区…</Trans>
+        </Text>
       </View>
     );
   }
@@ -137,7 +148,7 @@ function SelectBody({
     return (
       <StateCard
         messages={[{ text: loadError, tone: "destructive" }]}
-        actionLabel="重试"
+        actionLabel={t`重试`}
         onAction={onRetry}
       />
     );
@@ -146,10 +157,10 @@ function SelectBody({
     return (
       <StateCard
         messages={[
-          { text: "未找到可同步的工作区", tone: "muted" },
-          { text: "请确认对方设备已在线并已配对", tone: "muted-sm" },
+          { text: t`未找到可同步的工作区`, tone: "muted" },
+          { text: t`请确认对方设备已在线并已配对`, tone: "muted-sm" },
         ]}
-        actionLabel="重试"
+        actionLabel={t`重试`}
         onAction={onRetry}
       />
     );
@@ -222,7 +233,7 @@ function PeerGroup({
         <Text className="text-[11px] font-semibold text-foreground">{peerName}</Text>
         <View className="rounded-md bg-success/10 px-1.5 py-0.5">
           <Text style={{ color: colors.success }} className="text-[10px] font-medium">
-            在线
+            <Trans>在线</Trans>
           </Text>
         </View>
       </View>
@@ -284,11 +295,15 @@ function WorkspaceCandidateRow({
         >
           {workspace.name}
         </Text>
-        <Text className="text-[11px] text-muted-foreground">{workspace.docCount} 篇笔记</Text>
+        <Text className="text-[11px] text-muted-foreground">
+          <Trans>{workspace.docCount} 篇笔记</Trans>
+        </Text>
       </View>
       {workspace.isLocal ? (
         <View className="rounded-md bg-muted px-2 py-0.5">
-          <Text className="text-[10px] text-muted-foreground">已在本地</Text>
+          <Text className="text-[10px] text-muted-foreground">
+            <Trans>已在本地</Trans>
+          </Text>
         </View>
       ) : null}
     </Pressable>

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import Constants from "expo-constants";
 import {
   BadgeCheck,
@@ -17,6 +18,7 @@ const APP_VERSION = Constants.expoConfig?.version ?? "0.0.0";
 
 export default function AboutSettings() {
   const colors = useThemeColors();
+  const { t } = useLingui();
 
   const openUrl = (url: string) => {
     Linking.openURL(url).catch((err) => console.warn("[about] openURL failed:", err));
@@ -24,7 +26,7 @@ export default function AboutSettings() {
 
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
-      <SettingsHeader title="关于" />
+      <SettingsHeader title={t`关于`} />
 
       <View className="flex-1 items-center justify-center px-8 -mt-10">
         <View className="flex-row items-center gap-4">
@@ -40,7 +42,7 @@ export default function AboutSettings() {
               <View className="flex-row items-center gap-1">
                 <BadgeCheck color={colors.success} size={12} />
                 <Text className="text-[11px] font-medium" style={{ color: colors.success }}>
-                  已是最新
+                  <Trans>已是最新</Trans>
                 </Text>
               </View>
             </View>
@@ -48,24 +50,28 @@ export default function AboutSettings() {
         </View>
 
         <Text className="mt-5 text-[13px] text-muted-foreground">
-          去中心化、本地优先的 P2P 笔记应用
+          <Trans>去中心化、本地优先的 P2P 笔记应用</Trans>
         </Text>
 
         <View className="mt-6 flex-row items-center gap-3">
           <Pressable
             className="h-9 flex-row items-center gap-1.5 rounded-lg border border-border px-3.5"
-            accessibilityLabel="检查更新"
+            accessibilityLabel={t`检查更新`}
           >
             <RefreshCw color={colors.foreground} size={13} />
-            <Text className="text-[13px] text-foreground">检查更新</Text>
+            <Text className="text-[13px] text-foreground">
+              <Trans>检查更新</Trans>
+            </Text>
           </Pressable>
           <Pressable
             onPress={() => openUrl("https://github.com/yexiyue/SwarmNote/releases")}
             className="h-9 flex-row items-center gap-1.5 rounded-lg border border-border px-3.5"
-            accessibilityLabel="更新日志"
+            accessibilityLabel={t`更新日志`}
           >
             <FileText color={colors.foreground} size={13} />
-            <Text className="text-[13px] text-foreground">更新日志</Text>
+            <Text className="text-[13px] text-foreground">
+              <Trans>更新日志</Trans>
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -74,11 +80,11 @@ export default function AboutSettings() {
       <View className="flex-row items-center justify-center gap-5 pb-6">
         <LinkButton icon={Code} label="GitHub" url="https://github.com/yexiyue/SwarmNote" />
         <View className="h-3 w-px bg-border" />
-        <LinkButton icon={BookOpen} label="文档" url="https://yexiyue.github.io/SwarmNote/" />
+        <LinkButton icon={BookOpen} label={t`文档`} url="https://yexiyue.github.io/SwarmNote/" />
         <View className="h-3 w-px bg-border" />
         <LinkButton
           icon={MessageSquare}
-          label="反馈"
+          label={t`反馈`}
           url="https://github.com/yexiyue/SwarmNote/issues"
         />
       </View>

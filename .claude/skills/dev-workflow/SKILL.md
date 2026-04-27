@@ -21,7 +21,8 @@ description: |
 | 主题/样式/UI 组件 | `theme-and-styling.md` |
 | 编辑器相关 | `editor.md` |
 | Rust 桥接 | `rust-bridge.md` |
-| 构建/工具链/i18n | `toolchain.md` |
+| 构建/工具链 | `toolchain.md` |
+| 国际化 / Lingui / 翻译 | `i18n.md` |
 
 **读取方式**：使用 Read 工具读取对应文件，遵循其中记录的最佳实践和注意事项。
 

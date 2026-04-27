@@ -5,6 +5,8 @@ export default function SettingsLayout() {
     <Stack screenOptions={{ headerShown: false, animation: "slide_from_right" }}>
       <Stack.Screen name="index" options={{ animation: "none" }} />
       <Stack.Screen name="general" />
+      <Stack.Screen name="language" />
+      <Stack.Screen name="theme" />
       <Stack.Screen name="network" />
       <Stack.Screen name="devices" />
       <Stack.Screen name="about" />

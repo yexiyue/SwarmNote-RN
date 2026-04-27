@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { OTPInput, type OTPInputRef, type SlotProps } from "input-otp-native";
 import { ArrowLeft } from "lucide-react-native";
@@ -15,6 +16,7 @@ const SLOT_KEYS = ["s0", "s1", "s2", "s3", "s4", "s5"] as const;
 export default function InputCode() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const otpRef = useRef<OTPInputRef>(null);
   const [code, setCode] = useState("");
   const [looking, setLooking] = useState(false);
@@ -39,7 +41,7 @@ export default function InputCode() {
         },
       });
     } catch (_err) {
-      setError("配对码无效或已过期");
+      setError(t`配对码无效或已过期`);
       setCode("");
       otpRef.current?.clear();
     } finally {
@@ -53,18 +55,20 @@ export default function InputCode() {
         <Pressable
           onPress={() => router.back()}
           hitSlop={12}
-          accessibilityLabel="返回"
+          accessibilityLabel={t`返回`}
           className="h-11 w-11 -ml-2 items-start justify-center"
         >
           <ArrowLeft color={colors.foreground} size={24} />
         </Pressable>
-        <Text className="text-[17px] font-semibold text-foreground">输入配对码</Text>
+        <Text className="text-[17px] font-semibold text-foreground">
+          <Trans>输入配对码</Trans>
+        </Text>
         <View className="h-6 w-6" />
       </View>
 
       <View className="flex-1 items-center justify-center gap-5 px-6 pb-6">
         <Text className="text-center text-[15px] text-muted-foreground">
-          输入对方设备上显示的 6 位配对码
+          <Trans>输入对方设备上显示的 6 位配对码</Trans>
         </Text>
         <OTPInput
           ref={otpRef}
@@ -94,14 +98,14 @@ export default function InputCode() {
         <Pressable
           onPress={() => onLookup(code)}
           disabled={code.length !== 6 || looking}
-          accessibilityLabel="连接"
+          accessibilityLabel={t`连接`}
           className="h-13 items-center justify-center rounded-xl bg-primary disabled:bg-muted"
         >
           {looking ? (
             <ActivityIndicator color={colors.foreground} size="small" />
           ) : (
             <Text className="text-[17px] font-semibold text-primary-foreground disabled:text-muted-foreground">
-              连接
+              <Trans>连接</Trans>
             </Text>
           )}
         </Pressable>

@@ -187,5 +187,6 @@ git commit -m "chore: update editor submodule"
 - `dev-notes/knowledge/toolchain.md`
 - `dev-notes/knowledge/sync.md`
 - `dev-notes/knowledge/files-panel.md`
+- `dev-notes/knowledge/i18n.md`
 
 设计稿位于 `dev-notes/design/mobile-design.pen`，需要通过 Pencil MCP 工具读取和修改，不要用普通文件读取工具解析 `.pen`。

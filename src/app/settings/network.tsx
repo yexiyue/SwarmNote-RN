@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Power, Zap } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +18,7 @@ const SUCCESS_TINT_ICON_BG = "#4CAF5022";
 
 export default function NetworkSettings() {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const online = useSwarmStore((s) => s.online);
   const natStatus = useSwarmStore((s) => s.natStatus);
   const pairedOnline = useSwarmStore(
@@ -26,14 +28,14 @@ export default function NetworkSettings() {
   const setUserWantsNetwork = useNetworkPreferenceStore((s) => s.setUserWantsNetwork);
 
   const subtitle = online
-    ? `已连接 ${pairedOnline} 台设备 · ${natStatus ?? "NAT 未知"}`
+    ? t`已连接 ${pairedOnline} 台设备 · ${natStatus ?? t`NAT 未知`}`
     : userWantsNetwork
-      ? "正在启动…"
-      : "已手动关闭";
+      ? t`正在启动…`
+      : t`已手动关闭`;
 
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
-      <SettingsHeader title="网络" />
+      <SettingsHeader title={t`网络`} />
 
       <ScrollView
         contentContainerClassName="gap-5 px-5 pt-2 pb-8"
@@ -41,7 +43,7 @@ export default function NetworkSettings() {
       >
         <View className="gap-2">
           <Text className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            P2P 网络
+            <Trans>P2P 网络</Trans>
           </Text>
           <View
             className="flex-row items-center gap-3 rounded-xl border p-4"
@@ -59,7 +61,7 @@ export default function NetworkSettings() {
             <View className="flex-1 gap-1">
               <View className="flex-row items-center gap-1.5">
                 <Text className="text-[14px] font-semibold text-foreground">
-                  {online ? "运行中" : "未启动"}
+                  {online ? <Trans>运行中</Trans> : <Trans>未启动</Trans>}
                 </Text>
                 <View
                   className="rounded-full px-1.5 py-0.5"
@@ -81,20 +83,20 @@ export default function NetworkSettings() {
               onPress={() => setUserWantsNetwork(!userWantsNetwork)}
               hitSlop={6}
               className="h-8 rounded-lg border border-border px-3 justify-center"
-              accessibilityLabel={userWantsNetwork ? "关闭" : "开启"}
+              accessibilityLabel={userWantsNetwork ? t`关闭` : t`开启`}
             >
               <Text className="text-[12px] text-foreground">
-                {userWantsNetwork ? "关闭" : "开启"}
+                {userWantsNetwork ? <Trans>关闭</Trans> : <Trans>开启</Trans>}
               </Text>
             </Pressable>
           </View>
         </View>
 
-        <SettingSection label="设置">
+        <SettingSection label={t`设置`}>
           <SettingRow
             icon={Zap}
-            label="开机自动启动网络"
-            description="打开工作区时自动启动 P2P 节点"
+            label={t`开机自动启动网络`}
+            description={t`打开工作区时自动启动 P2P 节点`}
           >
             <Switch checked={userWantsNetwork} onCheckedChange={setUserWantsNetwork} />
           </SettingRow>

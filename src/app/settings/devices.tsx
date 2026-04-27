@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import {
   Check,
@@ -28,6 +29,7 @@ import { useSwarmStore } from "@/stores/swarm-store";
 export default function DevicesSettings() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const devices = useSwarmStore((s) => s.devices);
   const pairedDevices = useSwarmStore((s) => s.pairedDevices);
   const [info, setInfo] = useState<UniffiDeviceInfo | null>(null);
@@ -63,7 +65,7 @@ export default function DevicesSettings() {
         },
       );
       if (resp.tag === "Refused") {
-        setPairError("配对被拒绝");
+        setPairError(t`配对被拒绝`);
       } else {
         router.push({
           pathname: "/pairing/success",
@@ -86,14 +88,16 @@ export default function DevicesSettings() {
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
       <SettingsHeader
-        title="设备"
+        title={t`设备`}
         right={
           <Pressable
             onPress={() => router.push("/pairing/input-code" as never)}
             className="h-8 rounded-lg border border-border px-3 justify-center"
-            accessibilityLabel="输入配对码"
+            accessibilityLabel={t`输入配对码`}
           >
-            <Text className="text-[12px] text-foreground">输入配对码</Text>
+            <Text className="text-[12px] text-foreground">
+              <Trans>输入配对码</Trans>
+            </Text>
           </Pressable>
         }
       />
@@ -118,11 +122,11 @@ export default function DevicesSettings() {
         <View className="gap-2">
           <View className="flex-row items-center justify-between">
             <Text className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              已配对设备
+              <Trans>已配对设备</Trans>
             </Text>
             {pairedDevices.length > 0 ? (
               <Text className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                {pairedDevices.length} 台
+                {t`${pairedDevices.length} 台`}
               </Text>
             ) : null}
           </View>
@@ -134,7 +138,7 @@ export default function DevicesSettings() {
                 const rtt = d.rttMs !== undefined ? Number(d.rttMs) : undefined;
                 const meta =
                   isOnline && rtt !== undefined
-                    ? `${d.os} · 局域网 · ${rtt}ms`
+                    ? t`${d.os} · 局域网 · ${rtt}ms`
                     : `${d.os} · ${d.platform}`;
                 return (
                   <View key={d.peerId}>
@@ -143,7 +147,7 @@ export default function DevicesSettings() {
                         router.push(`/settings/devices/${encodeURIComponent(d.peerId)}` as never)
                       }
                       accessibilityRole="button"
-                      accessibilityLabel={`${d.name ?? d.hostname} 详情`}
+                      accessibilityLabel={t`${d.name ?? d.hostname} 详情`}
                       className="flex-row items-center gap-3 px-3.5 py-3 active:bg-muted"
                     >
                       <Icon color={colors.mutedForeground} size={18} />
@@ -166,7 +170,7 @@ export default function DevicesSettings() {
                           style={{ color: isOnline ? colors.success : colors.mutedForeground }}
                           className="text-[11px] font-medium"
                         >
-                          {isOnline ? "在线" : "离线"}
+                          {isOnline ? <Trans>在线</Trans> : <Trans>离线</Trans>}
                         </Text>
                       </View>
                       <ChevronRight color={colors.mutedForeground} size={16} />
@@ -178,7 +182,9 @@ export default function DevicesSettings() {
             </View>
           ) : (
             <View className="rounded-xl border border-dashed border-border bg-card/40 px-4 py-5">
-              <Text className="text-center text-[12px] text-muted-foreground">还没有配对设备</Text>
+              <Text className="text-center text-[12px] text-muted-foreground">
+                <Trans>还没有配对设备</Trans>
+              </Text>
             </View>
           )}
         </View>
@@ -186,15 +192,17 @@ export default function DevicesSettings() {
         <View className="gap-2">
           <View className="flex-row items-center justify-between">
             <Text className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              附近设备
+              <Trans>附近设备</Trans>
             </Text>
             <Pressable
               hitSlop={6}
               className="flex-row items-center gap-1 rounded-md border border-border px-2 h-6"
-              accessibilityLabel="刷新"
+              accessibilityLabel={t`刷新`}
             >
               <RefreshCw color={colors.mutedForeground} size={11} />
-              <Text className="text-[10px] text-muted-foreground">刷新</Text>
+              <Text className="text-[10px] text-muted-foreground">
+                <Trans>刷新</Trans>
+              </Text>
             </Pressable>
           </View>
           {pairError !== null ? (
@@ -213,20 +221,20 @@ export default function DevicesSettings() {
                           {d.name ?? d.hostname}
                         </Text>
                         <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-                          {d.os} · 局域网
+                          {t`${d.os} · 局域网`}
                         </Text>
                       </View>
                       <Pressable
                         onPress={() => onPairNearby(d)}
                         disabled={pairingPeerId !== null}
-                        accessibilityLabel={`配对 ${d.name ?? d.hostname}`}
+                        accessibilityLabel={t`配对 ${d.name ?? d.hostname}`}
                         className="h-8 min-w-14 items-center justify-center rounded-lg bg-primary px-3 disabled:opacity-60"
                       >
                         {pairingPeerId === d.peerId ? (
                           <ActivityIndicator color={colors.foreground} size="small" />
                         ) : (
                           <Text className="text-[12px] font-semibold text-primary-foreground">
-                            配对
+                            <Trans>配对</Trans>
                           </Text>
                         )}
                       </Pressable>
@@ -239,7 +247,9 @@ export default function DevicesSettings() {
           ) : (
             <View className="items-center gap-2 rounded-xl border border-dashed border-border bg-card/40 px-4 py-5">
               <Radar color={colors.mutedForeground} size={24} strokeWidth={1.5} />
-              <Text className="text-center text-[12px] text-muted-foreground">暂无附近设备</Text>
+              <Text className="text-center text-[12px] text-muted-foreground">
+                <Trans>暂无附近设备</Trans>
+              </Text>
             </View>
           )}
         </View>
@@ -256,6 +266,7 @@ function MyDeviceCard({
   onRenamed: (next: string) => void;
 }) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
@@ -321,7 +332,7 @@ function MyDeviceCard({
               disabled={saving}
               hitSlop={6}
               className="h-7 w-7 items-center justify-center rounded-md"
-              accessibilityLabel="保存"
+              accessibilityLabel={t`保存`}
             >
               {saving ? (
                 <ActivityIndicator size="small" color={colors.foreground} />
@@ -334,7 +345,7 @@ function MyDeviceCard({
               disabled={saving}
               hitSlop={6}
               className="h-7 w-7 items-center justify-center rounded-md"
-              accessibilityLabel="取消"
+              accessibilityLabel={t`取消`}
             >
               <CloseIcon color={colors.mutedForeground} size={16} />
             </Pressable>
@@ -345,7 +356,7 @@ function MyDeviceCard({
           </Text>
         )}
         <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-          {info ? `${info.os} · ${info.arch} · 当前设备` : "—"}
+          {info ? t`${info.os} · ${info.arch} · 当前设备` : "—"}
         </Text>
         {info ? (
           <Text className="text-[10px] text-muted-foreground" numberOfLines={1}>
@@ -358,9 +369,11 @@ function MyDeviceCard({
           onPress={() => setEditing(true)}
           hitSlop={6}
           className="h-8 rounded-lg border border-border px-3 justify-center"
-          accessibilityLabel="编辑设备名称"
+          accessibilityLabel={t`编辑设备名称`}
         >
-          <Text className="text-[12px] text-foreground">编辑</Text>
+          <Text className="text-[12px] text-foreground">
+            <Trans>编辑</Trans>
+          </Text>
         </Pressable>
       )}
     </View>

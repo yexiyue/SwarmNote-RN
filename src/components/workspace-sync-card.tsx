@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Pause, RefreshCw, WifiOff } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, View } from "react-native";
@@ -15,6 +16,7 @@ interface WorkspaceSyncCardProps {
 
 export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const pairedDevices = useSwarmStore((s) => s.pairedDevices);
   const syncProgress = useSwarmStore((s) => s.syncProgress);
   const lastSyncedAt = useSyncPersistStore((s) => s.lastSyncedAt[workspaceId]);
@@ -52,22 +54,22 @@ export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
     );
     setTriggering(false);
     if (failures.length === onlineDevices.length) {
-      Alert.alert("同步失败", failures.join("\n"));
+      Alert.alert(t`同步失败`, failures.join("\n"));
     } else if (failures.length > 0) {
-      Alert.alert("部分设备同步失败", failures.join("\n"));
+      Alert.alert(t`部分设备同步失败`, failures.join("\n"));
     }
   };
 
   const dotColor = offline ? colors.mutedForeground : colors.success;
   let statusLabel: string;
-  if (offline) statusLabel = "暂无在线设备";
-  else if (syncing) statusLabel = "同步中";
-  else statusLabel = "已同步";
+  if (offline) statusLabel = t`暂无在线设备`;
+  else if (syncing) statusLabel = t`同步中`;
+  else statusLabel = t`已同步`;
 
   const metaParts: string[] = [];
-  if (!offline) metaParts.push(`与 ${onlineCount} 台设备保持同步`);
+  if (!offline) metaParts.push(t`与 ${onlineCount} 台设备保持同步`);
   if (!syncing && lastSyncedAt !== undefined) {
-    metaParts.push(`最后同步 ${formatLastSyncedAt(lastSyncedAt)}`);
+    metaParts.push(t`最后同步 ${formatLastSyncedAt(lastSyncedAt)}`);
   }
   const metaLine = metaParts.join(" · ");
 
@@ -89,7 +91,7 @@ export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
         <View className="flex-row items-center gap-1.5">
           <WifiOff color={colors.mutedForeground} size={12} />
           <Text className="text-[11px] text-muted-foreground">
-            请先配对设备或等待已配对设备上线
+            {t`请先配对设备或等待已配对设备上线`}
           </Text>
         </View>
       ) : null}
@@ -98,7 +100,7 @@ export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
         <Pressable
           onPress={handleSyncNow}
           disabled={offline || triggering}
-          accessibilityLabel="立即同步"
+          accessibilityLabel={t`立即同步`}
           className="flex-1 h-10 flex-row items-center justify-center gap-2 rounded-lg border border-border bg-background active:bg-muted disabled:opacity-50"
         >
           {triggering ? (
@@ -106,19 +108,19 @@ export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
           ) : (
             <RefreshCw color={colors.foreground} size={14} />
           )}
-          <Text className="text-[13px] font-medium text-foreground">立即同步</Text>
+          <Text className="text-[13px] font-medium text-foreground">{t`立即同步`}</Text>
         </Pressable>
 
         <View className="items-center gap-1">
           <Pressable
             disabled
-            accessibilityLabel="暂停 · 即将推出"
+            accessibilityLabel={t`暂停 · 即将推出`}
             accessibilityState={{ disabled: true }}
             className="h-10 w-10 items-center justify-center rounded-lg border border-border bg-background opacity-50"
           >
             <Pause color={colors.mutedForeground} size={16} />
           </Pressable>
-          <Text className="text-[9px] text-muted-foreground">即将推出</Text>
+          <Text className="text-[9px] text-muted-foreground">{t`即将推出`}</Text>
         </View>
       </View>
     </View>

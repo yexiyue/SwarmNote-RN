@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { ExternalLink, Info } from "lucide-react-native";
 import { Fragment, useEffect, useRef } from "react";
@@ -24,6 +25,7 @@ function isSyncCompletedOk(
 export default function SyncWizardSyncing() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const items = useSyncWizardStore((s) => s.items);
   const updateItem = useSyncWizardStore((s) => s.updateItem);
   const didStartRef = useRef(false);
@@ -100,7 +102,7 @@ export default function SyncWizardSyncing() {
     }
   }, [items, router]);
 
-  const title = items.length === 1 ? "正在同步" : `正在同步 ${items.length} 个工作区`;
+  const title = items.length === 1 ? t`正在同步` : t`正在同步 ${items.length} 个工作区`;
 
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top", "bottom"]}>
@@ -128,7 +130,7 @@ export default function SyncWizardSyncing() {
             style={{ color: WARNING_FG }}
             className="flex-1 text-[11px] font-medium leading-normal"
           >
-            同步期间请保持两台设备在线，可切到后台。
+            <Trans>同步期间请保持两台设备在线，可切到后台。</Trans>
           </Text>
         </View>
       </ScrollView>
@@ -136,11 +138,13 @@ export default function SyncWizardSyncing() {
       <View className="border-t border-border px-5 py-3 bg-background">
         <Pressable
           onPress={() => router.dismissAll()}
-          accessibilityLabel="后台运行"
+          accessibilityLabel={t`后台运行`}
           className="h-10 flex-row items-center justify-center gap-2 rounded-lg border border-border bg-background active:bg-muted"
         >
           <ExternalLink color={colors.foreground} size={14} />
-          <Text className="text-[13px] font-medium text-foreground">后台运行</Text>
+          <Text className="text-[13px] font-medium text-foreground">
+            <Trans>后台运行</Trans>
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -26,6 +27,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 export default function WorkspaceDetail() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const params = useLocalSearchParams<{ id: string }>();
   const targetPath = useMemo(
     () => (typeof params.id === "string" ? decodeURIComponent(params.id) : null),
@@ -47,10 +49,10 @@ export default function WorkspaceDetail() {
   }, [refresh]);
 
   if (targetPath === null) {
-    return <MissingWorkspace message="无效的工作区路径" onBack={() => router.back()} />;
+    return <MissingWorkspace message={t`无效的工作区路径`} onBack={() => router.back()} />;
   }
   if (items !== null && workspace === null) {
-    return <MissingWorkspace message="工作区不存在" onBack={() => router.back()} />;
+    return <MissingWorkspace message={t`工作区不存在`} onBack={() => router.back()} />;
   }
 
   const handleOpen = async () => {
@@ -61,7 +63,7 @@ export default function WorkspaceDetail() {
       router.dismissAll();
       router.replace("/(main)" as never);
     } catch (err) {
-      Alert.alert("打开失败", errorMessage(err));
+      Alert.alert(t`打开失败`, errorMessage(err));
     } finally {
       setSwitching(false);
     }
@@ -76,10 +78,12 @@ export default function WorkspaceDetail() {
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
       <View className="h-13 flex-row items-center gap-3 px-4">
-        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="返回">
+        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel={t`返回`}>
           <ArrowLeft color={colors.foreground} size={22} />
         </Pressable>
-        <Text className="text-[16px] font-semibold text-foreground">工作区详情</Text>
+        <Text className="text-[16px] font-semibold text-foreground">
+          <Trans>工作区详情</Trans>
+        </Text>
       </View>
 
       <ScrollView
@@ -100,21 +104,21 @@ export default function WorkspaceDetail() {
 
             <View className="gap-2">
               <Text className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                操作
+                <Trans>操作</Trans>
               </Text>
               <View className="rounded-xl border border-border bg-card overflow-hidden">
                 <ActionRow
                   icon={ExternalLink}
-                  label={isActive ? "当前工作区" : "打开工作区"}
+                  label={isActive ? t`当前工作区` : t`打开工作区`}
                   disabled={isActive}
-                  badge={isActive ? "使用中" : undefined}
+                  badge={isActive ? t`使用中` : undefined}
                   onPress={handleOpen}
                   loading={switching}
                 />
                 <RowDivider />
-                <ActionRow icon={Pencil} label="重命名" disabled badge="即将推出" />
+                <ActionRow icon={Pencil} label={t`重命名`} disabled badge={t`即将推出`} />
                 <RowDivider />
-                <ActionRow icon={Trash2} label="删除" disabled destructive badge="即将推出" />
+                <ActionRow icon={Trash2} label={t`删除`} disabled destructive badge={t`即将推出`} />
               </View>
             </View>
           </>
@@ -134,6 +138,7 @@ function InfoCard({
   onCopyId: () => void;
 }) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const [docCount, setDocCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -174,19 +179,23 @@ function InfoCard({
         {isActive ? (
           <View className="flex-row items-center gap-1 rounded-md bg-primary/10 px-2 py-1">
             <CheckCircle2 color={colors.primary} size={12} />
-            <Text className="text-[10px] font-medium text-primary">当前</Text>
+            <Text className="text-[10px] font-medium text-primary">
+              <Trans>当前</Trans>
+            </Text>
           </View>
         ) : null}
       </View>
 
       <Text className="px-4 pt-1 pb-4 text-[11px] text-muted-foreground">
-        应用空间{docCount !== null ? `  ·  ${docCount} 个笔记` : ""}
+        {docCount !== null ? t`应用空间  ·  ${docCount} 个笔记` : t`应用空间`}
       </Text>
 
       <View className="mx-4 h-px bg-border" />
 
       <View className="flex-row items-center gap-2 px-4 py-3">
-        <Text className="text-[11px] text-muted-foreground">工作区 ID</Text>
+        <Text className="text-[11px] text-muted-foreground">
+          <Trans>工作区 ID</Trans>
+        </Text>
         <Text className="flex-1 text-[11px] font-mono text-foreground" numberOfLines={1}>
           {truncatedId}
         </Text>
@@ -194,7 +203,7 @@ function InfoCard({
           onPress={onCopyId}
           disabled={displayId === "—"}
           hitSlop={8}
-          accessibilityLabel="复制工作区 ID"
+          accessibilityLabel={t`复制工作区 ID`}
           className="h-7 w-7 items-center justify-center rounded-md active:bg-muted"
         >
           <Copy color={colors.mutedForeground} size={14} />
@@ -268,10 +277,11 @@ function RowDivider() {
 
 function MissingWorkspace({ message, onBack }: { message: string; onBack: () => void }) {
   const colors = useThemeColors();
+  const { t } = useLingui();
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
       <View className="h-13 flex-row items-center gap-3 px-4">
-        <Pressable onPress={onBack} hitSlop={12} accessibilityLabel="返回">
+        <Pressable onPress={onBack} hitSlop={12} accessibilityLabel={t`返回`}>
           <ArrowLeft color={colors.foreground} size={22} />
         </Pressable>
       </View>

@@ -4,6 +4,7 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { useLingui } from "@lingui/react/macro";
 import { ClipboardCopy, type LucideIcon, Pencil, Trash2 } from "lucide-react-native";
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { Pressable, View } from "react-native";
@@ -33,6 +34,7 @@ interface ActionItem {
 export const FileActionSheet = forwardRef<FileActionSheetRef, FileActionSheetProps>(
   function FileActionSheet({ onRename, onDelete, onCopyPath }, ref) {
     const colors = useThemeColors();
+    const { t } = useLingui();
     const sheetRef = useRef<BottomSheetModal>(null);
     const targetRef = useRef<UniffiFileTreeNode | null>(null);
 
@@ -58,9 +60,9 @@ export const FileActionSheet = forwardRef<FileActionSheetRef, FileActionSheetPro
     );
 
     const items: ActionItem[] = [
-      { id: "rename", label: "重命名", icon: Pencil, run: onRename },
-      { id: "copy-path", label: "复制路径", icon: ClipboardCopy, run: onCopyPath },
-      { id: "delete", label: "删除", icon: Trash2, destructive: true, run: onDelete },
+      { id: "rename", label: t`重命名`, icon: Pencil, run: onRename },
+      { id: "copy-path", label: t`复制路径`, icon: ClipboardCopy, run: onCopyPath },
+      { id: "delete", label: t`删除`, icon: Trash2, destructive: true, run: onDelete },
     ];
 
     const dismissThen = (cb: (node: UniffiFileTreeNode) => void) => {

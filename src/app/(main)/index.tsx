@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { EllipsisVertical, PanelLeft, PencilLine, Plus } from "lucide-react-native";
 import { useCallback, useRef } from "react";
@@ -19,6 +20,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 export default function WorkspaceScreen() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const workspace = useWorkspace();
   const workspaceInfo = useWorkspaceStore((s) => s.info);
   const keychainEphemeral = useSwarmStore((s) => s.keychainEphemeral);
@@ -57,7 +59,7 @@ export default function WorkspaceScreen() {
   );
 
   const headerTitle =
-    currentRelPath !== null ? basename(currentRelPath) : (workspaceInfo?.name ?? "我的工作区");
+    currentRelPath !== null ? basename(currentRelPath) : (workspaceInfo?.name ?? t`我的工作区`);
 
   return (
     <PagerView ref={pagerRef} style={{ flex: 1 }} initialPage={1} offscreenPageLimit={1} overdrag>
@@ -68,7 +70,7 @@ export default function WorkspaceScreen() {
       <View key="workspace" collapsable={false} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} className="bg-background" edges={["top"]}>
           <View className="h-13 flex-row items-center justify-between px-4">
-            <Pressable onPress={openFiles} hitSlop={12} accessibilityLabel="打开文件面板">
+            <Pressable onPress={openFiles} hitSlop={12} accessibilityLabel={t`打开文件面板`}>
               <PanelLeft color={colors.foreground} size={22} />
             </Pressable>
             <Text
@@ -77,7 +79,11 @@ export default function WorkspaceScreen() {
             >
               {headerTitle}
             </Text>
-            <Pressable onPress={openWorkspaceManager} hitSlop={12} accessibilityLabel="管理工作区">
+            <Pressable
+              onPress={openWorkspaceManager}
+              hitSlop={12}
+              accessibilityLabel={t`管理工作区`}
+            >
               <EllipsisVertical color={colors.foreground} size={22} />
             </Pressable>
           </View>
@@ -85,7 +91,7 @@ export default function WorkspaceScreen() {
           {keychainEphemeral ? (
             <View className="mx-5 rounded-lg bg-destructive/10 px-3 py-2">
               <Text className="text-[11px] text-destructive">
-                密钥链不可用，当前身份为临时状态（下次启动将改变）
+                <Trans>密钥链不可用，当前身份为临时状态（下次启动将改变）</Trans>
               </Text>
             </View>
           ) : null}
@@ -103,18 +109,20 @@ export default function WorkspaceScreen() {
                 <PencilLine color={colors.mutedForeground} size={36} strokeWidth={1.5} />
               </View>
               <Text className="mt-5 text-[17px] font-semibold text-foreground">
-                还没有打开的笔记
+                <Trans>还没有打开的笔记</Trans>
               </Text>
               <Text className="mt-2 text-[13px] text-muted-foreground text-center">
-                在左侧文件面板中选择一篇笔记，或新建一篇
+                <Trans>在左侧文件面板中选择一篇笔记，或新建一篇</Trans>
               </Text>
               <Pressable
                 onPress={handleNewFromBottomBar}
                 className="mt-6 h-10 flex-row items-center justify-center gap-1.5 rounded-lg bg-primary px-5"
-                accessibilityLabel="新建笔记"
+                accessibilityLabel={t`新建笔记`}
               >
                 <Plus color={colors.background} size={16} />
-                <Text className="text-[14px] font-semibold text-primary-foreground">新建笔记</Text>
+                <Text className="text-[14px] font-semibold text-primary-foreground">
+                  <Trans>新建笔记</Trans>
+                </Text>
               </Pressable>
             </View>
           )}

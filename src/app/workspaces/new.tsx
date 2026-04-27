@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { ArrowLeft, FolderPlus } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
@@ -21,6 +22,7 @@ import { useRecentWorkspacesStore } from "@/stores/recent-workspaces-store";
 export default function WorkspaceCreate() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const recentItems = useRecentWorkspacesStore((s) => s.items);
   const refreshRecent = useRecentWorkspacesStore((s) => s.refresh);
 
@@ -39,10 +41,10 @@ export default function WorkspaceCreate() {
     const v = validateWorkspaceName(name);
     if (!v.ok) return v;
     if (isDuplicateName(recentItems, name)) {
-      return { ok: false, reason: "同名工作区已存在" } as const;
+      return { ok: false, reason: t`同名工作区已存在` } as const;
     }
     return { ok: true } as const;
-  }, [name, recentItems]);
+  }, [name, recentItems, t]);
 
   const canSubmit = validation.ok && !submitting;
   const inlineError = name.length === 0 ? null : validation.ok ? null : validation.reason;
@@ -74,12 +76,14 @@ export default function WorkspaceCreate() {
           <Pressable
             onPress={() => router.back()}
             hitSlop={12}
-            accessibilityLabel="返回"
+            accessibilityLabel={t`返回`}
             disabled={submitting}
           >
             <ArrowLeft color={colors.foreground} size={22} />
           </Pressable>
-          <Text className="text-[16px] font-semibold text-foreground">新建工作区</Text>
+          <Text className="text-[16px] font-semibold text-foreground">
+            <Trans>新建工作区</Trans>
+          </Text>
         </View>
 
         <ScrollView
@@ -92,18 +96,22 @@ export default function WorkspaceCreate() {
             <View className="h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
               <FolderPlus color={colors.primary} size={28} strokeWidth={1.8} />
             </View>
-            <Text className="text-[20px] font-semibold text-foreground">创建一个工作区</Text>
+            <Text className="text-[20px] font-semibold text-foreground">
+              <Trans>创建一个工作区</Trans>
+            </Text>
             <Text className="text-center text-[13px] text-muted-foreground">
-              在 App 空间里开辟一块独立的笔记区域
+              <Trans>在 App 空间里开辟一块独立的笔记区域</Trans>
             </Text>
           </View>
 
           <View className="gap-2">
-            <Text className="px-1 text-[12px] font-medium text-muted-foreground">工作区名称</Text>
+            <Text className="px-1 text-[12px] font-medium text-muted-foreground">
+              <Trans>工作区名称</Trans>
+            </Text>
             <TextInput
               value={name}
               onChangeText={setName}
-              placeholder="我的笔记"
+              placeholder={t`我的笔记`}
               placeholderTextColor={colors.mutedForeground}
               autoFocus
               autoCapitalize="none"
@@ -123,7 +131,7 @@ export default function WorkspaceCreate() {
               <Text className="px-1 text-[12px] text-destructive">{inlineError}</Text>
             ) : (
               <Text className="px-1 text-[11px] text-muted-foreground">
-                存储在 App 私有空间，不会出现在系统文件 App 中
+                <Trans>存储在 App 私有空间，不会出现在系统文件 App 中</Trans>
               </Text>
             )}
             {serverError ? (
@@ -137,7 +145,7 @@ export default function WorkspaceCreate() {
             onPress={handleSubmit}
             disabled={!canSubmit}
             accessibilityRole="button"
-            accessibilityLabel="创建工作区"
+            accessibilityLabel={t`创建工作区`}
             className={`h-12 flex-row items-center justify-center rounded-lg ${
               canSubmit ? "bg-primary" : "bg-primary/40"
             }`}
@@ -145,7 +153,9 @@ export default function WorkspaceCreate() {
             {submitting ? (
               <ActivityIndicator color={colors.background} size="small" />
             ) : (
-              <Text className="text-[15px] font-semibold text-primary-foreground">创建工作区</Text>
+              <Text className="text-[15px] font-semibold text-primary-foreground">
+                <Trans>创建工作区</Trans>
+              </Text>
             )}
           </Pressable>
         </View>

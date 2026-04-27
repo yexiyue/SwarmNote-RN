@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import { useState } from "react";
@@ -13,6 +14,7 @@ import { truncatePeerId } from "@/lib/peer-id";
 export default function FoundDevice() {
   const router = useRouter();
   const colors = useThemeColors();
+  const { t } = useLingui();
   const params = useLocalSearchParams<{
     peerId: string;
     code: string;
@@ -45,7 +47,7 @@ export default function FoundDevice() {
         },
       );
       if (resp.tag === "Refused") {
-        setError("配对被拒绝");
+        setError(t`配对被拒绝`);
       } else {
         router.replace({
           pathname: "/pairing/success",
@@ -72,12 +74,14 @@ export default function FoundDevice() {
           onPress={() => router.back()}
           hitSlop={12}
           disabled={confirming}
-          accessibilityLabel="返回"
+          accessibilityLabel={t`返回`}
           className="h-11 w-11 -ml-2 items-start justify-center"
         >
           <ArrowLeft color={colors.foreground} size={24} />
         </Pressable>
-        <Text className="text-[17px] font-semibold text-foreground">确认设备</Text>
+        <Text className="text-[17px] font-semibold text-foreground">
+          <Trans>确认设备</Trans>
+        </Text>
         <View className="h-6 w-6" />
       </View>
 
@@ -86,29 +90,37 @@ export default function FoundDevice() {
           <View className="h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Icon color={colors.primary} size={32} />
           </View>
-          <Text className="text-[22px] font-bold text-foreground">找到设备</Text>
+          <Text className="text-[22px] font-bold text-foreground">
+            <Trans>找到设备</Trans>
+          </Text>
           <Text className="text-center text-[15px] text-muted-foreground">
-            确认这是你要配对的设备？
+            <Trans>确认这是你要配对的设备？</Trans>
           </Text>
         </View>
 
         <View className="gap-3.5 rounded-2xl border border-border bg-muted p-5">
           <View className="flex-row items-center justify-between">
-            <Text className="text-[14px] text-muted-foreground">设备名称</Text>
+            <Text className="text-[14px] text-muted-foreground">
+              <Trans>设备名称</Trans>
+            </Text>
             <Text className="max-w-[60%] text-[14px] font-medium text-foreground" numberOfLines={1}>
               {displayName}
             </Text>
           </View>
           <View className="h-px bg-border" />
           <View className="flex-row items-center justify-between">
-            <Text className="text-[14px] text-muted-foreground">系统</Text>
+            <Text className="text-[14px] text-muted-foreground">
+              <Trans>系统</Trans>
+            </Text>
             <Text className="text-[14px] font-medium text-foreground" numberOfLines={1}>
               {params.os} · {params.arch}
             </Text>
           </View>
           <View className="h-px bg-border" />
           <View className="flex-row items-center justify-between">
-            <Text className="text-[14px] text-muted-foreground">设备 ID</Text>
+            <Text className="text-[14px] text-muted-foreground">
+              <Trans>设备 ID</Trans>
+            </Text>
             <Text className="text-[14px] font-medium text-foreground">
               {truncatePeerId(params.peerId)}
             </Text>
@@ -124,23 +136,27 @@ export default function FoundDevice() {
         <Pressable
           onPress={onConfirm}
           disabled={confirming}
-          accessibilityLabel="确认配对"
+          accessibilityLabel={t`确认配对`}
           className="h-13 items-center justify-center rounded-xl bg-primary disabled:opacity-60"
         >
           {confirming ? (
             <ActivityIndicator color={colors.foreground} size="small" />
           ) : (
-            <Text className="text-[17px] font-semibold text-primary-foreground">确认配对</Text>
+            <Text className="text-[17px] font-semibold text-primary-foreground">
+              <Trans>确认配对</Trans>
+            </Text>
           )}
         </Pressable>
 
         <Pressable
           onPress={() => router.back()}
           disabled={confirming}
-          accessibilityLabel="取消"
+          accessibilityLabel={t`取消`}
           className="h-13 items-center justify-center rounded-xl border border-border bg-background"
         >
-          <Text className="text-[17px] font-medium text-foreground">取消</Text>
+          <Text className="text-[17px] font-medium text-foreground">
+            <Trans>取消</Trans>
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
