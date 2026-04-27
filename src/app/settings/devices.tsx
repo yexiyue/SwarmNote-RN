@@ -131,7 +131,10 @@ export default function DevicesSettings() {
             ) : null}
           </View>
           {pairedDevices.length > 0 ? (
-            <View className="overflow-hidden rounded-xl border border-border bg-card">
+            <View
+              key="paired-list"
+              className="overflow-hidden rounded-xl border border-border bg-card"
+            >
               {pairedDevices.map((d, i) => {
                 const Icon = devicePlatformIcon(d.platform);
                 const isOnline = d.isOnline === true;
@@ -181,7 +184,10 @@ export default function DevicesSettings() {
               })}
             </View>
           ) : (
-            <View className="rounded-xl border border-dashed border-border bg-card/40 px-4 py-5">
+            <View
+              key="paired-empty"
+              className="rounded-xl border border-dashed border-border bg-card/40 px-4 py-5"
+            >
               <Text className="text-center text-[12px] text-muted-foreground">
                 <Trans>还没有配对设备</Trans>
               </Text>
@@ -209,7 +215,10 @@ export default function DevicesSettings() {
             <Text className="px-1 text-[12px] text-destructive">{pairError}</Text>
           ) : null}
           {nearby.length > 0 ? (
-            <View className="overflow-hidden rounded-xl border border-border bg-card">
+            <View
+              key="nearby-list"
+              className="overflow-hidden rounded-xl border border-border bg-card"
+            >
               {nearby.map((d, i) => {
                 const Icon = devicePlatformIcon(d.platform);
                 return (
@@ -245,7 +254,10 @@ export default function DevicesSettings() {
               })}
             </View>
           ) : (
-            <View className="items-center gap-2 rounded-xl border border-dashed border-border bg-card/40 px-4 py-5">
+            <View
+              key="nearby-empty"
+              className="items-center gap-2 rounded-xl border border-dashed border-border bg-card/40 px-4 py-5"
+            >
               <Radar color={colors.mutedForeground} size={24} strokeWidth={1.5} />
               <Text className="text-center text-[12px] text-muted-foreground">
                 <Trans>暂无附近设备</Trans>

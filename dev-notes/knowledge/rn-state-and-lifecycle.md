@@ -30,6 +30,38 @@ stores 只暴露 `setX` actions，**不**在 action 里调 `getAppCore()` ——
 
 `DocFlushed` / `ExternalUpdate` / `ExternalConflict` / `FileTreeChanged` 当前不写 store —— 编辑器 WebView 桥和 workspace 文件树 hook 将来会各自订阅。
 
+### `pairedDevices` 双路径填充：NodeStarted + 增量事件
+
+`swarmStore.pairedDevices` 由两条路径写入，缺一不可：
+
+1. **节点启动兜底**：`NodeStarted` 分支调用 `refreshPairedDevices()`，把后端启动时装入内存的配对缓存一次性拉到前端。Rust core **不会**为已存在的配对关系补发 `PairedDeviceAdded` 事件，没有这一步冷启动后 store 永远 `[]`。
+2. **运行时增量**：`PairedDeviceAdded` / `PairedDeviceRemoved` 事件触发同一个 `refreshPairedDevices()` 拉全量列表。
+
+**不要**只靠某个 UI 页面 mount 时 `useEffect` 拉一次——`pairedDevices` 被 `settings/devices.tsx`、`settings/devices/[peerId].tsx`、`settings/network.tsx`、`workspace-sync-card.tsx` 等多个组件消费，逐个挂 effect 容易漏写，且用户可能不经过 devices 页面。
+
+`NodeStopped` 时**不**清空 `pairedDevices`（不在 `resetRuntimeFields()` 里）：配对关系与节点运行状态正交，离线时 UI 仍要展示历史配对记录（每条带 `isOnline=false`），与桌面端 `pairingStore` 行为一致。
+
+### Pairing emit 责任在 host shell，不在 PairingManager
+
+`swarmnote_core::PairingManager` 自身**只对对端**那一侧（接收方）发事件——本端是 host shell 的职责。host shell 指的是：
+
+- 桌面端：`src-tauri/src/commands/pairing.rs` 的 Tauri 命令
+- 移动端：`packages/swarmnote-core/rust/mobile-core/src/pairing.rs` 的 `UniffiAppCore` wrapper 方法
+
+三个成功的 pairing transition 都必须由 host shell 主动 emit，缺一不可：
+
+| Wrapper | 触发条件 | emit 序列 |
+|---|---|---|
+| `request_pairing` | `PairingResponse::Success` | `PairedDeviceAdded { info: None }` → `DevicesChanged` |
+| `respond_pairing_request` | `handle_pairing_request` 返回 `Some(info)` | `PairedDeviceAdded { info: Some(info) }` → `DevicesChanged` |
+| `unpair_device` | `pm.unpair` 成功 | `PairedDeviceRemoved { peer_id }` → `DevicesChanged` |
+
+`DevicesChanged` 是必要补充（`emit_devices_changed(core, bus)` helper）：发现列表里该设备的 `is_paired` 标志变化后，"附近设备"区需要重新过滤。
+
+如果只 emit `PairedDeviceAdded/Removed` 漏了 `DevicesChanged`，已配对区会刷新但附近设备区会出现"明明已配对了还显示在 nearby"的不一致——这是早期 mobile-core 漏 emit 时的实际现象。
+
+**未来若新增 pairing wrapper**：参照这套模式，不要假设 `PairingManager` 会替你发事件。
+
 ## P2P 网络生命周期
 
 两层控制，严格分离：

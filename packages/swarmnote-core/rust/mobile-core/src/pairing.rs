@@ -25,10 +25,20 @@
 use std::time::SystemTime;
 
 use swarmnote_core::protocol::{OsInfo, PairingMethod, PairingRefuseReason, PairingResponse};
-use swarmnote_core::{PairedDeviceInfo, PairingCodeInfo};
+use swarmnote_core::{AppCore, AppEvent, DeviceFilter, EventBus, PairedDeviceInfo, PairingCodeInfo};
 
 use crate::app::UniffiAppCore;
 use crate::error::FfiError;
+
+/// Re-emit `DevicesChanged` after a pairing transition so the discovery list
+/// reflects the new `is_paired` flag (mirrors the desktop `emit_devices`
+/// helper in `src-tauri/src/commands/pairing.rs`).
+async fn emit_devices_changed(core: &AppCore, bus: &dyn EventBus) {
+    if let Ok(dm) = core.devices().await {
+        let devices = dm.get_devices(DeviceFilter::All);
+        bus.emit(AppEvent::DevicesChanged { devices });
+    }
+}
 
 // ── Records ──────────────────────────────────────────────────
 
@@ -232,6 +242,15 @@ impl UniffiAppCore {
         let resp = pm
             .request_pairing(&peer_id, method.into(), remote_os_info.map(Into::into))
             .await?;
+        // Mirror the desktop Tauri command: PairingManager itself does not
+        // emit on the initiator side, so the host shell must do it. `info:
+        // None` is fine — RN listens to the tag and re-pulls the full list
+        // via `listPairedDevices()`.
+        if matches!(resp, PairingResponse::Success) {
+            self.event_bus
+                .emit(AppEvent::PairedDeviceAdded { info: None });
+            emit_devices_changed(&self.inner, &*self.event_bus).await;
+        }
         Ok(resp.into())
     }
 
@@ -244,7 +263,12 @@ impl UniffiAppCore {
         accept: bool,
     ) -> Result<(), FfiError> {
         let pm = self.inner.pairing().await?;
-        pm.handle_pairing_request(pending_id, accept).await?;
+        let result = pm.handle_pairing_request(pending_id, accept).await?;
+        if let Some(info) = result {
+            self.event_bus
+                .emit(AppEvent::PairedDeviceAdded { info: Some(info) });
+            emit_devices_changed(&self.inner, &*self.event_bus).await;
+        }
         Ok(())
     }
 
@@ -266,6 +290,11 @@ impl UniffiAppCore {
     /// success. Removes from both the in-memory cache and `devices.db`.
     pub async fn unpair_device(&self, peer_id: String) -> Result<(), FfiError> {
         let pm = self.inner.pairing().await?;
-        pm.unpair(&peer_id).await.map_err(Into::into)
+        pm.unpair(&peer_id).await?;
+        self.event_bus.emit(AppEvent::PairedDeviceRemoved {
+            peer_id: peer_id.clone(),
+        });
+        emit_devices_changed(&self.inner, &*self.event_bus).await;
+        Ok(())
     }
 }
