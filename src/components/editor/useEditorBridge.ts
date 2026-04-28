@@ -1,6 +1,7 @@
 import type { EditorEvent } from "@swarmnote/editor/events";
 import type { EditorApi, HostApi } from "@swarmnote/editor-web";
 import * as Comlink from "comlink";
+import { documentDirectory, EncodingType, writeAsStringAsync } from "expo-file-system/legacy";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   createRNEndpoint,
@@ -58,6 +59,15 @@ export function useEditorBridge(options: UseEditorBridgeOptions = {}): EditorBri
       },
       onCollaborationUpdate(update) {
         optionsRef.current.onCollaborationUpdate?.(update);
+      },
+      async onPasteFile(mimeType: string, base64Data: string): Promise<string> {
+        const ext = mimeType.split("/")[1]?.replace("jpeg", "jpg") ?? "png";
+        const fileName = `paste_${Date.now()}.${ext}`;
+        const uri = `${documentDirectory ?? ""}${fileName}`;
+        await writeAsStringAsync(uri, base64Data, {
+          encoding: EncodingType.Base64,
+        });
+        return uri;
       },
       log(message: string) {
         console.log("[Editor WebView]", message);

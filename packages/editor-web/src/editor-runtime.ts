@@ -28,6 +28,7 @@ interface RuntimeState {
   collaborationUpdateListener:
     | ((update: Uint8Array, origin: unknown) => void)
     | null;
+  pasteListener: ((e: ClipboardEvent) => void) | null;
 }
 
 function getEditorRoot(): HTMLElement {
@@ -47,6 +48,7 @@ export function createEditorRuntime(host: HostApi): EditorApi {
     editor: null,
     ydoc: null,
     collaborationUpdateListener: null,
+    pasteListener: null,
   };
 
   function emitEditorEvent(event: EditorEvent): void {
@@ -65,6 +67,44 @@ export function createEditorRuntime(host: HostApi): EditorApi {
     state.editor?.destroy();
     state.editor = null;
     resetCollaborationBinding();
+    if (state.pasteListener) {
+      document.removeEventListener('paste', state.pasteListener);
+      state.pasteListener = null;
+    }
+  }
+
+  function registerPasteListener(): void {
+    if (state.pasteListener) {
+      document.removeEventListener('paste', state.pasteListener);
+    }
+    const listener = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        if (!item.type.startsWith('image/')) continue;
+        e.preventDefault();
+        const blob = item.getAsFile();
+        if (!blob) continue;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          const base64 = dataUrl.split(',')[1];
+          if (!base64) return;
+          host
+            .onPasteFile(item.type, base64)
+            .then((uri) => {
+              state.editor?.insertText(`![](${uri})`);
+            })
+            .catch(() => {
+              /* ignore paste errors */
+            });
+        };
+        reader.readAsDataURL(blob);
+        break; // only process first image per paste
+      }
+    };
+    state.pasteListener = listener;
+    document.addEventListener('paste', listener);
   }
 
   function createCollaborationConfig(
@@ -127,6 +167,7 @@ export function createEditorRuntime(host: HostApi): EditorApi {
           },
         });
 
+        registerPasteListener();
         debugLog('createEditor success');
       } catch (err) {
         debugLog(`createEditor FAILED: ${(err as Error).message}`);

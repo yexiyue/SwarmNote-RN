@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { EllipsisVertical, PanelLeft, PencilLine, Plus } from "lucide-react-native";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,6 +29,7 @@ export default function WorkspaceScreen() {
   const currentInitialState = useCurrentDocStore((s) => s.initialState);
   const commandSheetRef = useRef<CommandSheetRef>(null);
   const pagerRef = useRef<PagerView>(null);
+  const [searchVisible, setSearchVisible] = useState(false);
 
   const openFiles = useCallback(() => pagerRef.current?.setPage(0), []);
   const openWorkspace = useCallback(() => pagerRef.current?.setPage(1), []);
@@ -102,6 +103,8 @@ export default function WorkspaceScreen() {
               docUuid={currentDocUuid}
               initialState={currentInitialState}
               onCollabUpdate={onCollabUpdate}
+              searchVisible={searchVisible}
+              onSearchVisibilityChange={setSearchVisible}
             />
           ) : (
             <View className="flex-1 items-center justify-center px-8">
@@ -128,7 +131,7 @@ export default function WorkspaceScreen() {
           )}
 
           <BottomCommandBar
-            onSearch={() => console.log("[workspace] search tapped")}
+            onSearch={() => setSearchVisible((v) => !v)}
             onNew={handleNewFromBottomBar}
             onMenu={() => commandSheetRef.current?.present()}
           />

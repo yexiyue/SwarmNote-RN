@@ -44,6 +44,9 @@ export interface HostApi {
    *  update as a top-level argument keeps the `uint8array` transferHandler
    *  effective. */
   onCollaborationUpdate(update: Uint8Array): void;
+  /** Called when the user pastes an image in the editor. The host saves the
+   *  file to local storage and returns the `file://` URI to insert. */
+  onPasteFile(mimeType: string, base64Data: string): Promise<string>;
   log(message: string): void;
 }
 
