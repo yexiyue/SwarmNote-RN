@@ -206,7 +206,36 @@ npx expo start --clear
 
 ---
 
-## 知识库索引
+## UpgradeLink secrets(可选,用于自动更新)
+
+仓库带 Android in-app updater(走 UpgradeLink),如果你想发布时让旧版本设备能自动收到更新通知,需要在 GitHub repo Settings → Secrets and variables → Actions 配 3 个 secret:
+
+| Name | 用途 |
+|---|---|
+| `UPGRADE_LINK_ACCESS_KEY` | UpgradeLink 账号 access key |
+| `UPGRADE_LINK_ACCESS_SECRET` | UpgradeLink 账号 access secret |
+| `UPGRADE_LINK_APK_KEY` | UpgradeLink 平台上为这个 app 创建的 Android 项目 key |
+
+CI 通过这些 secret:
+
+1. 用 `EXPO_PUBLIC_*` 前缀同名环境变量在 `gradlew assembleRelease` 时让 Metro inline 进 JS bundle(client 端调 UpgradeLink 用)
+2. 在 `upgradelink-upload` job 里通过 `toolsetlink/upgradelink-action@3.0.2` 把新 release 的 APK URL 推到 UpgradeLink
+
+本地开发:在仓库根创建 `.env.local`(已 gitignored),内容:
+
+```
+EXPO_PUBLIC_UPGRADELINK_ACCESS_KEY=...
+EXPO_PUBLIC_UPGRADELINK_ACCESS_SECRET=...
+EXPO_PUBLIC_UPGRADELINK_APK_KEY=...
+```
+
+不配的话客户端会 silent skip 更新检查,App 仍可正常使用。
+
+详见 [dev-notes/knowledge/auto-update.md](knowledge/auto-update.md)。
+
+---
+
+# 知识库索引
 
 更深的踩坑记录散在 `dev-notes/knowledge/`:
 
