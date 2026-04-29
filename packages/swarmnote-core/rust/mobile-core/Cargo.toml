@@ -26,3 +26,9 @@ uuid = { version = "1", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 tokio = { version = "1", features = ["rt-multi-thread", "sync", "macros"] }
 
+[profile.release]
+lto = "thin"
+codegen-units = 1
+opt-level = "z"
+strip = "symbols"
+
