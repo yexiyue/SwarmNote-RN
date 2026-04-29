@@ -51,7 +51,7 @@ app-example
 .claude/skills/*
 !.claude/skills/dev-workflow/
 !.claude/skills/uniffi-bindgen-rn/
-.omc
+**/.omc
 **/openspec
 **/.obsidian
 .playwright
