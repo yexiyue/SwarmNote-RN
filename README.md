@@ -1,222 +1,273 @@
+<div align="center">
+
+<img src="logo.png" width="128" alt="SwarmNote Mobile">
+
 # SwarmNote Mobile
 
-SwarmNote 的移动端应用，使用 Expo (React Native) 构建。通过 uniffi-bindgen-react-native 桥接 Rust 核心逻辑，与桌面端共享 P2P 同步、CRDT 协作、文档管理等核心能力。
+**把你的设备群带在身上**
 
-## 项目背景
+*Take your swarm with you.*
 
-[SwarmNote](https://github.com/yexiyue/SwarmNote) 是一个去中心化、本地优先的 P2P 笔记同步工具。桌面端已实现完整功能（Tauri v2 + React），本仓库是其移动端对应项目。
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![Expo](https://img.shields.io/badge/Expo-SDK_55-000020?style=flat-square&logo=expo)](https://expo.dev)
+[![React Native](https://img.shields.io/badge/React_Native-0.83-61DAFB?style=flat-square&logo=react)](https://reactnative.dev)
+[![NativeWind](https://img.shields.io/badge/NativeWind-v5-38BDF8?style=flat-square)](https://www.nativewind.dev)
+[![uniffi-rn](https://img.shields.io/badge/uniffi--bindgen--rn-0.31-orange?style=flat-square)](https://github.com/jhugman/uniffi-bindgen-react-native)
 
-### 核心理念
+[这是什么](#这是什么) · [开发](#开发) · [架构](#架构) · [路线图](#路线图)
 
-- **P2P 免费同步** — 设备间直接通信，不经过第三方服务器
-- **CRDT 自动合并** — 离线编辑后重连，字符级自动合并，零冲突
-- **数据完全本地** — 笔记存储在设备上，隐私优先
-- **跨平台复用** — Rust 核心逻辑通过 uniffi 桥接，桌面端和移动端共享同一套后端
+</div>
 
-### Swarm 生态
+---
 
-```
-SwarmDrop   v0.4.4  — 点对点文件传输（已完成）
-SwarmNote   v0.2.3  — P2P 笔记同步-桌面端（已完成核心功能）
-SwarmNote Mobile    — P2P 笔记同步-移动端（本项目，开发中）
-swarm-p2p-core      — P2P 网络 SDK（共享基础库）
-```
+## 这是什么
 
-## 技术栈
+[SwarmNote](https://github.com/yexiyue/SwarmNote) 的移动端实现——基于 **Expo + React Native**，通过 [`uniffi-bindgen-react-native`](https://github.com/jhugman/uniffi-bindgen-react-native) 桥接 Rust 核心逻辑。
 
-| 层面 | 选型 | 说明 |
-|------|------|------|
-| 框架 | Expo SDK 55 | React Native 0.83 + React 19 |
-| 路由 | Expo Router | 文件路由（`src/app/`） |
-| 样式 | NativeWind v4 | Tailwind CSS 3 for React Native |
-| UI 组件 | React Native Reusables | shadcn/ui 的 RN 移植版 |
-| 状态管理 | Zustand | 与桌面端一致 |
-| 国际化 | Lingui | zh 源语言，en 翻译 |
-| Rust 桥接 | uniffi-bindgen-react-native | 已集成，桥接 Rust 核心逻辑 |
-| Lint/Format | Biome | 替代 ESLint + Prettier |
-| Git Hooks | Lefthook | pre-commit (Biome) + commit-msg (commitlint) |
-| 包管理 | pnpm | `.npmrc` 配置 `node-linker=hoisted` |
+让你的手机加入桌面端组成的 swarm，笔记自动同步过来；离线编辑、回到联网时增量合并。**桌面端和移动端跑同一份 Rust 核心 (`swarmnote-core`)，共享同一份 CRDT 状态机和业务逻辑**。
 
-### 与桌面端的对应关系
+<table>
+<tr>
+<td width="25%" align="center">
+<h3>📱</h3>
+<b>移动伴侣</b><br>
+<sub>不是替代桌面<br>是 swarm 的一员</sub>
+</td>
+<td width="25%" align="center">
+<h3>🦀</h3>
+<b>Rust 共享核心</b><br>
+<sub>与桌面跑同一份 crate<br>uniffi JSI 直调</sub>
+</td>
+<td width="25%" align="center">
+<h3>✏️</h3>
+<b>同源编辑器</b><br>
+<sub>WebView + CodeMirror 6<br>桌面 / 移动行为一致</sub>
+</td>
+<td width="25%" align="center">
+<h3>🐝</h3>
+<b>无缝入群</b><br>
+<sub>6 位配对码<br>P2P 与桌面端互通</sub>
+</td>
+</tr>
+</table>
+
+> 目前处于早期开发阶段，未发布预编译版本。需要从源码构建（[开发](#开发)）。
+
+## 与桌面端的对应关系
 
 | 桌面端 (Tauri + React) | 移动端 (Expo + RN) |
 |---|---|
-| shadcn/ui (Radix + Tailwind 4) | React Native Reusables (NativeWind) |
+| shadcn/ui (Radix + Tailwind 4) | React Native Reusables (`@rn-primitives/*` + NativeWind 5) |
 | TanStack Router | Expo Router |
 | Zustand stores | Zustand stores（逻辑可复用） |
-| `invoke('cmd', args)` | uniffi 直接函数调用（类型安全） |
+| `invoke('cmd', args)`（IPC + JSON）| uniffi 直接函数调用（JSI + 类型安全） |
 | `app.emit("event")` | uniffi callback interface |
-| `src/components/ui/` | `src/components/ui/`（同路径） |
+| `swarmnote-core` (path 依赖) | `swarmnote-core` (uniffi-bindgen-rn 桥接) |
+| BlockNote ❌（已迁移） | CodeMirror 6 in WebView |
 
-## 目录结构
-
-```
-swarmnote-mobile/
-├── src/
-│   ├── app/                # Expo Router 文件路由
-│   │   └── _layout.tsx     # 根布局（ThemeProvider + PortalHost）
-│   ├── components/
-│   │   └── ui/             # RNR 组件（copy-paste，CLI 添加）
-│   ├── lib/
-│   │   ├── theme.ts        # 主题配置（CSS 变量的 JS 镜像）
-│   │   └── utils.ts        # cn() 工具函数
-│   ├── hooks/              # 自定义 hooks
-│   ├── stores/             # Zustand stores（待创建）
-│   ├── locales/            # i18n 翻译文件
-│   └── global.css          # Tailwind CSS 变量（亮/暗主题）
-├── packages/
-│   └── swarmnote-core/     # Rust 桥接库（Turbo Module）
-│       ├── rust/mobile-core/   # Rust 源码
-│       └── ubrn.config.yaml    # uniffi 构建配置
-├── assets/                 # 图片、字体等静态资源
-├── dev-notes/              # 开发笔记、技术调研
-├── milestones/             # 版本规划文档
-├── app.json                # Expo 配置
-├── babel.config.js         # NativeWind babel preset
-├── metro.config.js         # withNativeWind + inlineRem
-├── tailwind.config.js      # 主题色、圆角、动画
-├── biome.json              # Lint + Format 配置
-├── components.json         # RNR CLI 配置
-├── pnpm-workspace.yaml     # pnpm monorepo 工作区
-├── lefthook.yml            # Git hooks
-├── cliff.toml              # Changelog 生成
-├── lingui.config.ts        # i18n 配置
-└── CLAUDE.md               # AI 开发指南
-```
+桌面端目前用的也是 CodeMirror 6（封装在 [`@swarmnote/editor`](https://github.com/yexiyue/swarmnote-editor) git submodule 里），移动端通过 WebView 加载同一份编辑器核心——**桌面 / 移动用户拿到完全一致的编辑体验**。
 
 ## 开发
 
 ### 环境要求
 
-- Node.js 22+
-- pnpm 10+
-- Rust 工具链（`rustup`）+ Android NDK targets
+- Node.js 22+ · pnpm 10+
+- Rust 工具链（`rustup`）
 - Android Studio + Android SDK（Android 开发）
-- Xcode（iOS 开发，仅 macOS）
+- Xcode 16+（iOS 开发，仅 macOS）
 
-### 快速开始
+### 初始化
 
 ```bash
-# 安装依赖
+git clone --recurse-submodules https://github.com/yexiyue/SwarmNote-RN.git
+cd SwarmNote-RN
 pnpm install
 ```
 
-#### Android
+> `packages/editor/` 是独立的 [`swarmnote-editor`](https://github.com/yexiyue/swarmnote-editor) git submodule。`--recurse-submodules` 必加，否则编辑器核心不会拉下来。
+
+### Android
 
 ```bash
 # 1. 安装 Rust Android 交叉编译 targets（首次）
 rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
 
-# 2. 编译 Rust 并生成 TS/C++ 绑定
-cd packages/swarmnote-core
-pnpm ubrn:android
+# 2. 编译 Rust 并生成 TS / C++ 绑定
+pnpm --filter react-native-swarmnote-core ubrn:android
 
-# 3. 回到项目根目录，生成原生项目并运行
-cd ../..
+# 3. 生成原生项目并运行
 npx expo prebuild --platform android
 npx expo run:android
 ```
 
-#### iOS（仅 macOS）
+### iOS（仅 macOS）
 
 ```bash
 # 1. 安装 Rust iOS 交叉编译 targets（首次）
 rustup target add aarch64-apple-ios aarch64-apple-ios-sim
 
-# 2. 编译 Rust 并生成 TS/C++ 绑定
-cd packages/swarmnote-core
-pnpm ubrn:ios
+# 2. 编译 Rust 并生成 TS / C++ 绑定
+pnpm --filter react-native-swarmnote-core ubrn:ios
 
-# 3. 回到项目根目录，生成原生项目并运行
-cd ../..
+# 3. 生成原生项目并运行
 npx expo prebuild --platform ios
 npx expo run:ios
 ```
 
-> **注意**：本项目使用 Rust 原生模块，**不支持 Expo Go**，必须使用 Development Build。
-
-#### Rust 代码变更后
-
-修改 `packages/swarmnote-core/rust/` 下的 Rust 代码后，需要重新编译：
+### 修改 Rust 代码后
 
 ```bash
-cd packages/swarmnote-core
-pnpm ubrn:android    # 或 pnpm ubrn:ios
+# 重新编译 + 生成绑定
+pnpm --filter react-native-swarmnote-core ubrn:android   # 或 :ios
+# 然后重新跑 Expo development build
+npx expo run:android                                     # 或 :ios
 ```
 
-然后重新运行 `npx expo run:android`（或 `run:ios`）即可。
+### 修改编辑器核心后
 
-### 常用命令
+`packages/editor/` 是平台无关的 CodeMirror 6 核心（git submodule）。改动后要重建 WebView bundle：
 
 ```bash
-# Lint
-pnpm lint          # Biome check
-pnpm lint:ci       # CI 模式（非零退出码）
-pnpm format        # 自动修复
-
-# i18n
-pnpm lingui:extract    # 提取翻译消息
-
-# Changelog
-pnpm changelog         # 生成 CHANGELOG.md
-pnpm changelog:latest  # 查看未发布变更
-
-# UI 组件
-pnpm dlx @react-native-reusables/cli@latest add button    # 添加单个组件
-pnpm dlx @react-native-reusables/cli@latest add --all     # 添加所有组件
-pnpm dlx @react-native-reusables/cli@latest doctor         # 诊断配置
+pnpm --filter @swarmnote/editor-web build
 ```
 
-### 注意事项
+否则 WebView 里仍会加载旧的 bundle。
 
-- **不支持 Expo Go** — 使用 Development Build（`npx expo run:android` / `npx expo run:ios`）
-- **pnpm 必须 hoisted** — `.npmrc` 中的 `node-linker=hoisted` 不可删除
-- **修改 babel/metro 配置后** — 必须清缓存：`npx expo start --clear`
-- **修改 Rust 代码后** — 需要重新 `pnpm ubrn:android`（或 `ubrn:ios`），然后 `npx expo run:android`
-- **暗色模式 CSS 选择器** — 用 `.dark:root`（NativeWind 约定），不是 `.dark`
-- **RN 样式不继承** — 每个 `<Text>` 需单独加 className
+### Critical Notes
 
-## Rust 桥接架构
+- **不支持 Expo Go**——仓库依赖原生 Rust 模块，必须用 development build (`pnpm android` / `pnpm ios`)
+- **`.npmrc` 中 `node-linker=hoisted` 不能删**——Metro 不兼容 pnpm 默认的 symlink node_modules 布局
+- **`lightningcss` 锁定 `1.30.1`**（pnpm overrides）——其他版本会让 `src/global.css` 反序列化失败
+- **改 `src/global.css` 后必须 `npx expo start --clear`**
+- **不要手改生成代码**：`packages/swarmnote-core/{src,cpp}/generated/`（uniffi 自动生成）
 
-移动端通过 uniffi-bindgen-react-native 桥接 Rust 核心逻辑：
+## 架构
+
+```mermaid
+graph TB
+    subgraph App["移动端 App — React Native + Expo"]
+        UI["UI: NativeWind 5 + @rn-primitives/*<br/>Expo Router · Zustand · Lingui 6"]
+        WV["WebView (react-native-webview)"]
+    end
+
+    subgraph Editor["编辑器栈 — RN ↔ WebView 跨域"]
+        Bridge["Comlink (postMessage RPC)"]
+        EditorWeb["@swarmnote/editor-web<br/>WebView 入口 (EditorApi)"]
+        EditorCore["@swarmnote/editor (git submodule)<br/>CodeMirror 6 + Markdown + Yjs + KaTeX"]
+    end
+
+    subgraph Bridge2["Rust 桥接 — Turbo Module"]
+        TS["TypeScript (生成绑定)"]
+        JSI["Hermes JSI"]
+        Cpp["C++ (生成绑定)"]
+        Rust["swarmnote-core<br/>(与桌面端共享，含 yrs CRDT)"]
+    end
+
+    subgraph P2P["P2P 网络 — libp2p 0.56"]
+        Net["mDNS · DHT · DCUtR · Relay · GossipSub"]
+    end
+
+    UI --> WV
+    WV -- "injectJS / postMessage" --> Bridge
+    Bridge --> EditorWeb
+    EditorWeb --> EditorCore
+    UI -- "调用生成的 TS API" --> TS
+    TS --> JSI
+    JSI --> Cpp
+    Cpp --> Rust
+    Rust --> P2P
+
+    style Rust fill:#fef3c7,stroke:#d97706
+    style EditorCore fill:#fef3c7,stroke:#d97706
+```
+
+两条核心链路：
+
+- **编辑器链路** `RN → WebView → Comlink → CodeMirror 6`（无 JSON 序列化，调用 `EditorApi` 类型安全）
+- **业务逻辑链路** `TypeScript → Hermes JSI → C++ → Rust`（共享 `swarmnote-core` crate，与桌面端同源）
+
+### 工作区包
+
+`pnpm-workspace.yaml` 包含 3 个工作区：
+
+| 包 | 角色 |
+|----|----|
+| `react-native-swarmnote-core` | Rust bridge / Turbo Module（uniffi 生成绑定 + Android/iOS native 代码） |
+| `@swarmnote/editor` | 平台无关 CodeMirror 6 核心（**git submodule** —— [`yexiyue/swarmnote-editor`](https://github.com/yexiyue/swarmnote-editor)，桌面端也引用同一仓库） |
+| `@swarmnote/editor-web` | WebView bundle 入口 + 与 RN 端 Comlink RPC |
+
+### 项目结构
 
 ```
 swarmnote-mobile/
-├── packages/swarmnote-core/        # Rust 桥接库（React Native Turbo Module）
-│   ├── ubrn.config.yaml            # uniffi 构建配置
-│   ├── rust/mobile-core/           # Rust crate（#[uniffi::export]）
-│   │   ├── Cargo.toml
-│   │   └── src/lib.rs
-│   ├── src/generated/              # ubrn 生成的 TS 绑定
-│   ├── cpp/generated/              # ubrn 生成的 C++ JSI 绑定
-│   └── android/                    # Android 原生代码 + .a 静态库
-└── src/                            # RN 前端，调用生成的 TS API
+├── src/
+│   ├── app/                       # Expo Router 文件路由
+│   ├── components/
+│   │   ├── editor/                #   MarkdownEditor + Comlink bridge
+│   │   └── ui/                    #   React Native Reusables 生成组件
+│   ├── hooks/
+│   ├── lib/
+│   │   └── comlink-webview-adapter.ts
+│   ├── stores/                    # Zustand stores
+│   ├── locales/                   # Lingui 翻译
+│   └── global.css                 # Tailwind 4 主题变量（CSS-first）
+├── packages/
+│   ├── editor/                    # @swarmnote/editor (git submodule)
+│   ├── editor-web/                # @swarmnote/editor-web (WebView 入口)
+│   └── swarmnote-core/            # react-native-swarmnote-core (Rust bridge)
+│       ├── ubrn.config.yaml       #   uniffi 构建配置
+│       ├── rust/mobile-core/      #   Rust crate (#[uniffi::export])
+│       ├── src/generated/         #   ubrn 生成的 TS 绑定（不要手改）
+│       ├── cpp/generated/         #   ubrn 生成的 C++ JSI 绑定（不要手改）
+│       └── android/               #   Android 原生代码 + .a 静态库
+├── plugins/                        # Expo config plugins
+├── assets/                         # 图片、字体、icon
+├── dev-notes/                      # 开发笔记 + 知识库
+└── milestones/                     # 版本规划
 ```
 
-调用链路：`TypeScript → Hermes JSI → C++ → Rust`，无 JSON 序列化，性能优于 Tauri 的 WebView invoke。
+## 技术栈
 
-> 当前 `mobile-core` 是独立的最小化 crate（验证链路用）。后续桌面端 `app-core` 抽离后将替换为共享 crate。
+| 层级 | 技术 |
+|------|------|
+| 框架 | Expo SDK 55 · React Native 0.83 · React 19.2 |
+| 路由 | Expo Router（文件路由 · `typedRoutes` + `reactCompiler`） |
+| 样式 | NativeWind 5 + Tailwind CSS 4（CSS-first，无 `tailwind.config.js`） |
+| UI 组件 | [React Native Reusables](https://github.com/founded-labs/react-native-reusables) (`@rn-primitives/*`) |
+| 状态管理 | Zustand 5 |
+| 国际化 | Lingui 6（zh 源语言，en 翻译） |
+| 编辑器 | CodeMirror 6 + Yjs in WebView via Comlink |
+| Rust 桥接 | uniffi-bindgen-react-native 0.31（JSI Turbo Module） |
+| 跨平台核心 | `swarmnote-core` crate（与桌面端共享） |
+| 工具链 | Biome · Lefthook · commitlint · git-cliff |
 
-## 开发路线
+## 设计稿
 
-### Phase 1: UI 壳 + Rust 桥接验证
+设计稿位于 `dev-notes/design/mobile-design.pen`（[Pencil](https://withpencil.app/) 文件，需通过 Pencil MCP 工具读取，不是普通 Markdown）。
 
-- [ ] Tab 导航结构（笔记列表 / 编辑器 / 同步 / 设置）
-- [ ] 基础页面和组件
-- [ ] `crates/app-core/` 骨架 + uniffi hello world 调用
+## Swarm 生态
 
-### Phase 2: 功能串联
+| 项目 | 说明 | 状态 |
+|------|------|------|
+| [SwarmDrop](https://github.com/yexiyue/swarmdrop) | P2P 文件传输 | v0.4.4 |
+| [SwarmNote](https://github.com/yexiyue/SwarmNote) | P2P 笔记同步（桌面端） | v0.2.3 |
+| **SwarmNote-RN** | SwarmNote 移动端（本仓库） | 开发中 |
+| [swarm-p2p-core](https://github.com/yexiyue/swarm-p2p) | P2P 网络 SDK | 已完成 |
 
-- [ ] 工作区管理（打开/创建/列表）
-- [ ] 文档列表 + Markdown 预览
-- [ ] 身份管理（设备名、PeerId）
+## 路线图
 
-### Phase 3: 核心能力
+- [x] **Phase 1** — UI 壳 + Rust 桥接验证（uniffi hello world · Tab 导航 · WebView 编辑器跑通）
+- [ ] **Phase 2** — 功能串联（工作区管理 · 文档列表 · 身份管理）
+- [ ] **Phase 3** — 核心能力（P2P 同步 · 设备配对 · CRDT 状态持久化）
+- [ ] **Phase 4** — 与桌面端互通验证 + 首个 alpha 发布
+- [ ] **Phase 5** — 应用商店上架（Google Play · App Store）
 
-- [ ] 富文本编辑器（RN 端方案调研）
-- [ ] P2P 同步
-- [ ] 设备配对
+## 许可证
 
-## License
+[MIT](LICENSE) &copy; 2025 SwarmNote Contributors
 
-MIT
+---
+
+<div align="center">
+<sub>Built with <a href="https://expo.dev">Expo</a> · <a href="https://reactnative.dev">React Native</a> · <a href="https://github.com/jhugman/uniffi-bindgen-react-native">uniffi-bindgen-rn</a> · <a href="https://codemirror.net">CodeMirror 6</a> · <a href="https://yjs.dev">Yjs</a></sub>
+</div>
