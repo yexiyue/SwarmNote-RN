@@ -4,24 +4,40 @@ import {
   BadgeCheck,
   BookOpen,
   Code,
+  Download,
   FileText,
+  Loader,
   MessageSquare,
   RefreshCw,
 } from "lucide-react-native";
-import { Linking, Pressable, View } from "react-native";
+import { Linking, Platform, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 import { SettingsHeader } from "@/components/settings-header";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { useUpdateStore } from "@/stores/update-store";
 
 const APP_VERSION = Constants.expoConfig?.version ?? "0.0.0";
 
 export default function AboutSettings() {
   const colors = useThemeColors();
   const { t } = useLingui();
+  const { status, checkForUpdate } = useUpdateStore(
+    useShallow((s) => ({ status: s.status, checkForUpdate: s.checkForUpdate })),
+  );
+
+  const isAndroid = Platform.OS === "android";
+  const isChecking = status === "checking";
+  const hasUpdate = status === "available" || status === "force-required";
 
   const openUrl = (url: string) => {
     Linking.openURL(url).catch((err) => console.warn("[about] openURL failed:", err));
+  };
+
+  const onCheckUpdate = () => {
+    if (isChecking) return;
+    void checkForUpdate(true);
   };
 
   return (
@@ -40,10 +56,31 @@ export default function AboutSettings() {
             <View className="flex-row items-center gap-2 mt-0.5">
               <Text className="text-[13px] text-muted-foreground">v{APP_VERSION}</Text>
               <View className="flex-row items-center gap-1">
-                <BadgeCheck color={colors.success} size={12} />
-                <Text className="text-[11px] font-medium" style={{ color: colors.success }}>
-                  <Trans>已是最新</Trans>
-                </Text>
+                {hasUpdate ? (
+                  <>
+                    <Download color={colors.primary} size={12} />
+                    <Text className="text-[11px] font-medium" style={{ color: colors.primary }}>
+                      <Trans>有新版可用</Trans>
+                    </Text>
+                  </>
+                ) : isChecking ? (
+                  <>
+                    <Loader color={colors.mutedForeground} size={12} />
+                    <Text
+                      className="text-[11px] font-medium"
+                      style={{ color: colors.mutedForeground }}
+                    >
+                      <Trans>正在检查...</Trans>
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <BadgeCheck color={colors.success} size={12} />
+                    <Text className="text-[11px] font-medium" style={{ color: colors.success }}>
+                      <Trans>已是最新</Trans>
+                    </Text>
+                  </>
+                )}
               </View>
             </View>
           </View>
@@ -54,15 +91,20 @@ export default function AboutSettings() {
         </Text>
 
         <View className="mt-6 flex-row items-center gap-3">
-          <Pressable
-            className="h-9 flex-row items-center gap-1.5 rounded-lg border border-border px-3.5"
-            accessibilityLabel={t`检查更新`}
-          >
-            <RefreshCw color={colors.foreground} size={13} />
-            <Text className="text-[13px] text-foreground">
-              <Trans>检查更新</Trans>
-            </Text>
-          </Pressable>
+          {isAndroid && (
+            <Pressable
+              onPress={onCheckUpdate}
+              disabled={isChecking}
+              className="h-9 flex-row items-center gap-1.5 rounded-lg border border-border px-3.5"
+              accessibilityLabel={t`检查更新`}
+              style={{ opacity: isChecking ? 0.5 : 1 }}
+            >
+              <RefreshCw color={colors.foreground} size={13} />
+              <Text className="text-[13px] text-foreground">
+                <Trans>检查更新</Trans>
+              </Text>
+            </Pressable>
+          )}
           <Pressable
             onPress={() => openUrl("https://github.com/yexiyue/SwarmNote/releases")}
             className="h-9 flex-row items-center gap-1.5 rounded-lg border border-border px-3.5"

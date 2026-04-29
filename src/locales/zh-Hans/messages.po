@@ -15,17 +15,17 @@ msgstr ""
 
 #. placeholder {0}: info.os
 #. placeholder {1}: info.arch
-#: src/app/settings/devices.tsx:359
+#: src/app/settings/devices.tsx:371
 msgid "{0} · {1} · 当前设备"
 msgstr "{0} · {1} · 当前设备"
 
 #. placeholder {0}: d.os
-#: src/app/settings/devices.tsx:224
+#: src/app/settings/devices.tsx:233
 msgid "{0} · 局域网"
 msgstr "{0} · 局域网"
 
 #. placeholder {0}: d.os
-#: src/app/settings/devices.tsx:141
+#: src/app/settings/devices.tsx:144
 msgid "{0} · 局域网 · {rtt}ms"
 msgstr "{0} · 局域网 · {rtt}ms"
 
@@ -48,7 +48,7 @@ msgid "{0} 篇笔记"
 msgstr "{0} 篇笔记"
 
 #. placeholder {0}: d.name ?? d.hostname
-#: src/app/settings/devices.tsx:150
+#: src/app/settings/devices.tsx:153
 msgid "{0} 详情"
 msgstr "{0} 详情"
 
@@ -89,6 +89,10 @@ msgstr "P2P 网络"
 msgid "一切就绪！"
 msgstr "一切就绪！"
 
+#: src/components/update/UpdateProgressDialog.tsx:39
+msgid "下载完成后系统会引导你完成安装"
+msgstr "下载完成后系统会引导你完成安装"
+
 #: src/components/workspace-sync-card.tsx:70
 msgid "与 {onlineCount} 台设备保持同步"
 msgstr "与 {onlineCount} 台设备保持同步"
@@ -122,7 +126,7 @@ msgstr "你的设备已准备好加入蜂群网络"
 msgid "使用中"
 msgstr "使用中"
 
-#: src/app/settings/devices.tsx:335
+#: src/app/settings/devices.tsx:347
 msgid "保存"
 msgstr "保存"
 
@@ -131,7 +135,7 @@ msgstr "保存"
 msgid "共享的工作区"
 msgstr "共享的工作区"
 
-#: src/app/settings/about.tsx:29
+#: src/app/settings/about.tsx:45
 #: src/app/settings/index.tsx:115
 #: src/components/command-sheet.tsx:63
 msgid "关于"
@@ -190,8 +194,8 @@ msgstr "删除文件夹"
 msgid "删除笔记"
 msgstr "删除笔记"
 
-#: src/app/settings/devices.tsx:200
-#: src/app/settings/devices.tsx:204
+#: src/app/settings/devices.tsx:206
+#: src/app/settings/devices.tsx:210
 msgid "刷新"
 msgstr "刷新"
 
@@ -206,7 +210,7 @@ msgstr "加载中…"
 msgid "即将推出"
 msgstr "即将推出"
 
-#: src/app/settings/about.tsx:53
+#: src/app/settings/about.tsx:90
 msgid "去中心化、本地优先的 P2P 笔记应用"
 msgstr "去中心化、本地优先的 P2P 笔记应用"
 
@@ -214,13 +218,17 @@ msgstr "去中心化、本地优先的 P2P 笔记应用"
 msgid "去中心化笔记，自然同步"
 msgstr "去中心化笔记，自然同步"
 
-#: src/app/settings/about.tsx:87
+#: src/app/settings/about.tsx:129
 msgid "反馈"
 msgstr "反馈"
 
+#: src/components/update/UpdateDialog.tsx:47
+msgid "发现新版本"
+msgstr "发现新版本"
+
 #: src/app/pairing/found-device.tsx:154
 #: src/app/pairing/found-device.tsx:158
-#: src/app/settings/devices.tsx:348
+#: src/app/settings/devices.tsx:360
 #: src/app/settings/devices/[peerId].tsx:138
 #: src/components/files-panel.tsx:121
 #: src/components/files/InlineNameInput.tsx:106
@@ -305,7 +313,7 @@ msgstr "在 App 空间里开辟一块独立的笔记区域"
 msgid "在左侧文件面板中选择一篇笔记，或新建一篇"
 msgstr "在左侧文件面板中选择一篇笔记，或新建一篇"
 
-#: src/app/settings/devices.tsx:173
+#: src/app/settings/devices.tsx:176
 #: src/app/settings/devices/[peerId].tsx:209
 #: src/app/workspaces/sync/select.tsx:236
 msgid "在线"
@@ -414,7 +422,7 @@ msgstr "已在本地"
 msgid "已手动关闭"
 msgstr "已手动关闭"
 
-#: src/app/settings/about.tsx:45
+#: src/app/settings/about.tsx:80
 msgid "已是最新"
 msgstr "已是最新"
 
@@ -486,6 +494,18 @@ msgstr "当前"
 #: src/app/workspaces/[id].tsx:112
 msgid "当前工作区"
 msgstr "当前工作区"
+
+#: src/components/update/ForceUpdateDialog.tsx:51
+#~ msgid "当前版本 v{0} 已不再受支持,请升级到 v{1} 才能继续使用。"
+#~ msgstr "当前版本 v{0} 已不再受支持,请升级到 v{1} 才能继续使用。"
+
+#: src/components/update/ForceUpdateDialog.tsx:53
+msgid "当前版本 v{current} 已不再受支持,请升级到 v{latest} 才能继续使用。"
+msgstr "当前版本 v{current} 已不再受支持,请升级到 v{latest} 才能继续使用。"
+
+#: src/components/update/ForceUpdateDialog.tsx:50
+msgid "必须更新"
+msgstr "必须更新"
 
 #: src/components/command-sheet.tsx:60
 msgid "快速切换笔记"
@@ -583,7 +603,7 @@ msgstr "数据完全本地，隐私优先"
 msgid "文件夹名称"
 msgstr "文件夹名称"
 
-#: src/app/settings/about.tsx:83
+#: src/app/settings/about.tsx:125
 msgid "文档"
 msgstr "文档"
 
@@ -608,6 +628,14 @@ msgstr "新建文件夹"
 msgid "新建笔记"
 msgstr "新建笔记"
 
+#: src/components/update/UpdateDialog.tsx:48
+#~ msgid "新版本 v{0} 可用,当前 v{1}"
+#~ msgstr "新版本 v{0} 可用,当前 v{1}"
+
+#: src/components/update/UpdateDialog.tsx:50
+msgid "新版本 v{latest} 可用,当前 v{current}"
+msgstr "新版本 v{latest} 可用,当前 v{current}"
+
 #: src/app/workspaces/[id].tsx:52
 msgid "无效的工作区路径"
 msgstr "无效的工作区路径"
@@ -621,14 +649,18 @@ msgid "暂无在线设备"
 msgstr "暂无在线设备"
 
 #: src/app/onboarding/pairing.tsx:185
-#: src/app/settings/devices.tsx:251
+#: src/app/settings/devices.tsx:263
 msgid "暂无附近设备"
 msgstr "暂无附近设备"
 
-#: src/app/settings/about.tsx:69
-#: src/app/settings/about.tsx:73
+#: src/app/settings/about.tsx:111
+#: src/app/settings/about.tsx:115
 msgid "更新日志"
 msgstr "更新日志"
+
+#: src/app/settings/about.tsx:63
+msgid "有新版可用"
+msgstr "有新版可用"
 
 #: src/app/onboarding/pairing.tsx:129
 msgid "有配对码？点击输入"
@@ -652,10 +684,24 @@ msgstr "未知"
 msgid "来自 \"{0}\" ({1})"
 msgstr "来自 \"{0}\" ({1})"
 
-#: src/app/settings/about.tsx:59
-#: src/app/settings/about.tsx:63
+#: src/components/update/ForceUpdateDialog.tsx:60
+#: src/components/update/UpdateDialog.tsx:57
+msgid "查看更新内容"
+msgstr "查看更新内容"
+
+#: src/components/update/ForceUpdateDialog.tsx:59
+#: src/components/update/UpdateDialog.tsx:55
+#~ msgid "查看更新内容 ↗"
+#~ msgstr "查看更新内容 ↗"
+
+#: src/app/settings/about.tsx:99
+#: src/app/settings/about.tsx:104
 msgid "检查更新"
 msgstr "检查更新"
+
+#: src/components/update/UpdateProgressDialog.tsx:36
+msgid "正在下载新版本"
+msgstr "正在下载新版本"
 
 #: src/app/workspaces/sync/syncing.tsx:105
 msgid "正在同步"
@@ -669,6 +715,10 @@ msgstr "正在同步 {0} 个工作区"
 #: src/app/settings/network.tsx:33
 msgid "正在启动…"
 msgstr "正在启动…"
+
+#: src/app/settings/about.tsx:73
+msgid "正在检查..."
+msgstr "正在检查..."
 
 #: src/app/workspaces/sync/select.tsx:142
 msgid "正在获取可同步的工作区…"
@@ -735,15 +785,24 @@ msgstr "确认这是你要配对的设备？"
 msgid "确认配对"
 msgstr "确认配对"
 
-#: src/app/settings/devices.tsx:173
+#: src/app/settings/devices.tsx:176
 #: src/app/settings/devices/[peerId].tsx:212
 msgid "离线"
 msgstr "离线"
+
+#: src/components/update/UpdateDialog.tsx:64
+msgid "稍后"
+msgstr "稍后"
 
 #: src/components/workspace-sync-card.tsx:103
 #: src/components/workspace-sync-card.tsx:111
 msgid "立即同步"
 msgstr "立即同步"
+
+#: src/components/update/ForceUpdateDialog.tsx:67
+#: src/components/update/UpdateDialog.tsx:69
+msgid "立即更新"
+msgstr "立即更新"
 
 #: src/components/files/InlineNameInput.tsx:80
 msgid "笔记标题"
@@ -769,11 +828,11 @@ msgstr "给设备取个名字"
 msgid "继续"
 msgstr "继续"
 
-#: src/app/settings/devices.tsx:375
+#: src/app/settings/devices.tsx:387
 msgid "编辑"
 msgstr "编辑"
 
-#: src/app/settings/devices.tsx:372
+#: src/app/settings/devices.tsx:384
 msgid "编辑设备名称"
 msgstr "编辑设备名称"
 
@@ -898,7 +957,7 @@ msgstr "还没有打开的笔记"
 msgid "还没有笔记"
 msgstr "还没有笔记"
 
-#: src/app/settings/devices.tsx:186
+#: src/app/settings/devices.tsx:192
 msgid "还没有配对设备"
 msgstr "还没有配对设备"
 
@@ -950,13 +1009,13 @@ msgid "部分设备同步失败"
 msgstr "部分设备同步失败"
 
 #: src/app/onboarding/pairing.tsx:173
-#: src/app/settings/devices.tsx:237
+#: src/app/settings/devices.tsx:246
 msgid "配对"
 msgstr "配对"
 
 #. placeholder {0}: d.name ?? d.hostname
 #: src/app/onboarding/pairing.tsx:166
-#: src/app/settings/devices.tsx:230
+#: src/app/settings/devices.tsx:239
 msgid "配对 {0}"
 msgstr "配对 {0}"
 
@@ -997,7 +1056,7 @@ msgstr "重试"
 msgid "附近的设备"
 msgstr "附近的设备"
 
-#: src/app/settings/devices.tsx:195
+#: src/app/settings/devices.tsx:201
 msgid "附近设备"
 msgstr "附近设备"
 

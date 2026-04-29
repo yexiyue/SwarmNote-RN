@@ -7,16 +7,18 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, useColorScheme, View } from "react-native";
+import { ActivityIndicator, Platform, useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { PairingRequestHost } from "@/components/pairing-request-host";
+import { UpdateHost } from "@/components/update/UpdateHost";
 import { initAppCore } from "@/core/app-core";
 import { useNavTheme } from "@/hooks/useThemeColors";
 import { LinguiProvider } from "@/i18n/LinguiProvider";
 import { initI18n } from "@/i18n/lingui";
 import { restoreThemePreference } from "@/lib/theme-persistence";
 import { waitForOnboardingHydration } from "@/stores/onboarding-store";
+import { useUpdateStore } from "@/stores/update-store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,6 +47,18 @@ export default function RootLayout() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!ready || Platform.OS !== "android") return;
+    const timer = setTimeout(() => {
+      void useUpdateStore.getState().checkForUpdate();
+    }, 2000);
+    const unsubscribe = useUpdateStore.getState().setupAppStateListener();
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [ready]);
 
   if (!ready) return null;
 
@@ -88,6 +102,7 @@ export default function RootLayout() {
                 <Stack.Screen name="explore" />
               </Stack>
               <PairingRequestHost />
+              <UpdateHost />
               <PortalHost />
             </BottomSheetModalProvider>
           </LinguiProvider>
