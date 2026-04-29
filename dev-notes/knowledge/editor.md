@@ -323,6 +323,37 @@ const listener = (update: Uint8Array, origin: unknown) => {
 
 **相关文件**：`packages/editor/src/theme/createTheme.ts`、`packages/editor/src/extensions/editorSettingsExtension.ts`
 
+## v0.2 行为变更
+
+随 [adopt-clm-editor-patterns](../../openspec/changes/adopt-clm-editor-patterns/) change 落地：
+
+### 表格
+
+- **commit 时机**：单元格编辑改为 `blur` 或 `Enter` 时一次性 commit（不再 `onInput` 每次按键 dispatch）
+  - **影响**：IME 中文/日文/韩文输入不再被打断；Yjs 协作每次编辑只产生一次 diff；撤销颗粒度更自然
+- **列宽美化删除**：`serializeMarkdownTable` 不再计算 displayWidth / 用空格 padding，markdown 写出为单空格 `| col1 | col2 |` 形式
+  - **影响**：用户手动格式化的表格 whitespace 不会被改写
+- **MD toggle 按钮**：widget toolbar 新增 "MD" 按钮 → 切到 markdown 源码模式（"Table" 按钮切回）
+  - **影响**：contentEditable 体验出问题时有逃生舱口
+- **单元格 inline markdown 渲染**：cell 失焦时 `**bold**` / `*italic*` / `~~strike~~` / `` `code` `` / `[link](url)` 渲染为富文本，聚焦时显示原始 markdown
+  - 不支持 wikilink `[[...]]`（v0.3 走 lezer 节点扩展统一）
+
+### 代码块
+
+- **三模式 + off**：`EditorFeatureToggles.codeBlockMode: 'off' | 'inline' | 'auto' | 'toggle'`，默认 `inline`（保持当前体验）
+- `auto` / `toggle` 模式的卡片**目前不做语法高亮**（monospace 纯文本），用户进入源码模式才看到完整高亮。后续可接入 lowlight 增强
+
+### 智能粘贴
+
+- 选中文字粘贴 URL → 自动转 `[selected text](url)`
+- 拖拽文件 → 调用 `EditorProps.uploadFile?.(file)` hook（未配置时静默忽略）
+
+### Admonition / Callout
+
+- `> [!note]` / `> [!warning]` 等 GFM-style callout 渲染为带颜色边框 + 图标的样式
+- 默认导出 `GFM_TYPES`（5 种），可按需 import `OBSIDIAN_TYPES` 扩展到 13 种
+- 未注册的 type 显示默认图标 + 字面 label，不会渲染失败
+
 ## 代码块语言高亮
 
 直接使用 `@codemirror/language-data` 的完整 `languages` 列表，支持 50+ 种语言。

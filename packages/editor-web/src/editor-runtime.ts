@@ -39,6 +39,31 @@ function getEditorRoot(): HTMLElement {
   return parent;
 }
 
+const ABSOLUTE_URL_RE = /^(https?:|data:|blob:|file:|asset:|tauri:)/i;
+
+/**
+ * Map workspace-relative image src into a `file://` URL the WebView can load.
+ * Mirrors the desktop `convertFileSrc(wsPath + url)` strategy but using plain
+ * file:// (RN WebView is configured with allowFileAccessFromFileURLs).
+ *
+ * Absolute schemes are returned as-is so external https / data URLs continue
+ * to flow through unchanged.
+ */
+function createWorkspaceImageResolver(
+  workspacePath: string | undefined,
+): ((src: string) => string) | undefined {
+  if (!workspacePath) return undefined;
+  // Strip trailing slashes so we don't produce `file:///path//foo.png`.
+  const base = workspacePath.replace(/\/+$/, '');
+  return (src: string): string => {
+    if (!src) return src;
+    if (ABSOLUTE_URL_RE.test(src)) return src;
+    // Strip leading `./` or `/` so relative paths normalize cleanly.
+    const cleaned = src.replace(/^(\.\/|\/)+/, '');
+    return `file://${base}/${cleaned}`;
+  };
+}
+
 /**
  * 创建 Editor Runtime，返回 EditorApi 实现。
  * host 是通过 Comlink.wrap 获得的 RN 侧 HostApi 代理。
@@ -162,6 +187,7 @@ export function createEditorRuntime(host: HostApi): EditorApi {
           initialSearchState: options.initialSearchState,
           autofocus: options.autofocus,
           collaboration: createCollaborationConfig(options),
+          imageResolver: createWorkspaceImageResolver(options.workspacePath),
           onEvent(event) {
             emitEditorEvent(event);
           },

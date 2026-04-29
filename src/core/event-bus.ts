@@ -35,6 +35,12 @@ export class EventBus implements ForeignEventBus {
 
       case UniffiAppEvent_Tags.NodeStarted:
         swarm.setOnline(true);
+        // Rust core populates the paired-devices cache in-memory during
+        // start_node, but does NOT replay `PairedDeviceAdded` events for
+        // existing pairings. Without this fire-and-forget refresh, a cold
+        // start leaves `swarmStore.pairedDevices` as `[]` until the user
+        // pairs/unpairs again — see specs/rn-state-stores delta.
+        refreshPairedDevices();
         break;
 
       case UniffiAppEvent_Tags.NodeStopped:

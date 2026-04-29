@@ -15,6 +15,13 @@ export interface RuntimeInitOptions {
   initialSearchState?: SearchState | null;
   autofocus?: boolean;
   collaboration?: EditorCollaborationConfig;
+  /**
+   * Local filesystem path of the active workspace. When set, the runtime
+   * resolves workspace-relative image src `![](images/foo.png)` into
+   * `file://<workspacePath>/images/foo.png` so the WebView can load them.
+   * Absolute schemes (http/https/data/blob/asset/file/tauri) pass through.
+   */
+  workspacePath?: string;
 }
 
 export interface RuntimeCreateEditorOptions extends RuntimeInitOptions {}

@@ -12,6 +12,7 @@ import { Keyboard, Platform, useColorScheme, View } from "react-native";
 import type { WebViewMessageEvent } from "react-native-webview";
 import WebView from "react-native-webview";
 import { clear as clearBridge, register as registerBridge } from "@/core/editor-bridge-registry";
+import { useWorkspaceStore } from "@/stores/workspace-store";
 import { FormattingToolbar } from "./FormattingToolbar";
 import { SearchBar } from "./SearchBar";
 import { useEditorBridge } from "./useEditorBridge";
@@ -182,6 +183,7 @@ export function MarkdownEditor({
 
   const colorScheme = useColorScheme();
   const appearance = colorScheme === "dark" ? "dark" : "light";
+  const workspacePath = useWorkspaceStore((s) => s.info?.path);
 
   const options: EditorInitOptions = useMemo(
     () => ({
@@ -197,8 +199,9 @@ export function MarkdownEditor({
               fragmentName: "document",
             }
           : undefined,
+      workspacePath,
     }),
-    [appearance, collabMode, enableYjs, initialText],
+    [appearance, collabMode, enableYjs, initialText, workspacePath],
   );
 
   useEffect(() => {
@@ -309,13 +312,15 @@ export function MarkdownEditor({
         <WebView
           ref={handleRef}
           source={{ uri: htmlUri }}
-          originWhitelist={["file://*"]}
+          originWhitelist={["file://*", "https://*", "data:*"]}
           onMessage={handleMessage}
           style={{ flex: 1, opacity: 0.99 }}
           javaScriptEnabled
           domStorageEnabled
           allowFileAccess
           allowFileAccessFromFileURLs
+          allowUniversalAccessFromFileURLs
+          mixedContentMode="always"
           scrollEnabled
           nestedScrollEnabled
           keyboardDisplayRequiresUserAction={false}
