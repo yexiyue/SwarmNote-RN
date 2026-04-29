@@ -45,7 +45,8 @@
             "deploymentTarget": "17.0"
           }
         }
-      ]
+      ],
+      "./plugins/with-android-release-signing"
     ],
     "experiments": {
       "typedRoutes": true,
