@@ -54,6 +54,11 @@ jobs:
           target: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
           cache-workspaces: packages/swarmnote-core/rust/mobile-core
 
+      - name: Install cargo-ndk
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-ndk
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v5
         with:
