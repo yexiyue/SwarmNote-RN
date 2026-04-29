@@ -35,7 +35,9 @@
     "prepare": "bob build",
     "typecheck": "tsc",
     "ubrn:android": "ubrn build android --and-generate && pnpm ubrn:fix",
+    "ubrn:android:release": "ubrn build android --and-generate --release && pnpm ubrn:fix",
     "ubrn:ios": "ubrn build ios --and-generate && pnpm ubrn:fix",
+    "ubrn:ios:release": "ubrn build ios --and-generate --release && pnpm ubrn:fix",
     "ubrn:fix": "node scripts/fix-ubrn-output.mjs",
     "ubrn:checkout": "ubrn checkout",
     "ubrn:clean": "rm -rfv cpp/ android/CMakeLists.txt android/src/main/java android/*.cpp ios/ src/Native* src/index.*ts* src/generated/"

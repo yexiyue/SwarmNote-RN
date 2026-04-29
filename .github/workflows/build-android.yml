@@ -80,7 +80,12 @@ jobs:
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-        run: pnpm --filter react-native-swarmnote-core ubrn:android
+        run: |
+          if [ "${{ inputs.build_type }}" = "release" ]; then
+            pnpm --filter react-native-swarmnote-core ubrn:android:release
+          else
+            pnpm --filter react-native-swarmnote-core ubrn:android
+          fi
 
       - name: Expo prebuild
         run: npx expo prebuild --platform android --clean --no-install

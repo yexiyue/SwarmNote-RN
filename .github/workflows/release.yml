@@ -106,11 +106,11 @@ jobs:
       - name: Build editor WebView bundle
         run: pnpm --filter @swarmnote/editor-web build
 
-      - name: Build Rust bridge (ubrn android)
+      - name: Build Rust bridge (ubrn android, release profile)
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-        run: pnpm --filter react-native-swarmnote-core ubrn:android
+        run: pnpm --filter react-native-swarmnote-core ubrn:android:release
 
       - name: Expo prebuild
         run: npx expo prebuild --platform android --clean --no-install
