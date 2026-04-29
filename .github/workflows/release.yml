@@ -147,7 +147,7 @@ jobs:
           PRIMARY=""
           for apk in android/app/build/outputs/apk/release/*.apk; do
             base=$(basename "$apk" .apk)
-            target="swarmnote-mobile-${{ steps.tag.outputs.tag }}-${base}.apk"
+            target="mobile-${{ steps.tag.outputs.tag }}-${base}.apk"
             cp "$apk" "artifacts/${target}"
             if [ -z "$PRIMARY" ]; then PRIMARY="$target"; fi
           done
