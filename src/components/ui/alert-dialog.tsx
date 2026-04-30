@@ -26,11 +26,24 @@ function AlertDialogOverlay({
   return (
     <FullWindowOverlay>
       <AlertDialogPrimitive.Overlay
-        // bg color via inline style: react-native-css drops `bg-{color}/{alpha}` className.
-        // See dev-notes/knowledge/theme-and-styling.md > AlertDialog/Dialog overlay.
-        style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        // Layout + bg are fully inline: react-native-css can drop alpha colors
+        // and arbitrary layout utilities under NativeWind v5 preview, leaving
+        // the overlay either transparent or non-fullscreen. Inline style is
+        // the only fully reliable path here. See
+        // dev-notes/knowledge/theme-and-styling.md > AlertDialog/Dialog overlay.
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          zIndex: 50,
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 8,
+          backgroundColor: "rgba(0,0,0,0.5)",
+        }}
         className={cn(
-          "absolute bottom-0 left-0 right-0 top-0 z-50 flex items-center justify-center p-2",
           Platform.select({
             web: "animate-in fade-in-0 fixed",
           }),
