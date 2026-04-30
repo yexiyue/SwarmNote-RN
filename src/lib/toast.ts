@@ -1,5 +1,4 @@
 import * as Haptics from "expo-haptics";
-import { Platform } from "react-native";
 import { Notifier } from "react-native-notifier";
 import { IosToast } from "@/components/ios-toast";
 import { errorMessage } from "./utils";
@@ -28,7 +27,6 @@ function show(alertType: AlertKind, title: string, opts: BaseOptions = {}) {
     duration: opts.duration ?? DEFAULT_DURATION_MS,
     Component: IosToast,
     componentProps: { alertType },
-    translucentStatusBar: Platform.OS === "android",
   });
 }
 
