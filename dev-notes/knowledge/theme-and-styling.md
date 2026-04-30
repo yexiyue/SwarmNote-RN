@@ -194,6 +194,45 @@ RN `<TextInput>` 在 Android 上默认给中文 / CJK 字形加 `includeFontPadd
 
 Dialog、AlertDialog、Popover、Tooltip、DropdownMenu、Select 等浮层组件依赖 `<PortalHost />`，已在根布局 `_layout.tsx` 配置。
 
+### AlertDialog / Dialog 遮罩用 inline style 设置 backgroundColor
+
+`react-native-css`（NativeWind v5 内核）对 `bg-{color}/{alpha}` 这种**带 alpha 的颜色 className** 解析失败 —— 转 RN style 时 `backgroundColor` 字段直接丢弃。结果：`<AlertDialogOverlay>` / `<DialogOverlay>` 的 `bg-black/50` 完全不生效，弹窗时屏幕周围依然亮，没有半透明遮罩。
+
+**症状**：
+
+- dialog 弹起时背景没变暗（设备列表 / 其他元素清晰可见）
+- dialog 自身位置不居中（看似 layout 流位置而非屏幕中心）—— 是同一个 bug 的次生现象，因为 alpha 颜色失败时整个 className 解析链可能被影响
+
+**根因**（spike 验证 2026-04-30，参考 `openspec/changes/fix-alert-dialog-overlay/design.md`）：
+
+| className | 实际效果 |
+| --- | --- |
+| `bg-black/50` | ❌ backgroundColor 不应用 |
+| `bg-red-500`（不透明） | ✅ 整屏变红，正常 |
+| inline `style={{backgroundColor:'rgba(0,0,0,0.5)'}}` | ✅ 50% 黑遮罩正常 |
+| `absolute inset-0` / `flex items-center justify-center` | ✅ 都正常 |
+
+**正确做法**（已落地在 [src/components/ui/alert-dialog.tsx](src/components/ui/alert-dialog.tsx) 和 [src/components/ui/dialog.tsx](src/components/ui/dialog.tsx)）：
+
+```tsx
+<AlertDialogPrimitive.Overlay
+  style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+  className="absolute bottom-0 left-0 right-0 top-0 z-50 flex items-center justify-center p-2"
+/>
+```
+
+布局类（`absolute` / `flex` / `items-center` / `justify-center`）保留在 className，仅遮罩颜色用 inline style 兜底。
+
+**不要做**：
+
+- 不要在 className 写 `bg-black/50`、`bg-white/30`、`bg-foreground/20` 之类带 alpha 的颜色 —— 静默失效。改用 inline style 的 `rgba(...)`
+- 不要因为这个 bug 就把所有 className 都搬 inline —— 布局类工作正常，搬过去等同于放弃 NativeWind 的 DX
+- 不要给 `<PortalHost />` 套 absoluteFill 容器 —— spike 证明 absolute inset-0 在 Overlay 上正常撑全屏，PortalHost 不需要 wrapper
+
+**何时可以删掉这个 workaround**：`react-native-css` 修复 alpha 颜色解析后，把 inline style 删掉、把 `bg-black/50` 加回 className。可参考 [react-native-css#234](https://github.com/nativewind/react-native-css/issues/234)（同一仓库的 SafeAreaView className 失效 issue，根因可能相关）。
+
+**相关文件**：`src/components/ui/alert-dialog.tsx`、`src/components/ui/dialog.tsx`
+
 ## 图标库
 
 ### 统一使用 lucide-react-native
