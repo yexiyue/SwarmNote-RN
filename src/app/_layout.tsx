@@ -9,8 +9,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { NotifierRoot } from "react-native-notifier";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Toaster } from "sonner-native";
 import { ErrorDialogHost } from "@/components/error-dialog-host";
 import { PairingRequestHost } from "@/components/pairing-request-host";
 import { UpdateHost } from "@/components/update/UpdateHost";
@@ -103,7 +103,6 @@ export default function RootLayout() {
                 <Stack.Screen name="editor-test" />
                 <Stack.Screen name="explore" />
               </Stack>
-              <Toaster position="top-center" />
               <PairingRequestHost />
               <ErrorDialogHost />
               <UpdateHost />
@@ -111,6 +110,12 @@ export default function RootLayout() {
             </BottomSheetModalProvider>
           </LinguiProvider>
         </ThemeProvider>
+        {/* NotifierRoot must be the last sibling under SafeAreaProvider so
+            it draws above every other tree. `useRNScreensOverlay` is the
+            iOS-only escape hatch that paints the toast inside react-native-
+            screens' FullWindowOverlay, putting it above native-stack modals
+            and RN Modal. */}
+        <NotifierRoot useRNScreensOverlay />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
