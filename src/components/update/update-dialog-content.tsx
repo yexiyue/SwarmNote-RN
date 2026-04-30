@@ -2,7 +2,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ExternalLink } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { Linking, Pressable, ScrollView } from "react-native";
-import Markdown from "react-native-markdown-display";
 import {
   AlertDialogContent,
   AlertDialogDescription,
@@ -28,7 +27,7 @@ interface UpdateDialogContentProps {
 }
 
 /** Shared body for UpdateDialog / ForceUpdateDialog. Renders header + version
- *  line + scrollable markdown notes (or a fallback "open release page" link
+ *  line + scrollable plain-text notes (or a fallback "open release page" link
  *  when `releaseNotes` is empty) + footer slot. */
 export function UpdateDialogContent({
   title,
@@ -61,7 +60,7 @@ export function UpdateDialogContent({
           contentContainerClassName="pr-1"
           showsVerticalScrollIndicator
         >
-          <Markdown style={markdownStyles(colors)}>{trimmedNotes}</Markdown>
+          <Text className="text-foreground text-sm leading-5">{trimmedNotes}</Text>
         </ScrollView>
       ) : (
         <Pressable onPress={openReleasePage} className="flex-row items-center gap-1">
@@ -75,48 +74,4 @@ export function UpdateDialogContent({
       <AlertDialogFooter>{footer}</AlertDialogFooter>
     </AlertDialogContent>
   );
-}
-
-type ThemeColors = ReturnType<typeof useThemeColors>;
-
-/** Style sheet for react-native-markdown-display tuned to NativeWind theme
- *  tokens. We can't use className here because the lib styles via inline
- *  StyleSheet objects, so we read CSS variables once via useThemeColors. */
-function markdownStyles(colors: ThemeColors) {
-  return {
-    body: { color: colors.foreground, fontSize: 13, lineHeight: 20 },
-    heading1: { color: colors.foreground, fontSize: 16, fontWeight: "600", marginTop: 4 },
-    heading2: { color: colors.foreground, fontSize: 15, fontWeight: "600", marginTop: 4 },
-    heading3: { color: colors.foreground, fontSize: 14, fontWeight: "600", marginTop: 4 },
-    paragraph: { marginTop: 0, marginBottom: 6 },
-    bullet_list: { marginBottom: 4 },
-    ordered_list: { marginBottom: 4 },
-    list_item: { color: colors.foreground, marginBottom: 2 },
-    code_inline: {
-      backgroundColor: colors.card,
-      color: colors.foreground,
-      paddingHorizontal: 4,
-      borderRadius: 3,
-      fontSize: 12,
-    },
-    code_block: {
-      backgroundColor: colors.card,
-      color: colors.foreground,
-      padding: 8,
-      borderRadius: 6,
-      fontSize: 12,
-    },
-    link: { color: colors.primary, textDecorationLine: "underline" },
-    strong: { fontWeight: "600" },
-    em: { fontStyle: "italic" },
-    blockquote: {
-      backgroundColor: colors.card,
-      borderLeftColor: colors.border,
-      borderLeftWidth: 3,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      marginVertical: 4,
-    },
-    hr: { backgroundColor: colors.border, height: 1, marginVertical: 8 },
-  } as const;
 }
