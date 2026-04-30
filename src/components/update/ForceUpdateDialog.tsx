@@ -1,36 +1,23 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ExternalLink } from "lucide-react-native";
-import { Linking, Pressable } from "react-native";
 import { useShallow } from "zustand/react/shallow";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Text } from "@/components/ui/text";
-import { useThemeColors } from "@/hooks/useThemeColors";
-import { toast } from "@/lib/toast";
 import { useUpdateStore } from "@/stores/update-store";
-
-const REPO_RELEASES_URL = "https://github.com/yexiyue/SwarmNote-RN/releases";
+import { UpdateDialogContent } from "./update-dialog-content";
 
 /**
- * Force-update dialog. Has no cancel button — the user can only update or
- * back out to the home screen via the OS. This mirrors the contract of
- * `upgradeType=2` from UpgradeLink.
+ * Force-update dialog. No cancel button — the user can only update or back
+ * out of the app via the OS. This mirrors the contract of `upgradeType=2`
+ * from UpgradeLink.
  */
 export function ForceUpdateDialog() {
-  const colors = useThemeColors();
   const { t } = useLingui();
-  const { status, latestVersion, currentVersion, executeUpdate } = useUpdateStore(
+  const { status, latestVersion, currentVersion, releaseNotes, executeUpdate } = useUpdateStore(
     useShallow((s) => ({
       status: s.status,
       latestVersion: s.latestVersion,
       currentVersion: s.currentVersion,
+      releaseNotes: s.releaseNotes,
       executeUpdate: s.executeUpdate,
     })),
   );
@@ -39,38 +26,21 @@ export function ForceUpdateDialog() {
   const latest = latestVersion ?? "";
   const current = currentVersion ?? "";
 
-  const openReleaseNotes = () => {
-    const target = latestVersion ? `${REPO_RELEASES_URL}/tag/v${latestVersion}` : REPO_RELEASES_URL;
-    Linking.openURL(target).catch((err: unknown) => toast.error(t`无法打开链接`, err));
-  };
-
   return (
     <AlertDialog open={open}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            <Trans>必须更新</Trans>
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            <Trans>
-              当前版本 v{current} 已不再受支持,请升级到 v{latest} 才能继续使用。
-            </Trans>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <Pressable onPress={openReleaseNotes} className="flex-row items-center gap-1">
-          <Text className="text-primary text-sm underline">
-            <Trans>查看更新内容</Trans>
-          </Text>
-          <ExternalLink color={colors.primary} size={14} />
-        </Pressable>
-        <AlertDialogFooter>
+      <UpdateDialogContent
+        title={<Trans>必须更新</Trans>}
+        versionLine={t`当前 v${current} 已不再支持，请升级到 v${latest}`}
+        releaseNotes={releaseNotes}
+        latestVersion={latestVersion}
+        footer={
           <AlertDialogAction onPress={() => void executeUpdate()}>
             <Text>
               <Trans>立即更新</Trans>
             </Text>
           </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+        }
+      />
     </AlertDialog>
   );
 }

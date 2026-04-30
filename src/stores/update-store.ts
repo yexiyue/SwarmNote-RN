@@ -57,9 +57,18 @@ interface UpdateState {
   error: string | null;
   hasChecked: boolean;
   lastCheckedAt: number;
+  /** True after user dismissed the foreground progress dialog and chose to
+   *  continue downloading in the background. UI uses this to swap the dialog
+   *  for a toast tracker. Reset to false on every executeUpdate() call. */
+  backgrounded: boolean;
 
   checkForUpdate(force?: boolean): Promise<void>;
   executeUpdate(): Promise<void>;
+  /** Dismiss the foreground progress dialog without aborting the download. */
+  backgroundDownload(): void;
+  /** Acknowledge an error after the user reads it; flips status back to
+   *  "available" so the user can retry from the original dialog. */
+  acknowledgeError(): void;
   dismiss(): Promise<void>;
   reset(): void;
   setupAppStateListener(): () => void;
@@ -100,6 +109,7 @@ export const useUpdateStore = create<UpdateState>()((set, get) => ({
   error: null,
   hasChecked: false,
   lastCheckedAt: 0,
+  backgrounded: false,
 
   async checkForUpdate(force = false) {
     if (Platform.OS !== "android") return;
@@ -175,6 +185,7 @@ export const useUpdateStore = create<UpdateState>()((set, get) => ({
 
     set({
       status: "downloading",
+      backgrounded: false,
       progress: { downloaded: 0, total: 0, percent: 0 },
     });
 
@@ -193,6 +204,21 @@ export const useUpdateStore = create<UpdateState>()((set, get) => ({
         error: err instanceof Error ? err.message : String(err),
       });
     }
+  },
+
+  backgroundDownload() {
+    if (get().status !== "downloading") return;
+    set({ backgrounded: true });
+  },
+
+  acknowledgeError() {
+    if (get().status !== "error") return;
+    // Drop back to "available" so the original update prompt can re-fire and
+    // the user can hit "立即更新" again. If the original status was
+    // "force-required", landing on "available" still surfaces the optional
+    // dialog — acceptable since the underlying upgradeType is unchanged and
+    // the next executeUpdate() will re-evaluate from `downloadUrl`.
+    set({ status: "available", error: null, progress: null, backgrounded: false });
   },
 
   async dismiss() {
@@ -220,6 +246,7 @@ export const useUpdateStore = create<UpdateState>()((set, get) => ({
       error: null,
       hasChecked: false,
       lastCheckedAt: 0,
+      backgrounded: false,
     });
   },
 

@@ -41,7 +41,7 @@ msgstr "Expires in {0} · Enter this code on the other device"
 
 #. placeholder {0}: item.ws.docCount
 #. placeholder {0}: workspace.docCount
-#: src/app/settings/devices/[peerId].tsx:408
+#: src/app/settings/devices/[peerId].tsx:406
 #: src/app/workspaces/sync/select.tsx:299
 #: src/components/sync/sync-item-status-row.tsx:46
 msgid "{0} 篇笔记"
@@ -74,7 +74,7 @@ msgid "{remaining}s"
 msgstr "{remaining}s"
 
 #. placeholder {0}: deleteTarget.name
-#: src/components/files-panel.tsx:325
+#: src/components/files-panel.tsx:144
 msgid "『{0}』包含 {childCount} 项，将一并删除。此操作无法撤销。"
 msgstr "“{0}” contains {childCount} items that will all be deleted. This action cannot be undone."
 
@@ -94,13 +94,21 @@ msgstr "P2P, server-less — devices sync directly"
 msgid "P2P 网络"
 msgstr "P2P network"
 
+#: src/components/update/UpdateDialog.tsx:30
+msgid "v{latest} · 当前 v{current}"
+msgstr ""
+
 #: src/app/onboarding/complete.tsx:52
 msgid "一切就绪！"
 msgstr "All set!"
 
-#: src/components/update/UpdateProgressDialog.tsx:39
+#: src/components/update/UpdateProgressDialog.tsx:48
 msgid "下载完成后系统会引导你完成安装"
 msgstr "The system installer will take over once the download finishes."
+
+#: src/components/update/UpdateErrorDialog.tsx:49
+msgid "下载或安装过程中出错，请稍后重试。"
+msgstr ""
 
 #: src/components/workspace-sync-card.tsx:75
 msgid "与 {onlineCount} 台设备保持同步"
@@ -149,8 +157,8 @@ msgstr "Save"
 msgid "保存失败"
 msgstr ""
 
-#: src/app/settings/devices/[peerId].tsx:349
-#: src/app/settings/devices/[peerId].tsx:367
+#: src/app/settings/devices/[peerId].tsx:347
+#: src/app/settings/devices/[peerId].tsx:365
 msgid "共享的工作区"
 msgstr "Shared workspaces"
 
@@ -164,6 +172,7 @@ msgstr "About"
 #: src/app/settings/network.tsx:86
 #: src/app/settings/network.tsx:89
 #: src/components/files-toolbar.tsx:35
+#: src/components/update/UpdateErrorDialog.tsx:55
 msgid "关闭"
 msgstr "Close"
 
@@ -173,7 +182,7 @@ msgid "最后同步 {0}"
 msgstr "Last synced {0}"
 
 #. placeholder {0}: formatRelativeTime(device.lastSeen)
-#: src/app/settings/devices/[peerId].tsx:241
+#: src/app/settings/devices/[peerId].tsx:239
 msgid "最后在线 {0}"
 msgstr "Last seen {0}"
 
@@ -182,7 +191,7 @@ msgstr "Last seen {0}"
 msgid "准备同步 · {0} 篇笔记"
 msgstr "Preparing · {0} notes"
 
-#: src/components/files-panel.tsx:284
+#: src/components/files-panel.tsx:296
 msgid "切换工作区"
 msgstr "Switch workspace"
 
@@ -196,7 +205,7 @@ msgid "创建工作区"
 msgstr "Create workspace"
 
 #: src/app/workspaces/[id].tsx:123
-#: src/components/files-panel.tsx:341
+#: src/components/files-panel.tsx:343
 #: src/components/files/FileActionSheet.tsx:65
 msgid "删除"
 msgstr "Delete"
@@ -205,11 +214,11 @@ msgstr "Delete"
 msgid "删除失败"
 msgstr "Delete failed"
 
-#: src/components/files-panel.tsx:322
+#: src/components/files-panel.tsx:141
 msgid "删除文件夹"
 msgstr "Delete folder"
 
-#: src/components/files-panel.tsx:322
+#: src/components/files-panel.tsx:141
 msgid "删除笔记"
 msgstr "Delete note"
 
@@ -223,7 +232,7 @@ msgid "刷新失败"
 msgstr ""
 
 #: src/app/workspaces/index.tsx:85
-#: src/components/files-panel.tsx:209
+#: src/components/files-panel.tsx:221
 msgid "加载中…"
 msgstr "Loading…"
 
@@ -245,26 +254,26 @@ msgstr "Decentralized notes that sync naturally"
 msgid "反馈"
 msgstr "Feedback"
 
-#: src/components/update/UpdateDialog.tsx:49
+#: src/components/update/UpdateDialog.tsx:29
 msgid "发现新版本"
 msgstr "Update available"
 
 #: src/app/pairing/found-device.tsx:154
 #: src/app/pairing/found-device.tsx:158
 #: src/app/settings/devices.tsx:373
-#: src/app/settings/devices/[peerId].tsx:213
-#: src/components/files-panel.tsx:336
+#: src/app/settings/devices/[peerId].tsx:211
+#: src/components/files-panel.tsx:338
 #: src/components/files/InlineNameInput.tsx:106
 msgid "取消"
 msgstr "Cancel"
 
-#: src/app/settings/devices/[peerId].tsx:186
-#: src/app/settings/devices/[peerId].tsx:195
-#: src/app/settings/devices/[peerId].tsx:204
+#: src/app/settings/devices/[peerId].tsx:184
+#: src/app/settings/devices/[peerId].tsx:193
+#: src/app/settings/devices/[peerId].tsx:202
 msgid "取消配对"
 msgstr "Unpair"
 
-#: src/app/settings/devices/[peerId].tsx:151
+#: src/app/settings/devices/[peerId].tsx:149
 msgid "取消配对失败"
 msgstr "Unpair failed"
 
@@ -308,6 +317,10 @@ msgstr "Sync workspaces"
 msgid "同步期间请保持两台设备在线，可切到后台。"
 msgstr "Keep both devices online while syncing — you can move to the background."
 
+#: src/components/update/UpdateProgressDialog.tsx:63
+msgid "后台下载"
+msgstr ""
+
 #: src/app/workspaces/sync/syncing.tsx:141
 #: src/app/workspaces/sync/syncing.tsx:146
 msgid "后台运行"
@@ -338,7 +351,7 @@ msgid "在左侧文件面板中选择一篇笔记，或新建一篇"
 msgstr "Pick a note from the left files panel, or create a new one"
 
 #: src/app/settings/devices.tsx:186
-#: src/app/settings/devices/[peerId].tsx:239
+#: src/app/settings/devices/[peerId].tsx:237
 #: src/app/workspaces/sync/select.tsx:236
 msgid "在线"
 msgstr "Online"
@@ -347,11 +360,11 @@ msgstr "Online"
 msgid "复制"
 msgstr "Copy"
 
-#: src/app/settings/devices/[peerId].tsx:322
+#: src/app/settings/devices/[peerId].tsx:320
 msgid "复制 Peer ID"
 msgstr "Copy Peer ID"
 
-#: src/components/files-panel.tsx:143
+#: src/components/files-panel.tsx:155
 msgid "复制失败"
 msgstr ""
 
@@ -392,7 +405,7 @@ msgstr "Keychain unavailable — current identity is ephemeral (will change on n
 msgid "密钥链不可用，身份为临时状态"
 msgstr "Keychain unavailable — identity is ephemeral"
 
-#: src/app/settings/devices/[peerId].tsx:379
+#: src/app/settings/devices/[peerId].tsx:377
 msgid "对方设备暂未打开任何工作区"
 msgstr "The other device hasn't opened any workspace yet"
 
@@ -414,7 +427,7 @@ msgstr "Workspace ID"
 msgid "工作区不存在"
 msgstr "Workspace not found"
 
-#: src/app/settings/devices/[peerId].tsx:354
+#: src/app/settings/devices/[peerId].tsx:352
 msgid "工作区列表来自对方设备"
 msgstr "Workspace list comes from the other device"
 
@@ -434,7 +447,7 @@ msgstr "Workspaces are stored in app storage and will be cleared when the app is
 msgid "工作区详情"
 msgstr "Workspace details"
 
-#: src/app/settings/devices/[peerId].tsx:207
+#: src/app/settings/devices/[peerId].tsx:205
 msgid "已下载的笔记仍保留在本地，只是不再与此设备同步。"
 msgstr "Downloaded notes stay on this device — they just no longer sync with this peer."
 
@@ -454,7 +467,7 @@ msgstr ""
 msgid "已刷新"
 msgstr ""
 
-#: src/app/settings/devices/[peerId].tsx:148
+#: src/app/settings/devices/[peerId].tsx:146
 msgid "已取消配对"
 msgstr ""
 
@@ -462,15 +475,15 @@ msgstr ""
 msgid "已同步"
 msgstr "Up to date"
 
-#: src/app/settings/devices/[peerId].tsx:415
+#: src/app/settings/devices/[peerId].tsx:413
 #: src/app/workspaces/sync/select.tsx:305
 msgid "已在本地"
 msgstr "Already local"
 
-#: src/app/settings/devices.tsx:126
+#: src/app/settings/devices.tsx:127
 #: src/app/settings/devices/[peerId].tsx:139
 #: src/app/workspaces/[id].tsx:77
-#: src/components/files-panel.tsx:140
+#: src/components/files-panel.tsx:152
 msgid "已复制"
 msgstr ""
 
@@ -516,7 +529,7 @@ msgstr "App storage"
 msgid "应用空间  ·  {docCount} 个笔记"
 msgstr "App storage  ·  {docCount} notes"
 
-#: src/app/settings/devices/[peerId].tsx:309
+#: src/app/settings/devices/[peerId].tsx:307
 msgid "延迟"
 msgstr "Latency"
 
@@ -547,6 +560,10 @@ msgstr "Auto-start network on launch"
 msgid "当前"
 msgstr "Active"
 
+#: src/components/update/ForceUpdateDialog.tsx:33
+msgid "当前 v{current} 已不再支持，请升级到 v{latest}"
+msgstr ""
+
 #: src/app/workspaces/[id].tsx:114
 msgid "当前工作区"
 msgstr "Active workspace"
@@ -556,10 +573,10 @@ msgstr "Active workspace"
 #~ msgstr "v{0} is no longer supported. Upgrade to v{1} to continue."
 
 #: src/components/update/ForceUpdateDialog.tsx:55
-msgid "当前版本 v{current} 已不再受支持,请升级到 v{latest} 才能继续使用。"
-msgstr "v{current} is no longer supported. Upgrade to v{latest} to continue."
+#~ msgid "当前版本 v{current} 已不再受支持,请升级到 v{latest} 才能继续使用。"
+#~ msgstr "v{current} is no longer supported. Upgrade to v{latest} to continue."
 
-#: src/components/update/ForceUpdateDialog.tsx:52
+#: src/components/update/ForceUpdateDialog.tsx:32
 msgid "必须更新"
 msgstr "Update required"
 
@@ -640,7 +657,7 @@ msgstr "Reject"
 msgid "排序"
 msgstr "Sort"
 
-#: src/components/files-panel.tsx:276
+#: src/components/files-panel.tsx:288
 msgid "排序即将推出"
 msgstr ""
 
@@ -707,16 +724,15 @@ msgstr "New note"
 #~ msgstr "v{0} is available (current v{1})"
 
 #: src/components/update/UpdateDialog.tsx:52
-msgid "新版本 v{latest} 可用,当前 v{current}"
-msgstr "v{latest} is available (current v{current})"
+#~ msgid "新版本 v{latest} 可用,当前 v{current}"
+#~ msgstr "v{latest} is available (current v{current})"
 
 #: src/app/workspaces/[id].tsx:53
 msgid "无效的工作区路径"
 msgstr "Invalid workspace path"
 
 #: src/app/settings/about.tsx:38
-#: src/components/update/ForceUpdateDialog.tsx:44
-#: src/components/update/UpdateDialog.tsx:41
+#: src/components/update/update-dialog-content.tsx:45
 msgid "无法打开链接"
 msgstr ""
 
@@ -732,6 +748,10 @@ msgstr "No devices online"
 #: src/app/settings/devices.tsx:274
 msgid "暂无附近设备"
 msgstr "No nearby devices"
+
+#: src/components/update/UpdateErrorDialog.tsx:46
+msgid "更新失败"
+msgstr ""
 
 #: src/app/settings/about.tsx:115
 #: src/app/settings/about.tsx:119
@@ -762,8 +782,7 @@ msgstr "Unknown"
 #~ msgid "来自 \"{0}\" ({1})"
 #~ msgstr "From \"{0}\" ({1})"
 
-#: src/components/update/ForceUpdateDialog.tsx:62
-#: src/components/update/UpdateDialog.tsx:59
+#: src/components/update/update-dialog-content.tsx:69
 msgid "查看更新内容"
 msgstr "What's new"
 
@@ -777,9 +796,13 @@ msgstr "What's new"
 msgid "检查更新"
 msgstr "Check for updates"
 
-#: src/components/update/UpdateProgressDialog.tsx:36
+#: src/components/update/UpdateProgressDialog.tsx:45
 msgid "正在下载新版本"
 msgstr "Downloading update"
+
+#: src/components/update/UpdateBackgroundTracker.tsx:40
+msgid "正在下载新版本 · {percent}%"
+msgstr ""
 
 #: src/app/workspaces/sync/syncing.tsx:105
 msgid "正在同步"
@@ -820,7 +843,7 @@ msgstr "Dark"
 msgid "添加工作区"
 msgstr "Add a workspace"
 
-#: src/components/files-panel.tsx:225
+#: src/components/files-panel.tsx:237
 msgid "点击下方工具栏新建你的第一条笔记"
 msgstr "Tap the toolbar below to create your first note"
 
@@ -853,11 +876,11 @@ msgid "确定"
 msgstr ""
 
 #. placeholder {0}: deleteTarget.name
-#: src/components/files-panel.tsx:326
+#: src/components/files-panel.tsx:145
 msgid "确定删除『{0}』？此操作无法撤销。"
 msgstr "Delete “{0}”? This action cannot be undone."
 
-#: src/app/settings/devices/[peerId].tsx:223
+#: src/app/settings/devices/[peerId].tsx:221
 msgid "确认取消配对"
 msgstr "Confirm unpair"
 
@@ -875,11 +898,11 @@ msgid "确认配对"
 msgstr "Confirm pairing"
 
 #: src/app/settings/devices.tsx:186
-#: src/app/settings/devices/[peerId].tsx:242
+#: src/app/settings/devices/[peerId].tsx:240
 msgid "离线"
 msgstr "Offline"
 
-#: src/components/update/UpdateDialog.tsx:66
+#: src/components/update/UpdateDialog.tsx:37
 msgid "稍后"
 msgstr "Later"
 
@@ -888,8 +911,8 @@ msgstr "Later"
 msgid "立即同步"
 msgstr "Sync now"
 
-#: src/components/update/ForceUpdateDialog.tsx:69
-#: src/components/update/UpdateDialog.tsx:71
+#: src/components/update/ForceUpdateDialog.tsx:39
+#: src/components/update/UpdateDialog.tsx:42
 msgid "立即更新"
 msgstr "Update now"
 
@@ -945,7 +968,7 @@ msgstr "Devices"
 msgid "设备 ID"
 msgstr "Device ID"
 
-#: src/app/settings/devices/[peerId].tsx:452
+#: src/app/settings/devices/[peerId].tsx:450
 msgid "设备不存在或已取消配对"
 msgstr "Device not found or already unpaired"
 
@@ -956,7 +979,7 @@ msgstr "Device not found or already unpaired"
 msgid "设备名称"
 msgstr "Device name"
 
-#: src/app/settings/devices/[peerId].tsx:357
+#: src/app/settings/devices/[peerId].tsx:355
 msgid "设备离线时无法刷新"
 msgstr "Cannot refresh while the device is offline"
 
@@ -967,7 +990,7 @@ msgstr "Device details"
 #: src/app/settings/index.tsx:49
 #: src/app/settings/network.tsx:95
 #: src/components/command-sheet.tsx:62
-#: src/components/files-panel.tsx:295
+#: src/components/files-panel.tsx:307
 msgid "设置"
 msgstr "Settings"
 
@@ -1032,7 +1055,7 @@ msgstr "Running"
 #: src/app/pairing/found-device.tsx:77
 #: src/app/pairing/input-code.tsx:58
 #: src/app/settings/devices/[peerId].tsx:63
-#: src/app/settings/devices/[peerId].tsx:446
+#: src/app/settings/devices/[peerId].tsx:444
 #: src/app/workspaces/[id].tsx:83
 #: src/app/workspaces/[id].tsx:286
 #: src/app/workspaces/index.tsx:48
@@ -1050,7 +1073,7 @@ msgstr "No workspaces yet"
 msgid "还没有打开的笔记"
 msgstr "No note open"
 
-#: src/components/files-panel.tsx:222
+#: src/components/files-panel.tsx:234
 msgid "还没有笔记"
 msgstr "No notes yet"
 
@@ -1068,7 +1091,7 @@ msgstr "Enter SwarmNote"
 msgid "连接"
 msgstr "Connect"
 
-#: src/app/settings/devices/[peerId].tsx:294
+#: src/app/settings/devices/[peerId].tsx:292
 msgid "连接方式"
 msgstr "Connection"
 
@@ -1150,6 +1173,7 @@ msgstr "Rename"
 
 #: src/app/workspaces/sync/select.tsx:151
 #: src/app/workspaces/sync/select.tsx:163
+#: src/components/update/UpdateErrorDialog.tsx:60
 msgid "重试"
 msgstr "Retry"
 
@@ -1169,7 +1193,7 @@ msgstr ""
 msgid "限制编辑器内容宽度以提升阅读体验"
 msgstr "Limit editor content width for better readability"
 
-#: src/app/settings/devices/[peerId].tsx:329
+#: src/app/settings/devices/[peerId].tsx:327
 msgid "首次配对"
 msgstr "Paired since"
 
@@ -1177,6 +1201,6 @@ msgstr "Paired since"
 msgid "默认使用系统主机名，你可以随时在设置中修改"
 msgstr "Defaults to the system hostname; you can change it later in Settings"
 
-#: src/components/files-panel.tsx:289
+#: src/components/files-panel.tsx:301
 msgid "默认工作区"
 msgstr "Default workspace"

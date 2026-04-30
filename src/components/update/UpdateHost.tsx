@@ -1,13 +1,15 @@
 import { Platform } from "react-native";
 import { ForceUpdateDialog } from "./ForceUpdateDialog";
+import { UpdateBackgroundTracker } from "./UpdateBackgroundTracker";
 import { UpdateDialog } from "./UpdateDialog";
+import { UpdateErrorDialog } from "./UpdateErrorDialog";
 import { UpdateProgressDialog } from "./UpdateProgressDialog";
 
 /**
- * Aggregates the three update dialogs. Each dialog reads its own slice of
- * `useUpdateStore` and decides whether to render based on `status`, so we can
- * mount them all and let the store be the single source of truth. iOS skips
- * the host entirely.
+ * Aggregates the update UI surface. Each child reads its own slice of
+ * `useUpdateStore` and gates its rendering by `status` (and `backgrounded`
+ * for the progress pair), so they can all be mounted side-by-side and the
+ * store stays the single source of truth. iOS skips the host entirely.
  */
 export function UpdateHost() {
   if (Platform.OS !== "android") return null;
@@ -16,6 +18,8 @@ export function UpdateHost() {
       <UpdateDialog />
       <ForceUpdateDialog />
       <UpdateProgressDialog />
+      <UpdateBackgroundTracker />
+      <UpdateErrorDialog />
     </>
   );
 }

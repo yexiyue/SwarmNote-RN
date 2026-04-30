@@ -3,8 +3,10 @@ import { View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -17,16 +19,23 @@ function formatMB(bytes: number): string {
 }
 
 /**
- * Non-cancellable progress dialog while the APK is being downloaded. Once the
- * download finishes, status flips to "ready" and the system PackageInstaller
- * takes over — at which point this dialog naturally unmounts.
+ * Foreground progress dialog while the APK is downloading. The user can hit
+ * "后台下载" to flip `backgrounded`, which hides this dialog and lets
+ * `UpdateBackgroundTracker` take over with a sonner toast. Download itself
+ * keeps running — `installer.ts` doesn't accept an abort signal yet, so we
+ * don't expose a cancel action either.
  */
 export function UpdateProgressDialog() {
-  const { status, progress } = useUpdateStore(
-    useShallow((s) => ({ status: s.status, progress: s.progress })),
+  const { status, progress, backgrounded, backgroundDownload } = useUpdateStore(
+    useShallow((s) => ({
+      status: s.status,
+      progress: s.progress,
+      backgrounded: s.backgrounded,
+      backgroundDownload: s.backgroundDownload,
+    })),
   );
 
-  const open = status === "downloading";
+  const open = status === "downloading" && !backgrounded;
 
   return (
     <AlertDialog open={open}>
@@ -48,6 +57,13 @@ export function UpdateProgressDialog() {
             </Text>
           </View>
         </View>
+        <AlertDialogFooter>
+          <AlertDialogAction onPress={backgroundDownload}>
+            <Text>
+              <Trans>后台下载</Trans>
+            </Text>
+          </AlertDialogAction>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
