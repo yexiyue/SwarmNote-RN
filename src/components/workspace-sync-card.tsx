@@ -1,11 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
 import { Pause, RefreshCw, WifiOff } from "lucide-react-native";
-import { useMemo, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, View } from "react-native";
+import { useMemo } from "react";
+import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { getAppCore } from "@/core/app-core";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { formatLastSyncedAt } from "@/lib/time-format";
+import { toast } from "@/lib/toast";
 import { errorMessage } from "@/lib/utils";
 import { syncKey, useSwarmStore } from "@/stores/swarm-store";
 import { useSyncPersistStore } from "@/stores/sync-persist-store";
@@ -20,7 +21,6 @@ export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
   const pairedDevices = useSwarmStore((s) => s.pairedDevices);
   const syncProgress = useSwarmStore((s) => s.syncProgress);
   const lastSyncedAt = useSyncPersistStore((s) => s.lastSyncedAt[workspaceId]);
-  const [triggering, setTriggering] = useState(false);
 
   const onlineDevices = useMemo(
     () => pairedDevices.filter((d) => d.isOnline === true),
@@ -40,24 +40,29 @@ export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
   const offline = onlineCount === 0;
   const syncing = activeSync !== null;
 
-  const handleSyncNow = async () => {
-    if (triggering || offline) return;
-    setTriggering(true);
+  const handleSyncNow = () => {
+    if (offline) return;
     const core = getAppCore();
-    const results = await Promise.allSettled(
-      onlineDevices.map((device) => core.triggerSyncWithPeer(workspaceId, device.peerId)),
-    );
-    const failures = results.flatMap((r, i) =>
-      r.status === "rejected"
-        ? [`${onlineDevices[i].name ?? onlineDevices[i].hostname}: ${errorMessage(r.reason)}`]
-        : [],
-    );
-    setTriggering(false);
-    if (failures.length === onlineDevices.length) {
-      Alert.alert(t`同步失败`, failures.join("\n"));
-    } else if (failures.length > 0) {
-      Alert.alert(t`部分设备同步失败`, failures.join("\n"));
-    }
+    const devices = onlineDevices;
+    const promise = Promise.allSettled(
+      devices.map((device) => core.triggerSyncWithPeer(workspaceId, device.peerId)),
+    ).then((results) => {
+      const failures = results.flatMap((r, i) =>
+        r.status === "rejected"
+          ? [`${devices[i].name ?? devices[i].hostname}: ${errorMessage(r.reason)}`]
+          : [],
+      );
+      if (failures.length === devices.length && devices.length > 0) {
+        throw new Error(failures.join("\n"));
+      }
+      return failures;
+    });
+
+    toast.promise(promise, {
+      loading: t`正在同步…`,
+      success: (failures) => (failures.length === 0 ? t`同步完成` : t`部分设备同步失败`),
+      error: t`同步失败`,
+    });
   };
 
   const dotColor = offline ? colors.mutedForeground : colors.success;
@@ -99,15 +104,11 @@ export function WorkspaceSyncCard({ workspaceId }: WorkspaceSyncCardProps) {
       <View className="flex-row items-center gap-2">
         <Pressable
           onPress={handleSyncNow}
-          disabled={offline || triggering}
+          disabled={offline}
           accessibilityLabel={t`立即同步`}
           className="flex-1 h-10 flex-row items-center justify-center gap-2 rounded-lg border border-border bg-background active:bg-muted disabled:opacity-50"
         >
-          {triggering ? (
-            <ActivityIndicator size="small" color={colors.foreground} />
-          ) : (
-            <RefreshCw color={colors.foreground} size={14} />
-          )}
+          <RefreshCw color={colors.foreground} size={14} />
           <Text className="text-[13px] font-medium text-foreground">{t`立即同步`}</Text>
         </Pressable>
 

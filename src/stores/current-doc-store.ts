@@ -1,6 +1,8 @@
-import { Alert } from "react-native";
+import { msg } from "@lingui/core/macro";
 import { create } from "zustand";
 import { getActiveWorkspaceOrNull } from "@/core/workspace-manager";
+import { i18n } from "@/i18n/lingui";
+import { useErrorDialogStore } from "./error-dialog-store";
 
 /** The lifecycle of the editor host on the main screen:
  *  - `idle`: no doc open, render empty state
@@ -83,8 +85,11 @@ export const useCurrentDocStore = create<CurrentDocState & CurrentDocActions>()(
       });
     } catch (err) {
       if (seq !== openSeq) return;
-      const msg = err instanceof Error ? err.message : String(err);
-      Alert.alert("打开笔记失败", msg);
+      const detail = err instanceof Error ? err.message : String(err);
+      // User is actively waiting for the note to open; surface as a blocking
+      // RNR AlertDialog via the global error-dialog host so the failure can't
+      // be missed mid-route-transition (toast is too transient here).
+      useErrorDialogStore.getState().show(i18n._(msg`打开笔记失败`), detail);
       set({ docUuid: null, relPath: null, initialState: null, openState: "idle" });
     }
   },

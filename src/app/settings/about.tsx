@@ -16,6 +16,7 @@ import { useShallow } from "zustand/react/shallow";
 import { SettingsHeader } from "@/components/settings-header";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { toast } from "@/lib/toast";
 import { useUpdateStore } from "@/stores/update-store";
 
 const APP_VERSION = Constants.expoConfig?.version ?? "0.0.0";
@@ -32,7 +33,10 @@ export default function AboutSettings() {
   const hasUpdate = status === "available" || status === "force-required";
 
   const openUrl = (url: string) => {
-    Linking.openURL(url).catch((err) => console.warn("[about] openURL failed:", err));
+    Linking.openURL(url).catch((err) => {
+      console.warn("[about] openURL failed:", err);
+      toast.error(t`无法打开链接`, err);
+    });
   };
 
   const onCheckUpdate = () => {
@@ -120,14 +124,22 @@ export default function AboutSettings() {
 
       {/* Bottom links */}
       <View className="flex-row items-center justify-center gap-5 pb-6">
-        <LinkButton icon={Code} label="GitHub" url="https://github.com/yexiyue/SwarmNote" />
+        <LinkButton
+          icon={Code}
+          label="GitHub"
+          onPress={() => openUrl("https://github.com/yexiyue/SwarmNote")}
+        />
         <View className="h-3 w-px bg-border" />
-        <LinkButton icon={BookOpen} label={t`文档`} url="https://yexiyue.github.io/SwarmNote/" />
+        <LinkButton
+          icon={BookOpen}
+          label={t`文档`}
+          onPress={() => openUrl("https://yexiyue.github.io/SwarmNote/")}
+        />
         <View className="h-3 w-px bg-border" />
         <LinkButton
           icon={MessageSquare}
           label={t`反馈`}
-          url="https://github.com/yexiyue/SwarmNote/issues"
+          onPress={() => openUrl("https://github.com/yexiyue/SwarmNote/issues")}
         />
       </View>
     </SafeAreaView>
@@ -137,19 +149,15 @@ export default function AboutSettings() {
 function LinkButton({
   icon: Icon,
   label,
-  url,
+  onPress,
 }: {
   icon: React.ComponentType<{ color?: string; size?: number }>;
   label: string;
-  url: string;
+  onPress: () => void;
 }) {
   const colors = useThemeColors();
   return (
-    <Pressable
-      onPress={() => Linking.openURL(url).catch(() => {})}
-      className="flex-row items-center gap-1"
-      accessibilityLabel={label}
-    >
+    <Pressable onPress={onPress} className="flex-row items-center gap-1" accessibilityLabel={label}>
       <Icon color={colors.mutedForeground} size={12} />
       <Text className="text-[12px] text-muted-foreground">{label}</Text>
     </Pressable>

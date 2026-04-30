@@ -1,5 +1,8 @@
+import { msg } from "@lingui/core/macro";
 import { Directory, Paths } from "expo-file-system";
 import type { UniffiWorkspaceCoreLike } from "react-native-swarmnote-core";
+import { i18n } from "@/i18n/lingui";
+import { toast } from "@/lib/toast";
 import { validateWorkspaceName, workspaceNameToDirUri } from "@/lib/workspace-naming";
 import { useCurrentDocStore } from "@/stores/current-doc-store";
 import { useFileTreeStore } from "@/stores/file-tree-store";
@@ -40,6 +43,7 @@ export async function openWorkspaceAt(path: string): Promise<UniffiWorkspaceCore
   // returned HydrateResult.failed. Never throws here.
   ws.hydrate().catch((err: unknown) => {
     console.warn("[workspace] hydrate failed:", err);
+    toast.error(i18n._(msg`工作区加载失败`), err);
   });
 
   return ws;

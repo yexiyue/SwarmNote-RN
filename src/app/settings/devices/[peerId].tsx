@@ -3,20 +3,23 @@ import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, CloudOff, Copy, Download, FolderClosed, Unlink } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   UniffiConnectionType,
   type UniffiPairedDeviceInfo,
   type UniffiRemoteWorkspaceInfo,
 } from "react-native-swarmnote-core";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Text } from "@/components/ui/text";
 import { getAppCore } from "@/core/app-core";
 import { useThemeColors } from "@/hooks/useThemeColors";
@@ -24,7 +27,7 @@ import { devicePlatformIcon } from "@/lib/device-platform";
 import { truncatePeerId } from "@/lib/peer-id";
 import { LAN_FG, LAN_TINT, WARNING_FG, WARNING_TINT } from "@/lib/theme-tokens";
 import { formatAbsoluteDate, formatRelativeTime } from "@/lib/time-format";
-import { errorMessage } from "@/lib/utils";
+import { toast } from "@/lib/toast";
 import { useSwarmStore } from "@/stores/swarm-store";
 
 export default function PairedDeviceDetail() {
@@ -93,6 +96,7 @@ function DeviceDetailBody({
   );
   const [refreshing, setRefreshing] = useState(false);
   const [unpairing, setUnpairing] = useState(false);
+  const [unpairOpen, setUnpairOpen] = useState(false);
 
   const loadRemoteWorkspaces = useCallback(
     async (
@@ -108,14 +112,18 @@ function DeviceDetailBody({
         const list = await getAppCore().getRemoteWorkspaces();
         if (isCancelled()) return;
         setRemoteWorkspaces(list.filter((w) => w.peerId === device.peerId));
+        if (userInitiated) toast.success(t`已刷新`);
       } catch (err) {
         console.warn("[device-detail] getRemoteWorkspaces failed:", err);
-        if (!isCancelled()) setRemoteWorkspaces([]);
+        if (!isCancelled()) {
+          setRemoteWorkspaces([]);
+          if (userInitiated) toast.error(t`刷新失败`, err);
+        }
       } finally {
         if (userInitiated && !isCancelled()) setRefreshing(false);
       }
     },
-    [device.peerId, isOnline],
+    [device.peerId, isOnline, t],
   );
 
   useEffect(() => {
@@ -128,75 +136,95 @@ function DeviceDetailBody({
 
   const handleCopyPeerId = async () => {
     await Clipboard.setStringAsync(device.peerId);
+    toast.success(t`已复制`);
   };
 
-  const confirmUnpair = () => {
-    Alert.alert(
-      t`取消配对`,
-      t`已下载的笔记仍保留在本地，只是不再与此设备同步。`,
-      [
-        { text: t`取消`, style: "cancel" },
-        {
-          text: t`确认取消配对`,
-          style: "destructive",
-          onPress: async () => {
-            setUnpairing(true);
-            try {
-              await getAppCore().unpairDevice(device.peerId);
-              onUnpaired();
-            } catch (err) {
-              Alert.alert(t`取消配对失败`, errorMessage(err));
-            } finally {
-              setUnpairing(false);
-            }
-          },
-        },
-      ],
-      { cancelable: true },
-    );
+  const handleUnpair = async () => {
+    setUnpairing(true);
+    try {
+      await getAppCore().unpairDevice(device.peerId);
+      toast.success(t`已取消配对`);
+      onUnpaired();
+    } catch (err) {
+      toast.error(t`取消配对失败`, err);
+    } finally {
+      setUnpairing(false);
+    }
   };
 
   return (
-    <ScrollView
-      contentContainerClassName="gap-4 px-5 pt-2 pb-8"
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        isOnline ? (
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => void loadRemoteWorkspaces({ userInitiated: true })}
-            tintColor={colors.mutedForeground}
-          />
-        ) : undefined
-      }
-    >
-      <HeroCard device={device} isOnline={isOnline} />
-
-      <DeviceMetaCard
-        device={device}
-        connection={connection}
-        isOnline={isOnline}
-        onCopyPeerId={handleCopyPeerId}
-      />
-
-      <SharedWorkspacesSection isOnline={isOnline} remoteWorkspaces={remoteWorkspaces} />
-
-      <Pressable
-        onPress={confirmUnpair}
-        disabled={unpairing}
-        accessibilityLabel={t`取消配对`}
-        className="h-[50px] flex-row items-center justify-center gap-2 rounded-[14px] bg-destructive disabled:opacity-60"
+    <>
+      <ScrollView
+        contentContainerClassName="gap-4 px-5 pt-2 pb-8"
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          isOnline ? (
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => void loadRemoteWorkspaces({ userInitiated: true })}
+              tintColor={colors.mutedForeground}
+            />
+          ) : undefined
+        }
       >
-        {unpairing ? (
-          <ActivityIndicator size="small" color={colors.background} />
-        ) : (
-          <Unlink color={colors.background} size={18} />
-        )}
-        <Text className="text-[16px] font-semibold text-destructive-foreground">
-          <Trans>取消配对</Trans>
-        </Text>
-      </Pressable>
-    </ScrollView>
+        <HeroCard device={device} isOnline={isOnline} />
+
+        <DeviceMetaCard
+          device={device}
+          connection={connection}
+          isOnline={isOnline}
+          onCopyPeerId={handleCopyPeerId}
+        />
+
+        <SharedWorkspacesSection isOnline={isOnline} remoteWorkspaces={remoteWorkspaces} />
+
+        <Pressable
+          onPress={() => setUnpairOpen(true)}
+          disabled={unpairing}
+          accessibilityLabel={t`取消配对`}
+          className="h-[50px] flex-row items-center justify-center gap-2 rounded-[14px] bg-destructive disabled:opacity-60"
+        >
+          {unpairing ? (
+            <ActivityIndicator size="small" color={colors.background} />
+          ) : (
+            <Unlink color={colors.background} size={18} />
+          )}
+          <Text className="text-[16px] font-semibold text-destructive-foreground">
+            <Trans>取消配对</Trans>
+          </Text>
+        </Pressable>
+      </ScrollView>
+
+      <AlertDialog open={unpairOpen} onOpenChange={setUnpairOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <Trans>取消配对</Trans>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              <Trans>已下载的笔记仍保留在本地，只是不再与此设备同步。</Trans>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              <Text>
+                <Trans>取消</Trans>
+              </Text>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive"
+              onPress={() => {
+                void handleUnpair();
+              }}
+            >
+              <Text className="text-destructive-foreground">
+                <Trans>确认取消配对</Trans>
+              </Text>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 

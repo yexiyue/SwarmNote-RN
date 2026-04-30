@@ -1,4 +1,7 @@
+import { msg } from "@lingui/core/macro";
 import { AppState, type AppStateStatus, type NativeEventSubscription } from "react-native";
+import { i18n } from "@/i18n/lingui";
+import { toast } from "@/lib/toast";
 import { useNetworkPreferenceStore } from "@/stores/network-preference-store";
 import { getAppCore } from "./app-core";
 
@@ -105,9 +108,10 @@ export class NetworkLifecycle {
       await getAppCore().startNetwork();
     } catch (err) {
       // NetworkAlreadyRunning is expected when called on an already-up node.
-      const msg = String(err);
-      if (!msg.includes("NetworkAlreadyRunning")) {
+      const errMsg = String(err);
+      if (!errMsg.includes("NetworkAlreadyRunning")) {
         console.warn("[network-lifecycle] startNetwork failed:", err);
+        toast.error(i18n._(msg`联网失败`), err);
       }
     }
   }
@@ -117,6 +121,7 @@ export class NetworkLifecycle {
       await getAppCore().stopNetwork();
     } catch (err) {
       console.warn("[network-lifecycle] stopNetwork failed:", err);
+      toast.error(i18n._(msg`断开网络失败`), err);
     }
   }
 }

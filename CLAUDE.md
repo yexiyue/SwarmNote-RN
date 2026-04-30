@@ -164,6 +164,7 @@ git commit -m "chore: update editor submodule"
 - 样式优先使用 NativeWind `className`；不要用 `StyleSheet.create` 去维护主题色，不要硬编码颜色。
 - UI 组件优先使用 `src/components/ui/` 下的 React Native Reusables 组件；通过 CLI 添加，不直接修改这些生成组件源码。
 - RNR 浮层组件依赖根布局里的 `<PortalHost />`；如果浮层显示异常，先检查 `_layout.tsx`。
+- toast 反馈统一通过 `@/lib/toast` 调用（`toast.success / error / info / promise`），禁止直接 `import` `sonner-native`；详细政策见 `dev-notes/knowledge/feedback-and-toast.md`。
 - commit message 使用 Conventional Commits；仓库通过 Lefthook + commitlint 校验。
 - 包管理固定使用 `pnpm`。
 
@@ -190,5 +191,6 @@ git commit -m "chore: update editor submodule"
 - `dev-notes/knowledge/files-panel.md`
 - `dev-notes/knowledge/i18n.md`
 - `dev-notes/knowledge/auto-update.md`
+- `dev-notes/knowledge/feedback-and-toast.md`
 
 设计稿位于 `dev-notes/design/mobile-design.pen`，需要通过 Pencil MCP 工具读取和修改，不要用普通文件读取工具解析 `.pen`。

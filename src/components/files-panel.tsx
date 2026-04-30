@@ -12,12 +12,22 @@ import {
   Settings,
 } from "lucide-react-native";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { UniffiFileTreeNode } from "react-native-swarmnote-core";
 import { FileActionSheet, type FileActionSheetRef } from "@/components/files/FileActionSheet";
 import { InlineNameInput } from "@/components/files/InlineNameInput";
 import { FilesToolbar } from "@/components/files-toolbar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Text } from "@/components/ui/text";
 import {
   basenameForEdit,
@@ -27,6 +37,7 @@ import {
   renameNode,
 } from "@/core/files-actions";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { toast } from "@/lib/toast";
 import { cn, errorMessage } from "@/lib/utils";
 import { useCurrentDocStore } from "@/stores/current-doc-store";
 import { useFileTreeStore } from "@/stores/file-tree-store";
@@ -54,6 +65,7 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
 
   const sheetRef = useRef<FileActionSheetRef>(null);
   const [_actionTarget, setActionTarget] = useState<UniffiFileTreeNode | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UniffiFileTreeNode | null>(null);
 
   useEffect(() => {
     refresh();
@@ -107,37 +119,44 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
     });
   }, []);
 
-  const handleDelete = useCallback(
+  const handleDelete = useCallback((node: UniffiFileTreeNode) => {
+    setDeleteTarget(node);
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    const node = deleteTarget;
+    if (node === null) return;
+    setDeleteTarget(null);
+    deleteNode(node)
+      .then(() => toast.success(t`已删除`))
+      .catch((err: unknown) => {
+        toast.error(t`删除失败`, err);
+      });
+  }, [deleteTarget, t]);
+
+  const deleteCopy = useMemo(() => {
+    if (deleteTarget === null) return null;
+    const isFolder = deleteTarget.children !== undefined && deleteTarget.children !== null;
+    const childCount = countDescendants(deleteTarget);
+    const title = isFolder ? t`删除文件夹` : t`删除笔记`;
+    const message =
+      isFolder && childCount > 0
+        ? t`『${deleteTarget.name}』包含 ${childCount} 项，将一并删除。此操作无法撤销。`
+        : t`确定删除『${deleteTarget.name}』？此操作无法撤销。`;
+    return { title, message };
+  }, [deleteTarget, t]);
+
+  const handleCopyPath = useCallback(
     (node: UniffiFileTreeNode) => {
-      const isFolder = node.children !== undefined && node.children !== null;
-      const childCount = countDescendants(node);
-      const title = isFolder ? t`删除文件夹` : t`删除笔记`;
-      const message = isFolder
-        ? childCount > 0
-          ? t`『${node.name}』包含 ${childCount} 项，将一并删除。此操作无法撤销。`
-          : t`确定删除『${node.name}』？此操作无法撤销。`
-        : t`确定删除『${node.name}』？此操作无法撤销。`;
-      Alert.alert(title, message, [
-        { text: t`取消`, style: "cancel" },
-        {
-          text: t`删除`,
-          style: "destructive",
-          onPress: () => {
-            deleteNode(node).catch((err: unknown) => {
-              Alert.alert(t`删除失败`, errorMessage(err));
-            });
-          },
-        },
-      ]);
+      Clipboard.setStringAsync(node.id)
+        .then(() => toast.success(t`已复制`))
+        .catch((err: unknown) => {
+          console.warn("[files-panel] copy path failed:", err);
+          toast.error(t`复制失败`, err);
+        });
     },
     [t],
   );
-
-  const handleCopyPath = useCallback((node: UniffiFileTreeNode) => {
-    Clipboard.setStringAsync(node.id).catch((err: unknown) => {
-      console.warn("[files-panel] copy path failed:", err);
-    });
-  }, []);
 
   const deriveParentRelPath = useCallback((): string | null => {
     if (selectedNodeId === null) return null;
@@ -266,7 +285,7 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
       <FilesToolbar
         onNewNote={onNewNote}
         onNewFolder={onNewFolder}
-        onSort={() => console.log("[files] sort")}
+        onSort={() => toast.info(t`排序即将推出`)}
         onCollapseAll={onCollapseAll}
         onClose={onClose}
       />
@@ -299,6 +318,36 @@ export function FilesPanel({ onClose }: FilesPanelProps) {
         onDelete={handleDelete}
         onCopyPath={handleCopyPath}
       />
+
+      <AlertDialog
+        open={deleteCopy !== null}
+        onOpenChange={(next) => {
+          if (!next) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          {deleteCopy !== null ? (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{deleteCopy.title}</AlertDialogTitle>
+                <AlertDialogDescription>{deleteCopy.message}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  <Text>
+                    <Trans>取消</Trans>
+                  </Text>
+                </AlertDialogCancel>
+                <AlertDialogAction className="bg-destructive" onPress={confirmDelete}>
+                  <Text className="text-destructive-foreground">
+                    <Trans>删除</Trans>
+                  </Text>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </>
+          ) : null}
+        </AlertDialogContent>
+      </AlertDialog>
     </SafeAreaView>
   );
 }

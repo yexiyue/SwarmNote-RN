@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Toaster } from "sonner-native";
+import { ErrorDialogHost } from "@/components/error-dialog-host";
 import { PairingRequestHost } from "@/components/pairing-request-host";
 import { UpdateHost } from "@/components/update/UpdateHost";
 import { initAppCore } from "@/core/app-core";
@@ -101,7 +103,9 @@ export default function RootLayout() {
                 <Stack.Screen name="editor-test" />
                 <Stack.Screen name="explore" />
               </Stack>
+              <Toaster position="top-center" />
               <PairingRequestHost />
+              <ErrorDialogHost />
               <UpdateHost />
               <PortalHost />
             </BottomSheetModalProvider>

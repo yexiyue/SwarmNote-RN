@@ -77,11 +77,11 @@ export function CodePairingCard({
       <Pressable
         onPress={onCopy}
         hitSlop={8}
-        className="h-7.5 flex-row items-center justify-center gap-1 rounded-md border border-border px-2.5"
+        className="h-8 flex-row items-center justify-center gap-1.5 rounded-lg border border-border px-3"
         accessibilityLabel={t`复制配对码`}
       >
-        <Copy color={colors.mutedForeground} size={12} />
-        <Text className="text-[11px] text-muted-foreground">
+        <Copy color={colors.foreground} size={12} />
+        <Text className="text-[12px] text-foreground">
           <Trans>复制</Trans>
         </Text>
       </Pressable>

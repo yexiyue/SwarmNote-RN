@@ -11,6 +11,7 @@ import { MarkdownEditor } from "@/components/editor/MarkdownEditor";
 import { FilesPanel } from "@/components/files-panel";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { toast } from "@/lib/toast";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useCurrentDocStore } from "@/stores/current-doc-store";
 import { useFilesUiStore } from "@/stores/files-ui-store";
@@ -128,7 +129,7 @@ export default function WorkspaceScreen() {
           )}
 
           <BottomCommandBar
-            onSearch={() => console.log("[workspace] search tapped")}
+            onSearch={() => toast.info(t`搜索即将推出`)}
             onNew={handleNewFromBottomBar}
             onMenu={() => commandSheetRef.current?.present()}
           />

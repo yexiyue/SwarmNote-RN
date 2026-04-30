@@ -12,7 +12,7 @@ import {
   Trash2,
 } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { UniffiRecentWorkspace } from "react-native-swarmnote-core";
 import { Text } from "@/components/ui/text";
@@ -20,7 +20,8 @@ import { WorkspaceSyncCard } from "@/components/workspace-sync-card";
 import { getAppCore } from "@/core/app-core";
 import { switchWorkspace } from "@/core/workspace-manager";
 import { useThemeColors } from "@/hooks/useThemeColors";
-import { errorMessage, truncateMiddle } from "@/lib/utils";
+import { toast } from "@/lib/toast";
+import { truncateMiddle } from "@/lib/utils";
 import { useRecentWorkspacesStore } from "@/stores/recent-workspaces-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -63,7 +64,7 @@ export default function WorkspaceDetail() {
       router.dismissAll();
       router.replace("/(main)" as never);
     } catch (err) {
-      Alert.alert(t`打开失败`, errorMessage(err));
+      toast.error(t`打开失败`, err);
     } finally {
       setSwitching(false);
     }
@@ -73,6 +74,7 @@ export default function WorkspaceDetail() {
     const id = workspace?.uuid ?? activeInfo?.id;
     if (id === undefined || id === null) return;
     await Clipboard.setStringAsync(id);
+    toast.success(t`已复制`);
   };
 
   return (

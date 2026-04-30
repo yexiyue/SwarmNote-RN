@@ -13,6 +13,7 @@ import {
   saveThemePreference,
   type ThemePreference,
 } from "@/lib/theme-persistence";
+import { toast } from "@/lib/toast";
 
 interface Option {
   value: ThemePreference;
@@ -38,8 +39,10 @@ export default function ThemeScreen() {
     setTheme(value);
     try {
       await saveThemePreference(value);
+      toast.success(t`主题已更新`);
     } catch (err) {
       console.warn("[theme] saveThemePreference failed:", err);
+      toast.error(t`保存失败`, err);
     }
   };
 

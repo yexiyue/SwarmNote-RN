@@ -15,6 +15,7 @@ import {
   type SupportedLanguage,
 } from "@/i18n/languageDetector";
 import { followSystemLanguage, setUserLanguage } from "@/i18n/lingui";
+import { toast } from "@/lib/toast";
 
 type Selection = SupportedLanguage | "system";
 
@@ -33,15 +34,20 @@ export default function LanguageScreen() {
   );
 
   const handleSelect = async (selection: Selection) => {
-    if (selection === "system") {
-      if (storedLang === null) return;
-      setStoredLang(null);
-      await followSystemLanguage();
-      return;
+    try {
+      if (selection === "system") {
+        if (storedLang === null) return;
+        setStoredLang(null);
+        await followSystemLanguage();
+      } else {
+        if (storedLang === selection) return;
+        setStoredLang(selection);
+        await setUserLanguage(selection);
+      }
+      toast.success(t`语言已更新`);
+    } catch (err) {
+      toast.error(t`保存失败`, err);
     }
-    if (storedLang === selection) return;
-    setStoredLang(selection);
-    await setUserLanguage(selection);
   };
 
   const isSystemSelected = storedLang === null;

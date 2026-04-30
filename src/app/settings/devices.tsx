@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import {
   Check,
@@ -24,6 +25,7 @@ import { usePairingCodeGenerator } from "@/hooks/usePairingCodeGenerator";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { devicePlatformIcon } from "@/lib/device-platform";
 import { truncatePeerId } from "@/lib/peer-id";
+import { toast } from "@/lib/toast";
 import { useSwarmStore } from "@/stores/swarm-store";
 
 export default function DevicesSettings() {
@@ -117,6 +119,14 @@ export default function DevicesSettings() {
           loading={generating}
           onGenerate={generate}
           onExpire={reset}
+          onCopy={
+            code === null
+              ? undefined
+              : async () => {
+                  await Clipboard.setStringAsync(code);
+                  toast.success(t`已复制`);
+                }
+          }
         />
 
         <View className="gap-2">
@@ -201,12 +211,13 @@ export default function DevicesSettings() {
               <Trans>附近设备</Trans>
             </Text>
             <Pressable
+              onPress={() => toast.info(t`附近设备会自动出现`)}
               hitSlop={6}
-              className="flex-row items-center gap-1 rounded-md border border-border px-2 h-6"
+              className="h-8 flex-row items-center justify-center gap-1.5 rounded-lg border border-border px-3"
               accessibilityLabel={t`刷新`}
             >
-              <RefreshCw color={colors.mutedForeground} size={11} />
-              <Text className="text-[10px] text-muted-foreground">
+              <RefreshCw color={colors.foreground} size={12} />
+              <Text className="text-[12px] text-foreground">
                 <Trans>刷新</Trans>
               </Text>
             </Pressable>
@@ -309,9 +320,11 @@ function MyDeviceCard({
       await getAppCore().setDeviceName(trimmed);
       onRenamed(trimmed);
       setEditing(false);
+      toast.success(t`已保存`);
     } catch (err) {
       console.warn("[devices] setDeviceName failed:", err);
       setError(true);
+      toast.error(t`保存失败`, err);
     } finally {
       setSaving(false);
     }

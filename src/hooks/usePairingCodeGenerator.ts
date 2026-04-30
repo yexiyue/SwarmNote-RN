@@ -1,5 +1,7 @@
+import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
 import { getAppCore } from "@/core/app-core";
+import { toast } from "@/lib/toast";
 
 const PAIRING_CODE_TTL_SECS = 600n;
 
@@ -7,6 +9,7 @@ const PAIRING_CODE_TTL_SECS = 600n;
  *  shared between the Onboarding Pairing step and the Swarm tab so the
  *  TTL constant and error handling stay in one place. */
 export function usePairingCodeGenerator() {
+  const { t } = useLingui();
   const [code, setCode] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -19,10 +22,11 @@ export function usePairingCodeGenerator() {
       setExpiresAt(info.expiresAt);
     } catch (err) {
       console.warn("[pairing] generatePairingCode failed:", err);
+      toast.error(t`生成失败`, err);
     } finally {
       setGenerating(false);
     }
-  }, []);
+  }, [t]);
 
   const reset = useCallback(() => {
     setCode(null);

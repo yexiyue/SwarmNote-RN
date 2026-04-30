@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ExternalLink } from "lucide-react-native";
 import { Linking, Pressable } from "react-native";
 import { useShallow } from "zustand/react/shallow";
@@ -14,12 +14,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { toast } from "@/lib/toast";
 import { useUpdateStore } from "@/stores/update-store";
 
 const REPO_RELEASES_URL = "https://github.com/yexiyue/SwarmNote-RN/releases";
 
 export function UpdateDialog() {
   const colors = useThemeColors();
+  const { t } = useLingui();
   const { status, latestVersion, currentVersion, dismiss, executeUpdate } = useUpdateStore(
     useShallow((s) => ({
       status: s.status,
@@ -36,7 +38,7 @@ export function UpdateDialog() {
 
   const openReleaseNotes = () => {
     const target = latestVersion ? `${REPO_RELEASES_URL}/tag/v${latestVersion}` : REPO_RELEASES_URL;
-    Linking.openURL(target).catch(() => {});
+    Linking.openURL(target).catch((err: unknown) => toast.error(t`无法打开链接`, err));
   };
 
   return (
