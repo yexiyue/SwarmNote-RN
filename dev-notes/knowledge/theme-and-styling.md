@@ -233,6 +233,58 @@ Dialog、AlertDialog、Popover、Tooltip、DropdownMenu、Select 等浮层组件
 
 **相关文件**：`src/components/ui/alert-dialog.tsx`、`src/components/ui/dialog.tsx`
 
+### Dialog 宽度用 Dimensions 算 inline width，不用 className `w-[X%]`
+
+`react-native-css`（NativeWind v5）**不解析任意百分数 className**（如 `w-[88%]` / `w-[94%]`）—— inspector 看到 className 上有它，但生成的 RN style 里没有 `width` 字段。同样 inline `style={{ width: "92%" }}` 在 dialog content 上也不可靠（实测渲染只有声称值的 ~40%，怀疑因为 `<NativeOnlyAnimatedView>` 包装层没有显式撑宽，导致百分数计算 reference 不到屏幕宽度）。
+
+**正确做法**（已落地在 [src/components/pairing-request-host.tsx](src/components/pairing-request-host.tsx)）：
+
+```tsx
+<AlertDialogContent
+  style={{
+    width: Math.min(Dimensions.get("window").width * 0.8, 480),
+    // ...其他 style
+  }}
+  className="max-w-none gap-4 bg-card p-6 sm:max-w-none"
+/>
+```
+
+- `Dimensions.get("window").width * 0.8` —— 占屏幕宽 80%（手机正常视觉）
+- `Math.min(..., 480)` —— 平板上不超过 480 dp，避免对话框横跨整屏
+- className 仍要 `max-w-none sm:max-w-none` 显式覆盖 `<AlertDialogContent>` 默认的 `max-w-[calc(100%-2rem)] sm:max-w-lg`（被 tw-merge 保留下来会限到 32rem = 512 dp，干扰 inline style）
+
+**不要做**：
+
+- 不要用 `w-[80%]` / `w-[94%]` className —— 静默不生效
+- 不要用 inline `width: "80%"` —— 包装层 reference 异常
+- 不要忘记 `sm:max-w-none` —— `sm:max-w-lg` 在 ≥640 dp 屏幕（很多 tablet）会偷偷限到 512 dp
+
+### DeviceCard 共享组件
+
+[src/components/device-card.tsx](src/components/device-card.tsx) 是 "icon + name + meta + 可选 extra slot" 的可复用设备行组件。
+
+**Variants**：
+
+- `inline`（默认）：透明底，gap 12，给"已经被 list/card 容器包裹"的场景用
+- `filled`：`bg-background rounded-xl p-3.5`，给 dialog / sheet 内嵌方块用
+
+**Icon 路由**：合并 `os` 与 `platform` 字段做 lowercase substring 匹配：`ipad/tablet → Tablet`、`ios/android → Smartphone`、`mac/windows → Laptop`、fallback → `Monitor`。颜色用 `useThemeColors().mutedForeground`。
+
+**何时用、何时不用**：
+
+| 场景 | 用 DeviceCard? |
+| --- | --- |
+| Dialog / Sheet 内嵌设备方块（如 PairingRequestHost） | ✅ `variant="filled"` |
+| 设置页设备列表（settings/devices.tsx 的 paired/nearby list） | ❌ 现有列表用 `text-[13px]/text-[11px]/icon size 18` 的紧凑 typography，DeviceCard 默认 15/13/22 不匹配；强行迁会视觉降级。保留现有内联实现 |
+| 详情页 3-row 信息卡（pairing/found-device.tsx） | ❌ 结构是设备名/系统/设备 ID 三行，与单行 icon+name+meta 模式不匹配 |
+
+**不要做**：
+
+- 不要在 DeviceCard 内置"在线/离线"圆点 —— 状态变体用 `extra` slot 传入更灵活
+- 不要硬编码 icon 颜色 —— 已用 `useThemeColors()` 动态读取
+
+**相关文件**：`src/components/device-card.tsx`、`src/components/pairing-request-host.tsx`
+
 ## 图标库
 
 ### 统一使用 lucide-react-native

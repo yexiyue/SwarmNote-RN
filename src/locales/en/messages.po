@@ -52,6 +52,11 @@ msgstr "{0} notes"
 msgid "{0} 详情"
 msgstr "{0} details"
 
+#. placeholder {0}: payload.deviceName
+#: src/components/pairing-request-host.tsx:78
+msgid "{0} 请求与你的设备配对"
+msgstr "{0} requests pairing"
+
 #: src/app/workspaces/sync/done.tsx:65
 msgid "{doneCount} 个成功 · {errorCount} 个失败"
 msgstr "{doneCount} succeeded · {errorCount} failed"
@@ -61,8 +66,12 @@ msgid "{os} · 局域网"
 msgstr "{os} · LAN"
 
 #: src/components/pairing-request-host.tsx:67
-msgid "{remaining} 秒后过期"
-msgstr "Expires in {remaining}s"
+#~ msgid "{remaining} 秒后过期"
+#~ msgstr "Expires in {remaining}s"
+
+#: src/components/pairing-request-host.tsx:82
+msgid "{remaining}s"
+msgstr "{remaining}s"
 
 #. placeholder {0}: node.name
 #: src/components/files-panel.tsx:117
@@ -369,6 +378,7 @@ msgid "对方设备暂未打开任何工作区"
 msgstr "The other device hasn't opened any workspace yet"
 
 #: src/app/pairing/success.tsx:33
+#: src/components/pairing-request-host.tsx:93
 msgid "局域网"
 msgstr "LAN"
 
@@ -427,7 +437,7 @@ msgid "已是最新"
 msgstr "Up to date"
 
 #: src/components/code-pairing-card.tsx:63
-#: src/components/pairing-request-host.tsx:67
+#: src/components/pairing-request-host.tsx:82
 msgid "已过期"
 msgstr "Expired"
 
@@ -571,7 +581,8 @@ msgstr "Device found"
 msgid "折叠全部"
 msgstr "Collapse all"
 
-#: src/components/pairing-request-host.tsx:73
+#: src/components/pairing-request-host.tsx:111
+#: src/components/pairing-request-host.tsx:115
 msgid "拒绝"
 msgstr "Reject"
 
@@ -579,7 +590,8 @@ msgstr "Reject"
 msgid "排序"
 msgstr "Sort"
 
-#: src/components/pairing-request-host.tsx:78
+#: src/components/pairing-request-host.tsx:101
+#: src/components/pairing-request-host.tsx:105
 msgid "接受"
 msgstr "Accept"
 
@@ -592,8 +604,8 @@ msgid "操作"
 msgstr "Actions"
 
 #: src/components/pairing-request-host.tsx:56
-msgid "收到配对请求"
-msgstr "Pairing request received"
+#~ msgid "收到配对请求"
+#~ msgstr "Pairing request received"
 
 #: src/app/onboarding/welcome.tsx:18
 msgid "数据完全本地，隐私优先"
@@ -678,11 +690,9 @@ msgstr "No syncable workspaces found"
 msgid "未知"
 msgstr "Unknown"
 
-#. placeholder {0}: payload.deviceName
-#. placeholder {1}: payload.os
 #: src/components/pairing-request-host.tsx:59
-msgid "来自 \"{0}\" ({1})"
-msgstr "From \"{0}\" ({1})"
+#~ msgid "来自 \"{0}\" ({1})"
+#~ msgstr "From \"{0}\" ({1})"
 
 #: src/components/update/ForceUpdateDialog.tsx:60
 #: src/components/update/UpdateDialog.tsx:57
@@ -1041,6 +1051,10 @@ msgstr "Pairing rejected"
 #: src/app/onboarding/pairing.tsx:108
 msgid "配对设备"
 msgstr "Pair a device"
+
+#: src/components/pairing-request-host.tsx:72
+msgid "配对请求"
+msgstr "Pairing request"
 
 #: src/app/workspaces/[id].tsx:119
 #: src/components/files/FileActionSheet.tsx:63
