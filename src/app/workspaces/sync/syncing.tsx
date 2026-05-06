@@ -11,15 +11,19 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 import { WARNING_FG, WARNING_TINT_SOFT } from "@/lib/theme-tokens";
 import { errorMessage } from "@/lib/utils";
 import { workspacesBaseDirUri } from "@/lib/workspace-naming";
-import { syncKey, useSwarmStore } from "@/stores/swarm-store";
+import { type SyncEntry, syncKey, useSwarmStore } from "@/stores/swarm-store";
 import { useSyncWizardStore, type WizardItem } from "@/stores/sync-wizard-store";
 
-/** `SyncCompleted` is written to swarmStore as `{completed:0, total:0, cancelled}`;
- *  `cancelled === false` is the signal that a full_sync landed successfully. */
-function isSyncCompletedOk(
-  entry: { completed: number; total: number; cancelled?: boolean } | undefined,
-): boolean {
-  return entry !== undefined && entry.cancelled === false;
+/** `SyncCompleted` is written to swarmStore as
+ *  `{completed:0, total:0, cancelled, error}`. Three terminal cases:
+ *  - clean finish: `cancelled:false, error:undefined` → `done`
+ *  - user cancelled: `cancelled:true` → ignored (no UI for cancel today)
+ *  - internal failure: `error` set → `error` */
+function syncTerminalKind(entry: SyncEntry | undefined): "done" | "error" | "pending" {
+  if (entry === undefined || entry.cancelled === undefined) return "pending";
+  if (entry.error !== undefined) return "error";
+  if (entry.cancelled) return "pending";
+  return "done";
 }
 
 export default function SyncWizardSyncing() {
@@ -55,8 +59,13 @@ export default function SyncWizardSyncing() {
           // Race guard: SyncCompleted may have landed before Wizard mount
           // (e.g. user re-entered the wizard while a prior sync was wrapping up).
           const existing = swarmState.syncProgress[syncKey(wi.ws.uuid, wi.ws.peerId)];
-          if (isSyncCompletedOk(existing)) {
+          const kind = syncTerminalKind(existing);
+          if (kind === "done") {
             updateItem(i, { status: "done" });
+            return;
+          }
+          if (kind === "error") {
+            updateItem(i, { status: "error", error: existing?.error });
             return;
           }
 
@@ -157,17 +166,20 @@ interface WatcherProps {
   cancelledRef: React.RefObject<boolean>;
 }
 
-/** Headless per-item listener: flips the wizard item to `done` once the
- *  backend `full_sync` emits `SyncCompleted{cancelled:false}`. Cancelled
- *  completions are ignored — no user-facing cancel path exists today. */
+/** Headless per-item listener: flips the wizard item to `done` or `error`
+ *  once the backend `full_sync` emits `SyncCompleted`. User-cancelled
+ *  completions stay in `syncing` since there is no user-facing cancel today. */
 function SyncItemCompletedWatcher({ index, item, cancelledRef }: WatcherProps) {
   const entry = useSwarmStore((s) => s.syncProgress[syncKey(item.ws.uuid, item.ws.peerId)]);
   const updateItem = useSyncWizardStore((s) => s.updateItem);
   useEffect(() => {
     if (cancelledRef.current) return;
     if (item.status !== "syncing") return;
-    if (isSyncCompletedOk(entry)) {
+    const kind = syncTerminalKind(entry);
+    if (kind === "done") {
       updateItem(index, { status: "done" });
+    } else if (kind === "error") {
+      updateItem(index, { status: "error", error: entry?.error });
     }
   }, [entry, item.status, index, updateItem, cancelledRef]);
   return null;

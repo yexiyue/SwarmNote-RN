@@ -5,7 +5,7 @@
 //! responsible for keeping exactly one instance alive (stash it in a context
 //! / store) and calling `uniffiDestroy()` on teardown.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
@@ -14,9 +14,11 @@ use swarmnote_core::libp2p::PeerId;
 use swarmnote_core::protocol::{AppRequest, AppResponse, WorkspaceRequest, WorkspaceResponse};
 use swarmnote_core::{
     config::save_config, ensure_workspace_row, AppCore, AppCoreBuilder, DeviceFilter,
-    DeviceStatus, NodeStatus,
+    DeviceStatus, NodeStatus, WorkspaceCore,
 };
+use tokio::sync::Mutex;
 use tokio::task::JoinSet;
+use uuid::Uuid;
 
 use crate::error::{FfiError, parse_uuid};
 use crate::events::{ForeignEventBus, UniffiEventBusAdapter};
@@ -40,6 +42,15 @@ pub struct UniffiAppCore {
     /// Kept here separately so wrap-layer code (e.g. `UniffiWorkspaceCore::hydrate`)
     /// can call methods on the concrete adapter type without downcasting.
     pub(crate) event_bus: Arc<UniffiEventBusAdapter>,
+    /// Strong refs to workspaces created via `create_workspace_for_sync` but
+    /// not yet held by any RN-side handle. Without this, the freshly-built
+    /// `Arc<WorkspaceCore>` would drop at the end of that method,
+    /// `AppCore.workspaces` would only retain a `Weak`, and the immediately-
+    /// following `trigger_sync_with_peer` would find a dangling Weak — sync
+    /// would early-exit with `NoWorkspaceDb` and pull zero documents.
+    /// Cleared inside `trigger_sync_with_peer` once `spawn_full_sync` has
+    /// pinned its own strong ref for the sync task's lifetime.
+    pub(crate) sync_pending: Mutex<HashMap<Uuid, Arc<WorkspaceCore>>>,
 }
 
 #[uniffi::export(async_runtime = "tokio")]
@@ -62,7 +73,11 @@ impl UniffiAppCore {
         )
         .build()
         .await?;
-        Ok(Arc::new(Self { inner, event_bus }))
+        Ok(Arc::new(Self {
+            inner,
+            event_bus,
+            sync_pending: Mutex::new(HashMap::new()),
+        }))
     }
 
     /// Snapshot of the device identity — peer id + user-facing metadata.
@@ -221,6 +236,8 @@ impl UniffiAppCore {
         })?;
         let coordinator = self.inner.sync_coordinator_or_err().await?;
         coordinator.spawn_full_sync(pid, workspace_uuid).await;
+        // Safe to release — spawn_full_sync now holds its own Arc.
+        self.sync_pending.lock().await.remove(&workspace_uuid);
         Ok(())
     }
 
@@ -363,7 +380,9 @@ impl UniffiAppCore {
             return Err(e);
         }
 
-        let _ws_core = self.inner.clone().open_workspace(ws_path.clone()).await?;
+        let ws_core = self.inner.clone().open_workspace(ws_path.clone()).await?;
+        // Keep-alive until `trigger_sync_with_peer` — see `sync_pending` docs.
+        self.sync_pending.lock().await.insert(ws_uuid, ws_core);
 
         // touch_recent_workspace failing only costs a missing MRU entry; the
         // workspace itself is already registered, so we swallow the error.

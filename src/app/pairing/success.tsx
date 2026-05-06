@@ -1,12 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Check, RefreshCw } from "lucide-react-native";
+import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UniffiConnectionType } from "react-native-swarmnote-core";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { truncatePeerId } from "@/lib/peer-id";
+import { useOnboardingStore } from "@/stores/onboarding-store";
 import { useSwarmStore } from "@/stores/swarm-store";
 
 export default function PairingSuccess() {
@@ -22,24 +24,45 @@ export default function PairingSuccess() {
   }>();
 
   const device = useSwarmStore((s) => s.devices.find((d) => d.peerId === params.peerId));
+  const markOnboarded = useOnboardingStore((s) => s.markCompleted);
+
+  // Reaching here means onboarding's main goal (pair or import) is satisfied.
+  // Mark it done so later `router.dismissAll()` (from "完成" / sync-wizard
+  // "打开工作区") doesn't bounce us back to /onboarding/welcome via the root
+  // redirect gate. Idempotent — safe for already-onboarded users coming from
+  // Settings → 配对设备.
+  useEffect(() => {
+    markOnboarded();
+  }, [markOnboarded]);
   const displayName = params.name || params.hostname;
   const latency =
     device?.latency !== undefined && device.latency !== null ? Number(device.latency) : undefined;
 
-  const connectionLabel = (type: UniffiConnectionType | undefined): string => {
-    if (type === undefined) return t`已连接`;
-    const kind =
-      type === UniffiConnectionType.Lan
-        ? t`局域网`
-        : type === UniffiConnectionType.Dcutr
-          ? t`打洞`
-          : t`中继`;
+  const networkLabel = (type: UniffiConnectionType | undefined): string => {
+    let kind: string;
+    switch (type) {
+      case UniffiConnectionType.Lan:
+        kind = t`局域网`;
+        break;
+      case UniffiConnectionType.Dcutr:
+        kind = t`打洞`;
+        break;
+      case UniffiConnectionType.Relay:
+        kind = t`中继`;
+        break;
+      default:
+        kind = t`已连接`;
+    }
     const rtt = latency !== undefined ? ` · ${latency}ms` : "";
-    return t`已连接 · ${kind}${rtt}`;
+    return `${kind}${rtt}`;
   };
 
   const finish = () => {
     router.dismissAll();
+  };
+
+  const goToSync = () => {
+    router.replace("/workspaces/sync/select" as never);
   };
 
   return (
@@ -87,21 +110,18 @@ export default function PairingSuccess() {
           <View className="h-px bg-border" />
           <View className="flex-row items-center justify-between">
             <Text className="text-[14px] text-muted-foreground">
-              <Trans>连接状态</Trans>
+              <Trans>网络</Trans>
             </Text>
-            <View className="flex-row items-center gap-1.5">
-              <View style={{ backgroundColor: colors.success }} className="h-2 w-2 rounded-full" />
-              <Text style={{ color: colors.success }} className="text-[14px] font-medium">
-                {connectionLabel(device?.connection)}
-              </Text>
-            </View>
+            <Text className="text-[14px] font-medium text-foreground">
+              {networkLabel(device?.connection)}
+            </Text>
           </View>
         </View>
       </View>
 
       <View className="gap-2.5 px-6 pb-6">
         <Pressable
-          onPress={finish}
+          onPress={goToSync}
           accessibilityLabel={t`同步工作区`}
           className="h-13 flex-row items-center justify-center gap-2 rounded-xl bg-primary"
         >

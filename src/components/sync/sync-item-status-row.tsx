@@ -1,6 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { Circle, CircleCheck, LoaderCircle, type LucideIcon, XCircle } from "lucide-react-native";
+import { useEffect } from "react";
 import { View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { syncKey, useSwarmStore } from "@/stores/swarm-store";
@@ -50,7 +58,11 @@ export function SyncItemStatusRow({ item, live }: Props) {
   return (
     <View className="gap-2.5 rounded-xl border border-border bg-card px-4 py-3.5">
       <View className="flex-row items-center gap-3">
-        <Icon color={iconColor} size={18} />
+        {item.status === "syncing" ? (
+          <SpinningIcon Icon={Icon} color={iconColor} />
+        ) : (
+          <Icon color={iconColor} size={18} />
+        )}
         <View className="flex-1 gap-0.5">
           <Text className="text-[14px] font-semibold text-foreground" numberOfLines={1}>
             {item.ws.name}
@@ -79,6 +91,23 @@ export function SyncItemStatusRow({ item, live }: Props) {
         </View>
       ) : null}
     </View>
+  );
+}
+
+function SpinningIcon({ Icon, color }: { Icon: LucideIcon; color: string }) {
+  const rotation = useSharedValue(0);
+  useEffect(() => {
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 1000, easing: Easing.linear }),
+      -1,
+      false,
+    );
+  }, [rotation]);
+  const style = useAnimatedStyle(() => ({ transform: [{ rotate: `${rotation.value}deg` }] }));
+  return (
+    <Animated.View style={style}>
+      <Icon color={color} size={18} />
+    </Animated.View>
   );
 }
 

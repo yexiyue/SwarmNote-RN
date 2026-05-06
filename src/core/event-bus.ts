@@ -99,15 +99,16 @@ export class EventBus implements ForeignEventBus {
       }
 
       case UniffiAppEvent_Tags.SyncCompleted: {
-        const { workspaceId, peerId, cancelled } = event.inner;
+        const { workspaceId, peerId, cancelled, error } = event.inner;
         // Keep the last-known totals on display briefly by setting a terminal
         // entry with `cancelled`; UI can fade it out on its own cadence.
         swarm.setSyncProgress(syncKey(workspaceId, peerId), {
           completed: 0,
           total: 0,
           cancelled,
+          error,
         });
-        if (!cancelled) {
+        if (!cancelled && error === undefined) {
           useSyncPersistStore.getState().setLastSyncedAt(workspaceId, Date.now());
           // If the finished workspace is the one the user currently has open,
           // pull newly synced docs into the file tree. Non-active workspaces

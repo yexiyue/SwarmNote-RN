@@ -111,6 +111,9 @@ pub enum UniffiAppEvent {
         /// `true` if the session was cancelled mid-run; `false` = normal
         /// finish.
         cancelled: bool,
+        /// `Some` if the session terminated early due to an internal error
+        /// (e.g. DocList request timeout). `None` for clean finish.
+        error: Option<String>,
     },
 
     // ── Collaboration awareness ──
@@ -241,10 +244,12 @@ fn map_event(event: AppEvent) -> UniffiAppEvent {
             workspace_id,
             peer_id,
             cancelled,
+            error,
         } => UniffiAppEvent::SyncCompleted {
             workspace_id: workspace_id.to_string(),
             peer_id,
             cancelled,
+            error,
         },
     }
 }

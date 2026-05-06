@@ -3333,7 +3333,7 @@ export const UniffiAppEvent = (() => {
 
     type SyncCompleted__interface = {
         tag: UniffiAppEvent_Tags.SyncCompleted;
-        inner: Readonly<{workspaceId: string; peerId: string; cancelled: boolean}>
+        inner: Readonly<{workspaceId: string; peerId: string; cancelled: boolean; error: string | undefined}>
     };
 
     
@@ -3344,12 +3344,16 @@ export const UniffiAppEvent = (() => {
          */
         readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
         readonly tag = UniffiAppEvent_Tags.SyncCompleted;
-        readonly inner: Readonly<{workspaceId: string; peerId: string; cancelled: boolean}>;
+        readonly inner: Readonly<{workspaceId: string; peerId: string; cancelled: boolean; error: string | undefined}>;
         constructor(inner: { workspaceId: string, peerId: string, 
         /**
          * `true` if the session was cancelled mid-run; `false` = normal
          * finish.
-         */cancelled: boolean }) {
+         */cancelled: boolean, 
+        /**
+         * `Some` if the session terminated early due to an internal error
+         * (e.g. DocList request timeout). `None` for clean finish.
+         */error: string | undefined }) {
             super("UniffiAppEvent", "SyncCompleted");
             this.inner = Object.freeze(inner);
         }
@@ -3358,7 +3362,11 @@ export const UniffiAppEvent = (() => {
         /**
          * `true` if the session was cancelled mid-run; `false` = normal
          * finish.
-         */cancelled: boolean }): SyncCompleted_ {
+         */cancelled: boolean, 
+        /**
+         * `Some` if the session terminated early due to an internal error
+         * (e.g. DocList request timeout). `None` for clean finish.
+         */error: string | undefined }): SyncCompleted_ {
             return new SyncCompleted_(inner);
         }
 
@@ -3466,7 +3474,7 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                 case 12: return new UniffiAppEvent.HydrateProgress({workspaceId: FfiConverterString.read(from), current: FfiConverterUInt64.read(from), total: FfiConverterUInt64.read(from) });
                 case 13: return new UniffiAppEvent.SyncStarted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from) });
                 case 14: return new UniffiAppEvent.SyncProgress({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), completed: FfiConverterUInt32.read(from), total: FfiConverterUInt32.read(from) });
-                case 15: return new UniffiAppEvent.SyncCompleted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), cancelled: FfiConverterBool.read(from) });
+                case 15: return new UniffiAppEvent.SyncCompleted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), cancelled: FfiConverterBool.read(from), error: FfiConverterOptionalString.read(from) });
                 case 16: return new UniffiAppEvent.ExternalAwarenessUpdate({docId: FfiConverterString.read(from), update: FfiConverterArrayBuffer.read(from) });
                 default: throw new UniffiInternalError.UnexpectedEnumCase();
             }
@@ -3572,6 +3580,7 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                     FfiConverterString.write(inner.workspaceId, into);
                     FfiConverterString.write(inner.peerId, into);
                     FfiConverterBool.write(inner.cancelled, into);
+                    FfiConverterOptionalString.write(inner.error, into);
                     return;
                 }
                 case UniffiAppEvent_Tags.ExternalAwarenessUpdate: {
@@ -3685,6 +3694,7 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                     size += FfiConverterString.allocationSize(inner.workspaceId);
                     size += FfiConverterString.allocationSize(inner.peerId);
                     size += FfiConverterBool.allocationSize(inner.cancelled);
+                    size += FfiConverterOptionalString.allocationSize(inner.error);
                     return size;
                 }
                 case UniffiAppEvent_Tags.ExternalAwarenessUpdate: {

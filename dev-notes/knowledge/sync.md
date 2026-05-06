@@ -176,6 +176,50 @@ pub fn decode_ws_awareness(data: &[u8]) -> Option<(Uuid, &[u8])> { ... }
 
 **相关文件**：`crates/core/src/workspace/sync/mod.rs`、`crates/core/src/workspace/sync/workspace_sync.rs`、`crates/core/src/workspace/sync/coordinator.rs`、`crates/core/src/network/event_loop.rs`、`crates/core/src/events.rs`、`packages/swarmnote-core/rust/mobile-core/src/workspace.rs`、`packages/swarmnote-core/rust/mobile-core/src/events.rs`
 
+## Wizard 同步：必须 keep-alive `WorkspaceCore` Arc
+
+`AppCore.workspaces: Mutex<HashMap<Uuid, Weak<WorkspaceCore>>>` 只持 Weak。`create_workspace_for_sync` 内部调 `open_workspace` 拿到 `Arc<WorkspaceCore>` 后立即返回 path 字符串，那个 Arc 在函数结尾就 drop。没人持 Strong 的话，AppCore.workspaces 里的 Weak 在毫秒级内就 dangling。然后 RN 端 IPC 回来调 `triggerSyncWithPeer`，后台 `full_sync` task 跑到 `build_local_doc_list` 第一行 `core.get_workspace(uuid)` 返回 `None` → `NoWorkspaceDb` 早退 → actions=0 → emit `SyncCompleted{error: Some(...)}`，wizard 看起来 `done` 但工作区是空的。
+
+**踩过的现象**：桌面端给 14 篇笔记的工作区，移动端 wizard 跑完打开 → 工作区空白。日志只看到 1 个 inbound `ListWorkspaces`，0 个 `ListDocs` doc-pull 请求。
+
+**修复（双层）**：
+
+1. **`coordinator.rs spawn_full_sync`** 启动时同步 upgrade Weak → Strong Arc，move 进 spawn closure（`let _ws_pin = ws_arc;`），保证 sync 期间不会 dangling。
+2. **mobile-core `UniffiAppCore`** 加 `sync_pending: Mutex<HashMap<Uuid, Arc<WorkspaceCore>>>`，`create_workspace_for_sync` 把刚 open 的 ws_core insert 进去，`trigger_sync_with_peer` 调完 `spawn_full_sync` 后立即 remove（spawn 已经 pin 了自己的 Strong）。**桌面端对称用 `SyncPendingMap` Tauri state**。
+
+**为什么不让 RN 端持 Arc？** mobile 单 active workspace 模式：wizard 期间不能冲掉用户当前 active；多 wizard item 也无法各持一份 Arc。
+
+**不要做**：不要简化成"反正旁路调用方式不会出问题"——detail 页"立即同步"工作区已 active，不暴露这个 bug，但 wizard 必踩。
+
+**相关文件**：`packages/swarmnote-core/rust/mobile-core/src/app.rs::sync_pending`、桌面 `src-tauri/src/platform/workspace_map.rs::SyncPendingMap`、共享 crate `crates/core/src/workspace/sync/coordinator.rs::spawn_full_sync`
+
+## `full_sync` 用 try/finally 保证 `SyncCompleted` always-emit
+
+`AppEvent::SyncCompleted` 是 wizard 唯一的 terminal 信号。早退路径漏 emit 会让 UI 卡死无限 spinner。
+
+```rust
+pub async fn full_sync(...) -> AppResult<()> {
+    core.event_bus.emit(AppEvent::SyncStarted { ... });
+    let result = run_full_sync(&core, ..., &cancel).await;  // 内层 ? 自由
+    let cancelled = cancel.is_cancelled();
+    let error = match &result { Ok(_) => None, Err(e) => Some(e.to_string()) };
+    core.event_bus.emit(AppEvent::SyncCompleted { workspace_id, peer_id, cancelled, error });
+    result
+}
+```
+
+**协议**：`AppEvent::SyncCompleted` 现有 `error: Option<String>` 字段。`None` = 正常完成；`Some(...)` = 早退（DocList timeout、NoWorkspaceDb 等）。RN watcher 用 `syncTerminalKind(entry)` 三态：
+- `cancelled === undefined` → `pending`（仍在跑）
+- `error !== undefined` → `error`（红色 ✗ + 错误文字）
+- `cancelled === true` → `pending`（用户取消，今天没 UI 进入）
+- 其它 → `done`
+
+**桌面端 Tauri payload**：`sync-completed` 事件多一个 `result: "success" | "cancelled" | "error"` 字段（`SyncResult` union 已扩展）+ `error: string | null`。
+
+**不要做**：不要在 `full_sync` 主体里用 `?` 早退然后忘记 emit `SyncCompleted` —— 这是导致一闪而过 / 无限 spinner 的根源。新增早退分支必须走 `run_full_sync` inner fn。
+
+**相关文件**：`crates/core/src/workspace/sync/full_sync.rs`、`crates/core/src/events.rs`、`src/core/event-bus.ts`、`src/app/workspaces/sync/syncing.tsx::syncTerminalKind`
+
 ## 取消配对保留本地文件
 
 `unpairDevice(peerId)` 只拆设备关系，**不删除任何本地工作区**。Alert 二次确认文案必须清楚："已下载的笔记仍保留在本地，只是不再与此设备同步。"

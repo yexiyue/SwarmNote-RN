@@ -3,11 +3,15 @@ import { create } from "zustand";
 
 type SyncKey = `${string}:${string}`;
 
-type SyncEntry = {
+export type SyncEntry = {
   completed: number;
   total: number;
   /** Set by `SyncCompleted`; absent while running. */
   cancelled?: boolean;
+  /** Set by `SyncCompleted` when the Rust core ended the session early due
+   *  to an internal error (e.g. DocList request timeout). UI uses this to
+   *  flip the wizard item to `"error"` instead of `"done"`. */
+  error?: string;
 };
 
 type HydrateEntry = {
@@ -73,7 +77,8 @@ export const useSwarmStore = create<SwarmState & SwarmActions>()((set, get) => (
       cur !== undefined &&
       cur.completed === entry.completed &&
       cur.total === entry.total &&
-      cur.cancelled === entry.cancelled
+      cur.cancelled === entry.cancelled &&
+      cur.error === entry.error
     ) {
       return;
     }
