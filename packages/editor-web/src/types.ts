@@ -56,6 +56,10 @@ export interface EditorApi {
   select(selection: EditorSelectionRange): void;
   focus(): void;
   blur(): void;
+  /** Set the bottom scroll margin in pixels — host calls this with the height
+   *  of any UI overlaying the editor (keyboard + toolbar / floating bar) so
+   *  CodeMirror keeps the cursor above the overlay during scrollIntoView. */
+  setScrollBottomMargin(px: number): void;
   setSearchState(state: SearchState | null, source?: string): void;
 }
 

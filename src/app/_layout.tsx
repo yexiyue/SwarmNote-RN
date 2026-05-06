@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { NotifierRoot } from "react-native-notifier";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorDialogHost } from "@/components/error-dialog-host";
@@ -74,49 +75,51 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <ThemeProvider value={navTheme}>
-          <LinguiProvider>
-            <BottomSheetModalProvider>
-              <StatusBar style={isDark ? "light" : "dark"} />
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="index" />
-                <Stack.Screen name="onboarding" />
-                <Stack.Screen name="(main)" />
-                <Stack.Screen name="workspaces" options={{ animation: "slide_from_right" }} />
-                <Stack.Screen
-                  name="settings"
-                  options={{ presentation: "modal", animation: "slide_from_bottom" }}
-                />
-                <Stack.Screen
-                  name="pairing/input-code"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="pairing/found-device"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="pairing/success"
-                  options={{ animation: "slide_from_right", gestureEnabled: false }}
-                />
-                <Stack.Screen name="editor-test" />
-                <Stack.Screen name="explore" />
-              </Stack>
-              <PairingRequestHost />
-              <ErrorDialogHost />
-              <UpdateHost />
-              <PortalHost />
-            </BottomSheetModalProvider>
-          </LinguiProvider>
-        </ThemeProvider>
-        {/* NotifierRoot must be the last sibling under SafeAreaProvider so
-            it draws above every other tree. `useRNScreensOverlay` is the
-            iOS-only escape hatch that paints the toast inside react-native-
-            screens' FullWindowOverlay, putting it above native-stack modals
-            and RN Modal. */}
-        <NotifierRoot useRNScreensOverlay />
-      </SafeAreaProvider>
+      <KeyboardProvider>
+        <SafeAreaProvider>
+          <ThemeProvider value={navTheme}>
+            <LinguiProvider>
+              <BottomSheetModalProvider>
+                <StatusBar style={isDark ? "light" : "dark"} />
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="onboarding" />
+                  <Stack.Screen name="(main)" />
+                  <Stack.Screen name="workspaces" options={{ animation: "slide_from_right" }} />
+                  <Stack.Screen
+                    name="settings"
+                    options={{ presentation: "modal", animation: "slide_from_bottom" }}
+                  />
+                  <Stack.Screen
+                    name="pairing/input-code"
+                    options={{ animation: "slide_from_right" }}
+                  />
+                  <Stack.Screen
+                    name="pairing/found-device"
+                    options={{ animation: "slide_from_right" }}
+                  />
+                  <Stack.Screen
+                    name="pairing/success"
+                    options={{ animation: "slide_from_right", gestureEnabled: false }}
+                  />
+                  <Stack.Screen name="editor-test" />
+                  <Stack.Screen name="explore" />
+                </Stack>
+                <PairingRequestHost />
+                <ErrorDialogHost />
+                <UpdateHost />
+                <PortalHost />
+              </BottomSheetModalProvider>
+            </LinguiProvider>
+          </ThemeProvider>
+          {/* NotifierRoot must be the last sibling under SafeAreaProvider so
+              it draws above every other tree. `useRNScreensOverlay` is the
+              iOS-only escape hatch that paints the toast inside react-native-
+              screens' FullWindowOverlay, putting it above native-stack modals
+              and RN Modal. */}
+          <NotifierRoot useRNScreensOverlay />
+        </SafeAreaProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

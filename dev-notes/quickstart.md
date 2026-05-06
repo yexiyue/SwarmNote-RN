@@ -8,16 +8,16 @@
 
 ## 1. 环境依赖
 
-| 依赖 | 版本 | 备注 |
-|---|---|---|
-| Node.js | 22+ | LTS |
-| pnpm | 10+ | `corepack enable` 或 `npm i -g pnpm` |
-| Rust | stable | 通过 [rustup](https://rustup.rs/) 安装 |
-| Git | 2.x | 仓库含 submodule,旧版 git 行为差异较大 |
-| Android Studio | 最新 | 含 Android SDK + NDK,Android 开发 |
-| Xcode | 16+ | 仅 macOS,iOS 开发;CLI Tools `xcode-select --install` |
-| CocoaPods | 最新 | iOS 才需要,`brew install cocoapods` |
-| JDK | 17 | Android 构建,推荐 Temurin |
+| 依赖             | 版本     | 备注                                                |
+| -------------- | ------ | ------------------------------------------------- |
+| Node.js        | 22+    | LTS                                               |
+| pnpm           | 10+    | `corepack enable` 或 `npm i -g pnpm`               |
+| Rust           | stable | 通过 [rustup](https://rustup.rs/) 安装                |
+| Git            | 2.x    | 仓库含 submodule,旧版 git 行为差异较大                       |
+| Android Studio | 最新     | 含 Android SDK + NDK,Android 开发                    |
+| Xcode          | 16+    | 仅 macOS,iOS 开发;CLI Tools `xcode-select --install` |
+| CocoaPods      | 最新     | iOS 才需要,`brew install cocoapods`                  |
+| JDK            | 17     | Android 构建,推荐 Temurin                             |
 
 ### Rust 交叉编译 target
 

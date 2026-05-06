@@ -43,7 +43,17 @@
         {
           "ios": {
             "deploymentTarget": "17.0"
+          },
+          "android": {
+            "softwareKeyboardLayoutMode": "resize"
           }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "允许 SwarmNote 访问相册以插入图片到笔记中。",
+          "cameraPermission": "允许 SwarmNote 使用相机拍摄图片插入到笔记中。"
         }
       ],
       "./plugins/with-android-release-signing",

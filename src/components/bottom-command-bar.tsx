@@ -1,6 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { Menu, Plus, Search } from "lucide-react-native";
 import { Pressable, View } from "react-native";
+import { useKeyboardState, useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useThemeColors } from "@/hooks/useThemeColors";
 
@@ -13,16 +15,25 @@ interface BottomCommandBarProps {
 /**
  * 悬浮底部胶囊工具栏 (h-13 rounded-full bg-card)。
  * 仅在 workspace 主屏 / 笔记编辑器页展示，files / settings modal 不使用。
+ *
+ * 与 EditorToolbar 互斥：键盘弹起时淡出并下沉，让位给工具栏；键盘收起后恢复。
  */
 export function BottomCommandBar({ onSearch, onNew, onMenu }: BottomCommandBarProps) {
   const colors = useThemeColors();
   const { t } = useLingui();
   const insets = useSafeAreaInsets();
+  const { progress } = useReanimatedKeyboardAnimation();
+  const { isVisible: keyboardVisible } = useKeyboardState();
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: 1 - progress.value,
+    transform: [{ translateY: progress.value * 80 }],
+  }));
 
   return (
-    <View
-      pointerEvents="box-none"
-      style={{ bottom: insets.bottom + 16 }}
+    <Animated.View
+      pointerEvents={keyboardVisible ? "none" : "box-none"}
+      style={[{ bottom: insets.bottom + 16 }, animatedStyle]}
       className="absolute left-5 right-5"
     >
       <View
@@ -45,7 +56,7 @@ export function BottomCommandBar({ onSearch, onNew, onMenu }: BottomCommandBarPr
           <Menu color={colors.mutedForeground} size={20} />
         </PillButton>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

@@ -183,6 +183,7 @@ git commit -m "chore: update editor submodule"
 
 - `dev-notes/knowledge/theme-and-styling.md`
 - `dev-notes/knowledge/editor.md`
+- `dev-notes/knowledge/editor-toolbar.md`
 - `dev-notes/knowledge/editor-core-abstractions.md`
 - `dev-notes/knowledge/rust-bridge.md`
 - `dev-notes/knowledge/ubrn.md`

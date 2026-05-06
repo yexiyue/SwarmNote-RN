@@ -304,6 +304,10 @@ export function createEditorRuntime(host: HostApi): EditorApi {
       state.editor?.blur();
     },
 
+    setScrollBottomMargin(px: number) {
+      state.editor?.setScrollBottomMargin(px);
+    },
+
     setSearchState(state_, source) {
       state.editor?.setSearchState(state_, source);
     },

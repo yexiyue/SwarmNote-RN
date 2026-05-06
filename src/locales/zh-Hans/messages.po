@@ -43,7 +43,7 @@ msgstr "{0} 后过期 · 在另一台设备输入此码"
 #. placeholder {0}: workspace.docCount
 #: src/app/settings/devices/[peerId].tsx:406
 #: src/app/workspaces/sync/select.tsx:299
-#: src/components/sync/sync-item-status-row.tsx:46
+#: src/components/sync/sync-item-status-row.tsx:54
 msgid "{0} 篇笔记"
 msgstr "{0} 篇笔记"
 
@@ -77,6 +77,10 @@ msgstr "{remaining}s"
 #: src/components/files-panel.tsx:144
 msgid "『{0}』包含 {childCount} 项，将一并删除。此操作无法撤销。"
 msgstr "『{0}』包含 {childCount} 项，将一并删除。此操作无法撤销。"
+
+#: src/components/editor/EditorImageInsertSheet.tsx:225
+#~ msgid "alt 文本"
+#~ msgstr "alt 文本"
 
 #: src/app/onboarding/welcome.tsx:20
 msgid "CRDT 自动合并，离线也能编辑"
@@ -122,7 +126,7 @@ msgstr ""
 "与其他设备配对后即可同步笔记。\n"
 "你也可以跳过，稍后在 Swarm 中配对。"
 
-#: src/app/pairing/success.tsx:36
+#: src/app/pairing/success.tsx:51
 msgid "中继"
 msgstr "中继"
 
@@ -134,10 +138,18 @@ msgstr "主题已更新"
 msgid "从已配对的设备拉取工作区"
 msgstr "从已配对的设备拉取工作区"
 
+#: src/components/editor/EditorImageInsertSheet.tsx:144
+#~ msgid "从相册选择"
+#~ msgstr "从相册选择"
+
 #: src/app/workspaces/index.tsx:75
 #: src/app/workspaces/sync/select.tsx:78
 msgid "从设备同步"
 msgstr "从设备同步"
+
+#: src/components/editor/EditorToolbar.tsx:201
+msgid "任务列表"
+msgstr "任务列表"
 
 #: src/app/onboarding/complete.tsx:55
 msgid "你的设备已准备好加入蜂群网络"
@@ -187,9 +199,13 @@ msgid "最后在线 {0}"
 msgstr "最后在线 {0}"
 
 #. placeholder {0}: item.ws.docCount
-#: src/components/sync/sync-item-status-row.tsx:44
+#: src/components/sync/sync-item-status-row.tsx:52
 msgid "准备同步 · {0} 篇笔记"
 msgstr "准备同步 · {0} 篇笔记"
+
+#: src/components/editor/EditorToolbar.tsx:228
+msgid "减少缩进"
+msgstr "减少缩进"
 
 #: src/components/files-panel.tsx:296
 msgid "切换工作区"
@@ -222,6 +238,10 @@ msgstr "删除文件夹"
 msgid "删除笔记"
 msgstr "删除笔记"
 
+#: src/components/editor/EditorToolbar.tsx:163
+msgid "删除线"
+msgstr "删除线"
+
 #: src/app/settings/devices.tsx:217
 #: src/app/settings/devices.tsx:221
 msgid "刷新"
@@ -230,6 +250,10 @@ msgstr "刷新"
 #: src/app/settings/devices/[peerId].tsx:120
 msgid "刷新失败"
 msgstr "刷新失败"
+
+#: src/components/editor/EditorToolbar.tsx:149
+msgid "加粗"
+msgstr "加粗"
 
 #: src/app/workspaces/index.tsx:85
 #: src/components/files-panel.tsx:221
@@ -290,7 +314,7 @@ msgid "同步中"
 msgstr "同步中"
 
 #: src/app/workspaces/sync/done.tsx:45
-#: src/components/sync/sync-item-status-row.tsx:35
+#: src/components/sync/sync-item-status-row.tsx:43
 #: src/components/workspace-sync-card.tsx:64
 msgid "同步失败"
 msgstr "同步失败"
@@ -300,7 +324,7 @@ msgstr "同步失败"
 msgid "同步完成"
 msgstr "同步完成"
 
-#: src/components/sync/sync-item-status-row.tsx:38
+#: src/components/sync/sync-item-status-row.tsx:46
 msgid "同步完成 · {count} 篇笔记"
 msgstr "同步完成 · {count} 篇笔记"
 
@@ -308,12 +332,12 @@ msgstr "同步完成 · {count} 篇笔记"
 msgid "同步完成（部分失败）"
 msgstr "同步完成（部分失败）"
 
-#: src/app/pairing/success.tsx:105
-#: src/app/pairing/success.tsx:110
+#: src/app/pairing/success.tsx:125
+#: src/app/pairing/success.tsx:130
 msgid "同步工作区"
 msgstr "同步工作区"
 
-#: src/app/workspaces/sync/syncing.tsx:133
+#: src/app/workspaces/sync/syncing.tsx:142
 msgid "同步期间请保持两台设备在线，可切到后台。"
 msgstr "同步期间请保持两台设备在线，可切到后台。"
 
@@ -321,8 +345,8 @@ msgstr "同步期间请保持两台设备在线，可切到后台。"
 msgid "后台下载"
 msgstr "后台下载"
 
-#: src/app/workspaces/sync/syncing.tsx:141
-#: src/app/workspaces/sync/syncing.tsx:146
+#: src/app/workspaces/sync/syncing.tsx:150
+#: src/app/workspaces/sync/syncing.tsx:155
 msgid "后台运行"
 msgstr "后台运行"
 
@@ -334,9 +358,21 @@ msgstr "启动时自动打开上次使用的工作区"
 msgid "启动行为"
 msgstr "启动行为"
 
-#: src/components/bottom-command-bar.tsx:44
+#: src/components/bottom-command-bar.tsx:55
 msgid "命令"
 msgstr "命令"
+
+#: src/components/editor/EditorToolbar.tsx:215
+msgid "图片"
+msgstr "图片"
+
+#: src/components/editor/EditorImageInsertSheet.tsx:200
+#~ msgid "图片地址"
+#~ msgstr "图片地址"
+
+#: src/components/editor/EditorImageInsertSheet.tsx:221
+#~ msgid "图片描述（可选）"
+#~ msgstr "图片描述（可选）"
 
 #: src/app/workspaces/index.tsx:69
 msgid "在 App 空间创建一个新的工作区"
@@ -346,7 +382,7 @@ msgstr "在 App 空间创建一个新的工作区"
 msgid "在 App 空间里开辟一块独立的笔记区域"
 msgstr "在 App 空间里开辟一块独立的笔记区域"
 
-#: src/app/(main)/index.tsx:116
+#: src/app/(main)/index.tsx:132
 msgid "在左侧文件面板中选择一篇笔记，或新建一篇"
 msgstr "在左侧文件面板中选择一篇笔记，或新建一篇"
 
@@ -355,6 +391,10 @@ msgstr "在左侧文件面板中选择一篇笔记，或新建一篇"
 #: src/app/workspaces/sync/select.tsx:236
 msgid "在线"
 msgstr "在线"
+
+#: src/components/editor/EditorToolbar.tsx:222
+msgid "增加缩进"
+msgstr "增加缩进"
 
 #: src/components/code-pairing-card.tsx:85
 msgid "复制"
@@ -390,14 +430,14 @@ msgstr "外观"
 msgid "存储在 App 私有空间，不会出现在系统文件 App 中"
 msgstr "存储在 App 私有空间，不会出现在系统文件 App 中"
 
-#: src/app/pairing/success.tsx:116
-#: src/app/pairing/success.tsx:120
+#: src/app/pairing/success.tsx:136
+#: src/app/pairing/success.tsx:140
 #: src/app/workspaces/sync/done.tsx:96
 #: src/app/workspaces/sync/done.tsx:100
 msgid "完成"
 msgstr "完成"
 
-#: src/app/(main)/index.tsx:95
+#: src/app/(main)/index.tsx:110
 msgid "密钥链不可用，当前身份为临时状态（下次启动将改变）"
 msgstr "密钥链不可用，当前身份为临时状态（下次启动将改变）"
 
@@ -409,7 +449,7 @@ msgstr "密钥链不可用，身份为临时状态"
 msgid "对方设备暂未打开任何工作区"
 msgstr "对方设备暂未打开任何工作区"
 
-#: src/app/pairing/success.tsx:33
+#: src/app/pairing/success.tsx:45
 #: src/components/pairing-request-host.tsx:92
 msgid "局域网"
 msgstr "局域网"
@@ -451,7 +491,7 @@ msgstr "工作区详情"
 msgid "已下载的笔记仍保留在本地，只是不再与此设备同步。"
 msgstr "已下载的笔记仍保留在本地，只是不再与此设备同步。"
 
-#: src/app/pairing/success.tsx:56
+#: src/app/pairing/success.tsx:79
 msgid "已与 {displayName} 建立安全连接"
 msgstr "已与 {displayName} 建立安全连接"
 
@@ -500,13 +540,13 @@ msgstr "已是最新"
 msgid "已过期"
 msgstr "已过期"
 
-#: src/app/pairing/success.tsx:30
+#: src/app/pairing/success.tsx:54
 msgid "已连接"
 msgstr "已连接"
 
 #: src/app/pairing/success.tsx:38
-msgid "已连接 · {kind}{rtt}"
-msgstr "已连接 · {kind}{rtt}"
+#~ msgid "已连接 · {kind}{rtt}"
+#~ msgstr "已连接 · {kind}{rtt}"
 
 #. placeholder {0}: natStatus ?? t`NAT 未知`
 #: src/app/settings/network.tsx:31
@@ -592,7 +632,7 @@ msgstr "恢复上次工作区"
 msgid "我的 iPhone"
 msgstr "我的 iPhone"
 
-#: src/app/(main)/index.tsx:63
+#: src/app/(main)/index.tsx:75
 #: src/app/workspaces/index.tsx:81
 msgid "我的工作区"
 msgstr "我的工作区"
@@ -628,7 +668,7 @@ msgstr "打开工作区"
 msgid "打开工作区时自动启动 P2P 节点"
 msgstr "打开工作区时自动启动 P2P 节点"
 
-#: src/app/(main)/index.tsx:74
+#: src/app/(main)/index.tsx:86
 msgid "打开文件面板"
 msgstr "打开文件面板"
 
@@ -636,7 +676,7 @@ msgstr "打开文件面板"
 msgid "打开笔记失败"
 msgstr "打开笔记失败"
 
-#: src/app/pairing/success.tsx:35
+#: src/app/pairing/success.tsx:48
 msgid "打洞"
 msgstr "打洞"
 
@@ -666,13 +706,17 @@ msgstr "排序即将推出"
 msgid "接受"
 msgstr "接受"
 
-#: src/components/bottom-command-bar.tsx:38
+#: src/components/bottom-command-bar.tsx:49
 msgid "搜索"
 msgstr "搜索"
 
-#: src/app/(main)/index.tsx:132
+#: src/app/(main)/index.tsx:148
 msgid "搜索即将推出"
 msgstr "搜索即将推出"
+
+#: src/components/editor/EditorToolbar.tsx:136
+msgid "撤销"
+msgstr "撤销"
 
 #: src/app/workspaces/[id].tsx:109
 msgid "操作"
@@ -694,11 +738,15 @@ msgstr "文件夹名称"
 msgid "文档"
 msgstr "文档"
 
+#: src/components/editor/EditorToolbar.tsx:156
+msgid "斜体"
+msgstr "斜体"
+
 #: src/core/network-lifecycle.ts:124
 msgid "断开网络失败"
 msgstr "断开网络失败"
 
-#: src/components/bottom-command-bar.tsx:41
+#: src/components/bottom-command-bar.tsx:52
 msgid "新建"
 msgstr "新建"
 
@@ -713,8 +761,8 @@ msgstr "新建工作区"
 msgid "新建文件夹"
 msgstr "新建文件夹"
 
-#: src/app/(main)/index.tsx:121
-#: src/app/(main)/index.tsx:125
+#: src/app/(main)/index.tsx:137
+#: src/app/(main)/index.tsx:141
 #: src/components/files-toolbar.tsx:31
 msgid "新建笔记"
 msgstr "新建笔记"
@@ -727,12 +775,20 @@ msgstr "新建笔记"
 #~ msgid "新版本 v{latest} 可用,当前 v{current}"
 #~ msgstr "新版本 v{latest} 可用,当前 v{current}"
 
+#: src/components/editor/EditorToolbar.tsx:187
+msgid "无序列表"
+msgstr "无序列表"
+
 #: src/app/workspaces/[id].tsx:53
 msgid "无效的工作区路径"
 msgstr "无效的工作区路径"
 
+#: src/components/editor/EditorHeadingSheet.tsx:61
+msgid "无标题"
+msgstr "无标题"
+
 #: src/app/settings/about.tsx:38
-#: src/components/update/update-dialog-content.tsx:45
+#: src/components/update/update-dialog-content.tsx:44
 msgid "无法打开链接"
 msgstr "无法打开链接"
 
@@ -758,6 +814,10 @@ msgstr "更新失败"
 msgid "更新日志"
 msgstr "更新日志"
 
+#: src/components/editor/EditorToolbar.tsx:194
+msgid "有序列表"
+msgstr "有序列表"
+
 #: src/app/settings/about.tsx:67
 msgid "有新版可用"
 msgstr "有新版可用"
@@ -782,7 +842,7 @@ msgstr "未知"
 #~ msgid "来自 \"{0}\" ({1})"
 #~ msgstr "来自 \"{0}\" ({1})"
 
-#: src/components/update/update-dialog-content.tsx:69
+#: src/components/update/update-dialog-content.tsx:68
 msgid "查看更新内容"
 msgstr "查看更新内容"
 
@@ -790,6 +850,34 @@ msgstr "查看更新内容"
 #: src/components/update/UpdateDialog.tsx:55
 #~ msgid "查看更新内容 ↗"
 #~ msgstr "查看更新内容 ↗"
+
+#: src/components/editor/EditorToolbar.tsx:178
+msgid "标题"
+msgstr "标题"
+
+#: src/components/editor/EditorHeadingSheet.tsx:62
+msgid "标题 1"
+msgstr "标题 1"
+
+#: src/components/editor/EditorHeadingSheet.tsx:63
+msgid "标题 2"
+msgstr "标题 2"
+
+#: src/components/editor/EditorHeadingSheet.tsx:64
+msgid "标题 3"
+msgstr "标题 3"
+
+#: src/components/editor/EditorHeadingSheet.tsx:65
+msgid "标题 4"
+msgstr "标题 4"
+
+#: src/components/editor/EditorHeadingSheet.tsx:66
+msgid "标题 5"
+msgstr "标题 5"
+
+#: src/components/editor/EditorHeadingSheet.tsx:67
+msgid "标题 6"
+msgstr "标题 6"
 
 #: src/app/settings/about.tsx:103
 #: src/app/settings/about.tsx:108
@@ -800,16 +888,16 @@ msgstr "检查更新"
 msgid "正在下载新版本"
 msgstr "正在下载新版本"
 
-#: src/components/update/UpdateBackgroundTracker.tsx:40
+#: src/components/update/UpdateBackgroundTracker.tsx:29
 msgid "正在下载新版本 · {percent}%"
 msgstr "正在下载新版本 · {percent}%"
 
-#: src/app/workspaces/sync/syncing.tsx:105
+#: src/app/workspaces/sync/syncing.tsx:114
 msgid "正在同步"
 msgstr "正在同步"
 
 #. placeholder {0}: items.length
-#: src/app/workspaces/sync/syncing.tsx:105
+#: src/app/workspaces/sync/syncing.tsx:114
 msgid "正在同步 {0} 个工作区"
 msgstr "正在同步 {0} 个工作区"
 
@@ -920,12 +1008,12 @@ msgstr "立即更新"
 msgid "笔记标题"
 msgstr "笔记标题"
 
-#: src/app/(main)/index.tsx:86
+#: src/app/(main)/index.tsx:100
 msgid "管理工作区"
 msgstr "管理工作区"
 
 #: src/app/pairing/found-device.tsx:113
-#: src/app/pairing/success.tsx:72
+#: src/app/pairing/success.tsx:95
 msgid "系统"
 msgstr "系统"
 
@@ -948,6 +1036,7 @@ msgstr "编辑"
 msgid "编辑设备名称"
 msgstr "编辑设备名称"
 
+#: src/app/pairing/success.tsx:113
 #: src/app/settings/index.tsx:97
 #: src/app/settings/network.tsx:38
 msgid "网络"
@@ -957,6 +1046,10 @@ msgstr "网络"
 msgid "联网失败"
 msgstr "联网失败"
 
+#: src/components/editor/EditorToolbar.tsx:170
+msgid "行内代码"
+msgstr "行内代码"
+
 #: src/app/settings/devices.tsx:93
 #: src/app/settings/index.tsx:103
 msgid "设备"
@@ -964,7 +1057,7 @@ msgstr "设备"
 
 #: src/app/onboarding/complete.tsx:74
 #: src/app/pairing/found-device.tsx:122
-#: src/app/pairing/success.tsx:81
+#: src/app/pairing/success.tsx:104
 msgid "设备 ID"
 msgstr "设备 ID"
 
@@ -975,7 +1068,7 @@ msgstr "设备不存在或已取消配对"
 #: src/app/onboarding/complete.tsx:62
 #: src/app/onboarding/device-name.tsx:63
 #: src/app/pairing/found-device.tsx:104
-#: src/app/pairing/success.tsx:63
+#: src/app/pairing/success.tsx:86
 msgid "设备名称"
 msgstr "设备名称"
 
@@ -1034,6 +1127,11 @@ msgstr "跳过"
 msgid "跳过配对"
 msgstr "跳过配对"
 
+#: src/components/editor/EditorImageInsertSheet.tsx:151
+#: src/components/editor/EditorImageInsertSheet.tsx:196
+#~ msgid "输入图片链接"
+#~ msgstr "输入图片链接"
+
 #: src/app/pairing/input-code.tsx:71
 msgid "输入对方设备上显示的 6 位配对码"
 msgstr "输入对方设备上显示的 6 位配对码"
@@ -1069,7 +1167,7 @@ msgstr "返回"
 msgid "还没有工作区"
 msgstr "还没有工作区"
 
-#: src/app/(main)/index.tsx:113
+#: src/app/(main)/index.tsx:129
 msgid "还没有打开的笔记"
 msgstr "还没有打开的笔记"
 
@@ -1096,8 +1194,8 @@ msgid "连接方式"
 msgstr "连接方式"
 
 #: src/app/pairing/success.tsx:90
-msgid "连接状态"
-msgstr "连接状态"
+#~ msgid "连接状态"
+#~ msgstr "连接状态"
 
 #: src/app/settings/theme.tsx:62
 msgid "选择外观"
@@ -1139,7 +1237,7 @@ msgstr "配对"
 msgid "配对 {0}"
 msgstr "配对 {0}"
 
-#: src/app/pairing/success.tsx:53
+#: src/app/pairing/success.tsx:76
 msgid "配对成功！"
 msgstr "配对成功！"
 
@@ -1166,6 +1264,10 @@ msgstr "配对设备"
 msgid "配对请求"
 msgstr "配对请求"
 
+#: src/components/editor/EditorToolbar.tsx:142
+msgid "重做"
+msgstr "重做"
+
 #: src/app/workspaces/[id].tsx:121
 #: src/components/files/FileActionSheet.tsx:63
 msgid "重命名"
@@ -1176,6 +1278,10 @@ msgstr "重命名"
 #: src/components/update/UpdateErrorDialog.tsx:60
 msgid "重试"
 msgstr "重试"
+
+#: src/components/editor/EditorToolbar.tsx:209
+msgid "链接"
+msgstr "链接"
 
 #: src/app/onboarding/pairing.tsx:136
 msgid "附近的设备"

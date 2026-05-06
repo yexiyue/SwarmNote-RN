@@ -2,8 +2,12 @@ import type { EditorEvent } from "@swarmnote/editor/events";
 import { DEFAULT_SETTINGS } from "@swarmnote/editor/types";
 import type { AwarenessUserState, EditorInitOptions } from "@swarmnote/editor-web";
 import { Asset } from "expo-asset";
+import { File } from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useColorScheme, View } from "react-native";
+import { Keyboard, useColorScheme, View } from "react-native";
+import { useKeyboardState } from "react-native-keyboard-controller";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { WebViewMessageEvent } from "react-native-webview";
 import WebView from "react-native-webview";
 import {
@@ -13,9 +17,53 @@ import {
   register as registerBridge,
 } from "@/core/editor-bridge-registry";
 import { colorForDevice } from "@/lib/awareness-color";
+import { useOptionalWorkspace } from "@/providers/workspace-provider";
+import { useCurrentDocStore } from "@/stores/current-doc-store";
 import { useEditorPresenceStore } from "@/stores/editor-presence-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
+import {
+  EditorHeadingSheet,
+  type EditorHeadingSheetRef,
+  type HeadingLevel,
+} from "./EditorHeadingSheet";
+import { EditorToolbar } from "./EditorToolbar";
 import { useEditorBridge } from "./useEditorBridge";
+import { useEditorFormatting } from "./useEditorFormatting";
+
+function stripExtension(name: string): string {
+  return name.replace(/\.[^/.]+$/, "");
+}
+
+// Static `.cm-content { padding-bottom }` covers the "user scrolls to the
+// very end with their finger" case (CM doesn't auto-scroll on touch). Combined
+// with the dynamic `setScrollBottomMargin` call below — which handles the
+// "cursor moves into the obscured zone, CM auto-scrolls" case — the last line
+// stays visible whether the user is editing or just browsing.
+//
+// Padding is applied to `.cm-content` (the scrolled element), NOT
+// `.cm-scroller` (the overflow:auto container) — Chromium has a long-standing
+// bug where `padding-bottom` on an `overflow:auto` element can't be scrolled
+// into view (chromium #879745).
+const CONTENT_BOTTOM_PADDING_PX = 120;
+
+// Vertical room above the keyboard's top edge that the toolbar occupies, used
+// when computing the dynamic bottom scroll margin while the keyboard is open.
+// Toolbar 48 + gap 8 = 56.
+const TOOLBAR_OVERLAY_PX = 56;
+// Vertical room above the safe-area bottom that BottomCommandBar occupies.
+// Bar height 52 + 16 px float gap = 68.
+const BOTTOM_BAR_OVERLAY_PX = 68;
+const INJECTED_BOTTOM_PADDING_CSS = `
+(function () {
+  var id = '__swarmnote_content_bottom_padding__';
+  if (document.getElementById(id)) return;
+  var style = document.createElement('style');
+  style.id = id;
+  style.textContent = '.cm-content { padding-bottom: ${CONTENT_BOTTOM_PADDING_PX}px !important; }';
+  document.head.appendChild(style);
+})();
+true;
+`;
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const EDITOR_HTML_MODULE = require("@swarmnote/editor-web/dist/index.html");
@@ -103,11 +151,15 @@ export function MarkdownEditor({
     [setPresence],
   );
 
+  // Intercepts SelectionFormattingChange to drive the toolbar's button state.
+  // Forwards every other event to the upstream `onEditorEvent` prop untouched.
+  const { formatting, handleEditorEvent } = useEditorFormatting(onEditorEvent);
+
   const { editorApi, setWebViewRef, onWebViewMessage } = useEditorBridge({
     onRuntimeReady() {
       setRuntimeReady(true);
     },
-    onEditorEvent,
+    onEditorEvent: handleEditorEvent,
     onCollaborationUpdate: handleCollaborationUpdate,
     onAwarenessUpdate: handleAwarenessUpdate,
     onPresenceChange: handlePresenceChange,
@@ -243,6 +295,85 @@ export function MarkdownEditor({
     [onWebViewMessage],
   );
 
+  const activeWorkspace = useOptionalWorkspace();
+  const noteRelPath = useCurrentDocStore((s) => s.relPath);
+  const insets = useSafeAreaInsets();
+  const { isVisible: keyboardVisible, height: keyboardHeight } = useKeyboardState();
+
+  // Push the bottom scroll margin to CM whenever the obscured-region height
+  // changes — keyboard show/hide, safe-area changes, or editor (re)creation.
+  // CM uses this to keep the cursor above the toolbar/keyboard during
+  // scrollIntoView (e.g. typing on the last line, cursor jumps).
+  useEffect(() => {
+    if (!editorApi || !editorCreated) return;
+    const margin = keyboardVisible
+      ? keyboardHeight + TOOLBAR_OVERLAY_PX
+      : insets.bottom + BOTTOM_BAR_OVERLAY_PX;
+    void editorApi.setScrollBottomMargin(margin);
+  }, [editorApi, editorCreated, keyboardVisible, keyboardHeight, insets.bottom]);
+
+  const headingSheetRef = useRef<EditorHeadingSheetRef>(null);
+
+  const handleRequestHeading = useCallback(() => {
+    // Keyboard.dismiss() only collapses the RN keyboard owner. The actual
+    // IME is owned by the WebView's contentEditable, so we must also blur
+    // the editor to make the IME slide away.
+    Keyboard.dismiss();
+    void editorApi?.blur();
+    headingSheetRef.current?.present();
+  }, [editorApi]);
+
+  const handleSelectHeading = useCallback(
+    (level: HeadingLevel) => {
+      if (!editorApi) return;
+      const current = formatting.heading;
+
+      if (level === 0) {
+        // Clear: toggleHeading at the current level toggles the prefix off.
+        if (current >= 1) void editorApi.execCommand("toggleHeading", current);
+      } else if (level !== current) {
+        void editorApi.execCommand("toggleHeading", level);
+      }
+    },
+    [editorApi, formatting.heading],
+  );
+
+  const handleRequestInsertImage = useCallback(async () => {
+    if (!editorApi || activeWorkspace === null || noteRelPath === null) return;
+
+    // Blur the editor so the IME collapses before the system picker shows.
+    Keyboard.dismiss();
+    void editorApi.blur();
+
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      quality: 0.9,
+      allowsMultipleSelection: false,
+    });
+    if (result.canceled || result.assets.length === 0) return;
+    const asset = result.assets[0];
+
+    const fileName = asset.fileName ?? `image-${Date.now()}.png`;
+    const alt = stripExtension(fileName);
+
+    try {
+      const file = new File(asset.uri);
+      const bytes = await file.bytes();
+      const arrayBuffer = bytes.buffer.slice(
+        bytes.byteOffset,
+        bytes.byteOffset + bytes.byteLength,
+      ) as ArrayBuffer;
+
+      const relPath = await activeWorkspace.saveMedia(noteRelPath, fileName, arrayBuffer);
+      await editorApi.execCommand("insertImage", relPath, alt);
+    } catch (err) {
+      console.error("[MarkdownEditor] image insert failed:", err);
+    }
+  }, [editorApi, activeWorkspace, noteRelPath]);
+
   if (!htmlUri) {
     return <View className="flex-1" />;
   }
@@ -254,6 +385,7 @@ export function MarkdownEditor({
         source={{ uri: htmlUri }}
         originWhitelist={["file://*", "https://*", "data:*"]}
         onMessage={handleMessage}
+        injectedJavaScript={INJECTED_BOTTOM_PADDING_CSS}
         style={{ flex: 1, opacity: 0.99 }}
         javaScriptEnabled
         domStorageEnabled
@@ -269,6 +401,19 @@ export function MarkdownEditor({
         contentInsetAdjustmentBehavior="never"
         overScrollMode="never"
         setSupportMultipleWindows={false}
+      />
+      {editorApi && editorCreated ? (
+        <EditorToolbar
+          editorApi={editorApi}
+          formatting={formatting}
+          onRequestInsertImage={handleRequestInsertImage}
+          onRequestHeading={handleRequestHeading}
+        />
+      ) : null}
+      <EditorHeadingSheet
+        ref={headingSheetRef}
+        currentLevel={formatting.heading}
+        onSelect={handleSelectHeading}
       />
     </View>
   );
