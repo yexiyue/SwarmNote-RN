@@ -43,6 +43,7 @@ interface RuntimeState {
         origin: unknown,
       ) => void)
     | null;
+  presenceChangeListener: (() => void) | null;
 }
 
 function getEditorRoot(): HTMLElement {
@@ -89,6 +90,7 @@ export function createEditorRuntime(host: HostApi): EditorApi {
     awareness: null,
     collaborationUpdateListener: null,
     awarenessUpdateListener: null,
+    presenceChangeListener: null,
   };
 
   function emitEditorEvent(event: EditorEvent): void {
@@ -103,22 +105,22 @@ export function createEditorRuntime(host: HostApi): EditorApi {
     state.ydoc = null;
 
     if (state.awareness) {
+      // setLocalState(null) must precede off('update') so the synthetic
+      // "removed" event reaches the listener and triggers the broadcast —
+      // see dev-notes/knowledge/editor.md "destroy 顺序敏感".
+      state.awareness.setLocalState(null);
+
       if (state.awarenessUpdateListener) {
         state.awareness.off('update', state.awarenessUpdateListener);
       }
-      const presenceListener = (
-        state.awareness as unknown as { __presenceListener?: () => void }
-      ).__presenceListener;
-      if (presenceListener) {
-        state.awareness.off('change', presenceListener);
+      if (state.presenceChangeListener) {
+        state.awareness.off('change', state.presenceChangeListener);
       }
-      // Clear local state so peers see us go offline immediately rather than
-      // waiting for the heartbeat timeout.
-      state.awareness.setLocalState(null);
       state.awareness.destroy();
     }
     state.awareness = null;
     state.awarenessUpdateListener = null;
+    state.presenceChangeListener = null;
   }
 
   function resetEditor(): void {
@@ -182,9 +184,12 @@ export function createEditorRuntime(host: HostApi): EditorApi {
 
     // Mirror remote-only presence snapshots to host so RN PresenceAvatars
     // can render without directly accessing the in-WebView Awareness.
+    // Multiple clientIDs sharing the same `user.deviceId` (transient
+    // stale-while-new-arrived during doc switches / packet loss) are folded
+    // into a single entry — RN PresenceAvatars uses `deviceId` as React key.
     const presenceListener = () => {
       const localId = awareness.clientID;
-      const users: AwarenessUserState[] = [];
+      const byDevice = new Map<string, AwarenessUserState>();
       for (const [clientId, raw] of awareness.getStates()) {
         if (clientId === localId) continue;
         const u = (raw as { user?: AwarenessUserState }).user;
@@ -193,19 +198,16 @@ export function createEditorRuntime(host: HostApi): EditorApi {
           typeof u.name === 'string' &&
           typeof u.deviceId === 'string' &&
           typeof u.color === 'string' &&
-          (u.platform === 'desktop' || u.platform === 'mobile')
+          (u.platform === 'desktop' || u.platform === 'mobile') &&
+          !byDevice.has(u.deviceId)
         ) {
-          users.push(u);
+          byDevice.set(u.deviceId, u);
         }
       }
-      host.onPresenceChange(users);
+      host.onPresenceChange([...byDevice.values()]);
     };
     awareness.on('change', presenceListener);
-    // Save under same listener slot — both fire on every awareness mutation,
-    // and we always tear them down together via resetCollaborationBinding.
-    // Stash the change-listener on awareness itself so cleanup can reach it.
-    (awareness as unknown as { __presenceListener?: () => void }).__presenceListener =
-      presenceListener;
+    state.presenceChangeListener = presenceListener;
 
     return {
       ...options.collaboration,

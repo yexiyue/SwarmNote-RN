@@ -383,6 +383,8 @@ const listener = (update: Uint8Array, origin: unknown) => {
 - **PresenceAvatars 不直接读 awareness**：RN 不能跨 WebView 边界访问 Awareness 实例。runtime 在 `awareness.on('change')` 中投影出远端用户列表，通过新顶层 RPC `host.onPresenceChange(users: AwarenessUserState[])` 推到 RN
 - **身份字段**：mount 完成后调 `editorApi.setLocalUserState({ name, platform, deviceId, color })`。`color` 由 `colorForDevice(peer_id)` 哈希到 8 色调色板，双端用同一份哈希函数（`src/lib/awareness-color.ts` 双仓库各放一份，逻辑一致）
 - **离场清理**：unmount 时 runtime 调 `awareness.setLocalState(null)` 让对端立即移除头像，不依赖 30s 超时
+- **destroy 顺序敏感**：`resetCollaborationBinding` 必须**先** `setLocalState(null)`、再 `off('update', ...)`、最后 `destroy()`。如果先 off 监听器，setLocalState(null) 触发的"我下线了"事件就没人接 → `host.onAwarenessUpdate` 不被调 → Rust 不广播 → 对端等 30s 才 GC。用户切 doc / hot-reload 频繁时旧 clientID 还没 GC 新的已经上线，对端 PresenceAvatars 看到"同设备 2 个头像"
+- **PresenceAvatars 按 deviceId 去重**：awareness clientID 是 Y.Doc 实例级别，不是设备级别。**不要**自定义 Y.Doc clientID 共享 — Yjs CRDT 协议要求 `(clientID, clock)` 全局唯一，复用会让 op 被静默丢弃 / 文档损坏。在 runtime presence projection 阶段用 `Map<deviceId, AwarenessUserState>` 折叠，RN 端拿到的就是去重列表；React key 用 `deviceId`，暂态 stale 期间不抖动
 
 ### Awareness 与 inline-rendering 的关系
 
