@@ -3,9 +3,6 @@ rust:
   directory: ./rust/mobile-core
   manifestPath: Cargo.toml
 
-android:
-  targets:
-    - arm64-v8a
 
 bindings:
   cpp: cpp/generated
