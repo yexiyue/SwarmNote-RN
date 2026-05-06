@@ -146,6 +146,36 @@ Workspace Detail SyncCard 的暂停按钮是 40×40 outline square + `pause` 图
 
 **相关文件**：`packages/swarmnote-core/rust/mobile-core/src/app.rs::get_remote_workspaces`, `src/app/settings/devices/[peerId].tsx`, `src/app/workspaces/sync/select.tsx`
 
+## Awareness 走独立 GossipSub 子 topic，不持久化
+
+协作光标 / presence 不复用 `swarmnote/ws/{uuid}` 这条持久化的 doc-update 通道，而是新增 **`swarmnote/ws-aw/{uuid}`** 子 topic：
+
+```rust
+// crates/core/src/workspace/sync/mod.rs
+pub fn ws_awareness_topic(workspace_uuid: &Uuid) -> String { ... }
+pub fn encode_ws_awareness(doc_uuid: &Uuid, update: &[u8]) -> Vec<u8> { ... }
+pub fn decode_ws_awareness(data: &[u8]) -> Option<(Uuid, &[u8])> { ... }
+```
+
+**为什么不复用 `ws_topic` + 加 enum variant？**
+
+- 现有 `encode_ws_gossip` 是 **positional 二进制**（`[16 bytes uuid][update bytes]`），无 discriminator
+- 如果在前面加 tag 字节，旧 binary 会把 tag 当成 uuid 的第一个字节而 corrupt
+- 用独立 topic 等价于"协议演进通过命名空间而非字段位"——旧 binary 不订阅新 topic，连 GossipSub mesh 都不掺和
+
+**关键约束**：
+
+- Rust 端**绝不**调 `ydoc().apply_sync_update`（那条路径会写盘）；只 `event_bus.emit(AppEvent::ExternalAwarenessUpdate)`
+- bytes 是 opaque y-protocols/awareness payload，Rust 完全不解码
+- `WorkspaceCore::broadcast_awareness(doc_uuid, bytes)` 是 best-effort，publish 失败不触发任何 SV 补偿（awareness 丢了就丢了，下个心跳或重连恢复）
+- 收到 awareness 但本地没打开对应 doc → 前端层（`event-bus.ts` + `editor-bridge-registry`）静默丢弃
+
+**协议反向兼容**：
+
+旧版 peer 不订阅 `ws-aw/*` topic，自然收不到 awareness 流量；新版 peer 仍然处理旧版的 `ws/*` doc-update。无 panic、无解码失败、无 warn-spam。
+
+**相关文件**：`crates/core/src/workspace/sync/mod.rs`、`crates/core/src/workspace/sync/workspace_sync.rs`、`crates/core/src/workspace/sync/coordinator.rs`、`crates/core/src/network/event_loop.rs`、`crates/core/src/events.rs`、`packages/swarmnote-core/rust/mobile-core/src/workspace.rs`、`packages/swarmnote-core/rust/mobile-core/src/events.rs`
+
 ## 取消配对保留本地文件
 
 `unpairDevice(peerId)` 只拆设备关系，**不删除任何本地工作区**。Alert 二次确认文案必须清楚："已下载的笔记仍保留在本地，只是不再与此设备同步。"

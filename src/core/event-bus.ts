@@ -3,7 +3,10 @@ import {
   type UniffiAppEvent,
   UniffiAppEvent_Tags,
 } from "react-native-swarmnote-core";
-import { getActive as getActiveEditorBridge } from "@/core/editor-bridge-registry";
+import {
+  getActiveAwareness as getActiveAwarenessBridge,
+  getActive as getActiveEditorBridge,
+} from "@/core/editor-bridge-registry";
 import { useFileTreeStore } from "@/stores/file-tree-store";
 import { useNotificationStore } from "@/stores/notification-store";
 import { syncKey, useSwarmStore } from "@/stores/swarm-store";
@@ -136,6 +139,15 @@ export class EventBus implements ForeignEventBus {
 
       case UniffiAppEvent_Tags.ExternalUpdate: {
         const active = getActiveEditorBridge();
+        if (active === null) break;
+        const { docId, update } = event.inner;
+        if (active.docUuid !== docId) break;
+        active.applyRemoteUpdate(new Uint8Array(update));
+        break;
+      }
+
+      case UniffiAppEvent_Tags.ExternalAwarenessUpdate: {
+        const active = getActiveAwarenessBridge();
         if (active === null) break;
         const { docId, update } = event.inner;
         if (active.docUuid !== docId) break;

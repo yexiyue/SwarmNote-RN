@@ -18,6 +18,7 @@ import { createEditorRuntime } from './editor-runtime';
 import type { HostApi } from './types';
 
 export type {
+  AwarenessUserState,
   EditorApi,
   EditorInitOptions,
   HostApi,

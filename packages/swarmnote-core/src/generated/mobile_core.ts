@@ -2828,7 +2828,8 @@ export enum UniffiAppEvent_Tags {
     HydrateProgress = "HydrateProgress",
     SyncStarted = "SyncStarted",
     SyncProgress = "SyncProgress",
-    SyncCompleted = "SyncCompleted"
+    SyncCompleted = "SyncCompleted",
+    ExternalAwarenessUpdate = "ExternalAwarenessUpdate"
 }
 /**
  * Every event emitted to RN. RN code typically dispatches on the variant
@@ -3369,6 +3370,43 @@ export const UniffiAppEvent = (() => {
         
 
     }
+    
+
+    type ExternalAwarenessUpdate__interface = {
+        tag: UniffiAppEvent_Tags.ExternalAwarenessUpdate;
+        inner: Readonly<{docId: string; update: ArrayBuffer}>
+    };
+
+    
+    /**
+     * Remote awareness (caret / presence) update for an open doc. Bytes are
+     * an opaque y-protocols/awareness payload; never decoded, never persisted.
+     */
+    class ExternalAwarenessUpdate_ extends UniffiEnum implements ExternalAwarenessUpdate__interface {
+        /**
+         * @private
+         * This field is private and should not be used, use `tag` instead.
+         */
+        readonly [uniffiTypeNameSymbol] = "UniffiAppEvent";
+        readonly tag = UniffiAppEvent_Tags.ExternalAwarenessUpdate;
+        readonly inner: Readonly<{docId: string; update: ArrayBuffer}>;
+        constructor(inner: { docId: string, update: ArrayBuffer }) {
+            super("UniffiAppEvent", "ExternalAwarenessUpdate");
+            this.inner = Object.freeze(inner);
+        }
+
+        static new(inner: { docId: string, update: ArrayBuffer }): ExternalAwarenessUpdate_ {
+            return new ExternalAwarenessUpdate_(inner);
+        }
+
+        static instanceOf(obj: any): obj is ExternalAwarenessUpdate_ {
+            return obj.tag === UniffiAppEvent_Tags.ExternalAwarenessUpdate;
+        }
+        
+
+        
+
+    }
 
     function instanceOf(obj: any): obj is UniffiAppEvent {
         return obj[uniffiTypeNameSymbol] === "UniffiAppEvent";
@@ -3390,7 +3428,8 @@ export const UniffiAppEvent = (() => {
   HydrateProgress: HydrateProgress_, 
   SyncStarted: SyncStarted_, 
   SyncProgress: SyncProgress_, 
-  SyncCompleted: SyncCompleted_
+  SyncCompleted: SyncCompleted_, 
+  ExternalAwarenessUpdate: ExternalAwarenessUpdate_
     });
 
 })();
@@ -3428,6 +3467,7 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                 case 13: return new UniffiAppEvent.SyncStarted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from) });
                 case 14: return new UniffiAppEvent.SyncProgress({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), completed: FfiConverterUInt32.read(from), total: FfiConverterUInt32.read(from) });
                 case 15: return new UniffiAppEvent.SyncCompleted({workspaceId: FfiConverterString.read(from), peerId: FfiConverterString.read(from), cancelled: FfiConverterBool.read(from) });
+                case 16: return new UniffiAppEvent.ExternalAwarenessUpdate({docId: FfiConverterString.read(from), update: FfiConverterArrayBuffer.read(from) });
                 default: throw new UniffiInternalError.UnexpectedEnumCase();
             }
         }
@@ -3534,6 +3574,13 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                     FfiConverterBool.write(inner.cancelled, into);
                     return;
                 }
+                case UniffiAppEvent_Tags.ExternalAwarenessUpdate: {
+                    ordinalConverter.write(16, into);
+                    const inner = value.inner;
+                    FfiConverterString.write(inner.docId, into);
+                    FfiConverterArrayBuffer.write(inner.update, into);
+                    return;
+                }
                 default:
                     // Throwing from here means that UniffiAppEvent_Tags hasn't matched an ordinal.
                     throw new UniffiInternalError.UnexpectedEnumCase();
@@ -3638,6 +3685,13 @@ const FfiConverterTypeUniffiAppEvent = (() => {
                     size += FfiConverterString.allocationSize(inner.workspaceId);
                     size += FfiConverterString.allocationSize(inner.peerId);
                     size += FfiConverterBool.allocationSize(inner.cancelled);
+                    return size;
+                }
+                case UniffiAppEvent_Tags.ExternalAwarenessUpdate: {
+                    const inner = value.inner;
+                    let size = ordinalConverter.allocationSize(16);
+                    size += FfiConverterString.allocationSize(inner.docId);
+                    size += FfiConverterArrayBuffer.allocationSize(inner.update);
                     return size;
                 }
                 default: throw new UniffiInternalError.UnexpectedEnumCase();
@@ -5676,6 +5730,12 @@ export interface UniffiWorkspaceCoreLike {
      */
     applyUpdate(docUuid: string, update: ArrayBuffer, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
     /**
+     * Broadcast a local awareness (caret / presence) update for an open doc.
+     * Bytes are an opaque y-protocols/awareness payload — never persisted,
+     * never decoded by core. Best-effort: silently no-op when P2P is down.
+     */
+    broadcastAwareness(docUuid: string, update: ArrayBuffer, asyncOpts_?: { signal: AbortSignal })  /*throws*/: Promise<void>;
+    /**
      * Flush every open Y.Doc and tear down watchers / sync. MUST be called
      * before dropping the last reference, otherwise dirty edits may be lost.
      * Fails with [`FfiError::WorkspaceCloseFailed`] when one or more docs
@@ -5810,6 +5870,39 @@ async  applyUpdate(docUuid: string, update: ArrayBuffer, asyncOpts_?: { signal: 
             /*rustCaller:*/ uniffiCaller,
             /*rustFutureFunc:*/ () => {
                 return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(
+                    uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
+                    FfiConverterString.lower(docUuid),FfiConverterArrayBuffer.lower(update)
+                );
+            },
+            /*pollFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_poll_void,
+            /*cancelFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_cancel_void,
+            /*completeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_complete_void,
+            /*freeFunc:*/ nativeModule().ubrn_ffi_mobile_core_rust_future_free_void,
+            /*liftFunc:*/ (_v) => {},
+            /*liftString:*/ FfiConverterString.lift,
+            /*asyncOpts:*/ asyncOpts_,
+            /*errorHandler:*/ FfiConverterTypeFfiError.lift.bind(FfiConverterTypeFfiError)
+        );
+    } catch (__error: any) {
+        if (uniffiIsDebug && __error instanceof Error) {
+            __error.stack = __stack;
+        }
+        throw __error;
+    }
+    }
+    
+    /**
+     * Broadcast a local awareness (caret / presence) update for an open doc.
+     * Bytes are an opaque y-protocols/awareness payload — never persisted,
+     * never decoded by core. Best-effort: silently no-op when P2P is down.
+     */
+async  broadcastAwareness(docUuid: string, update: ArrayBuffer, asyncOpts_?: { signal: AbortSignal }): Promise<void> /*throws*/ {
+    const __stack = uniffiIsDebug ? new Error().stack : undefined;
+    try {
+        return await uniffiRustCallAsync(
+            /*rustCaller:*/ uniffiCaller,
+            /*rustFutureFunc:*/ () => {
+                return nativeModule().ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness(
                     uniffiTypeUniffiWorkspaceCoreObjectFactory.clonePointer(this),
                     FfiConverterString.lower(docUuid),FfiConverterArrayBuffer.lower(update)
                 );
@@ -6957,6 +7050,9 @@ function uniffiEnsureInitialized() {
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update() !== 39794) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update");
+    }
+    if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness() !== 52211) {
+        throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness");
     }
     if (nativeModule().ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close() !== 15034) {
         throw new UniffiInternalError.ApiChecksumMismatch("uniffi_mobile_core_checksum_method_uniffiworkspacecore_close");

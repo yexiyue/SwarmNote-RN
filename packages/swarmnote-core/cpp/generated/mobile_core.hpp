@@ -57,6 +57,7 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_fn_clone_uniffiworkspacecore(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_free_uniffiworkspacecore(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_close(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
@@ -164,6 +165,7 @@ class NativeMobileCore : public jsi::HostObject {
     jsi::Value cpp_uniffi_mobile_core_checksum_method_foreigneventbus_emit(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);

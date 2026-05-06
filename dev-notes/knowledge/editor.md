@@ -354,6 +354,49 @@ const listener = (update: Uint8Array, origin: unknown) => {
 - 默认导出 `GFM_TYPES`（5 种），可按需 import `OBSIDIAN_TYPES` 扩展到 13 种
 - 未注册的 type 显示默认图标 + 字面 label，不会渲染失败
 
+## 协作光标 (Awareness)
+
+### 数据流
+
+```
+本地 caret 移动 → CodeMirror selection change
+              → y-codemirror.next 写入 awareness.localState.cursor
+              → awareness 'update' event
+              → editor-runtime 监听并 encodeAwarenessUpdate(...)
+              → host.onAwarenessUpdate(bytes) 顶层 RPC
+              → useEditorBridge → onAwarenessUpdate prop
+              → (main)/index.tsx 转发 workspace.broadcastAwareness(docUuid, buf)
+              → mobile-core Rust → swarmnote-core::WorkspaceCore::broadcast_awareness
+              → GossipSub publish 到 swarmnote/ws-aw/{workspace_uuid}
+              → 对端收 → coordinator::handle_ws_awareness_gossip
+              → ws_sync.handle_awareness_gossip → emit ExternalAwarenessUpdate
+              → 移动 event-bus → editor-bridge-registry.getActiveAwareness()
+              → editorApi.applyRemoteAwarenessUpdate(bytes)
+              → applyAwarenessUpdate(awareness, bytes, REMOTE_AWARENESS_ORIGIN)
+              → y-codemirror.next 渲染远端 caret + 名字 tag
+```
+
+### 关键约束
+
+- **awareness bytes 必须顶层 RPC 参数**：和 collaborationUpdate 同样的 transferHandler 不递归坑。新增 `host.onAwarenessUpdate(update: Uint8Array)` 与 `api.applyRemoteAwarenessUpdate(update: Uint8Array)`，**不要**塞进 EditorEvent 嵌套字段
+- **awareness 不持久化**：Rust 端走 `swarmnote/ws-aw/{uuid}` 子 topic，绕开 `ydoc().apply_sync_update` 的写盘路径，直接 emit `AppEvent::ExternalAwarenessUpdate`
+- **PresenceAvatars 不直接读 awareness**：RN 不能跨 WebView 边界访问 Awareness 实例。runtime 在 `awareness.on('change')` 中投影出远端用户列表，通过新顶层 RPC `host.onPresenceChange(users: AwarenessUserState[])` 推到 RN
+- **身份字段**：mount 完成后调 `editorApi.setLocalUserState({ name, platform, deviceId, color })`。`color` 由 `colorForDevice(peer_id)` 哈希到 8 色调色板，双端用同一份哈希函数（`src/lib/awareness-color.ts` 双仓库各放一份，逻辑一致）
+- **离场清理**：unmount 时 runtime 调 `awareness.setLocalState(null)` 让对端立即移除头像，不依赖 30s 超时
+
+### Awareness 与 inline-rendering 的关系
+
+CM6 的 decoration set 是合并的。本次 MVP 只接 caret（细线 + 名字 tag），**不**接远端选区高亮，因为选区色块可能与 inline-rendering 的格式字符隐藏 / live-preview decoration 打架。后续如果要做选区高亮，需要先做兼容性测试。
+
+### Submodule 提交顺序
+
+`packages/editor` 改动（`collaborationExtension.ts` 接 awareness 参数、`types.ts` 加 `awareness?: unknown`）属于 swarmnote-editor 子仓库。提交顺序固定：
+1. swarmnote-editor 仓库 commit + push
+2. SwarmNote 桌面仓库 `git submodule update --remote packages/editor` + bump pointer
+3. SwarmNote-RN 移动仓库同步 bump
+
+**相关文件**：`packages/editor/src/extensions/collaborationExtension.ts`、`packages/editor-web/src/editor-runtime.ts`、`src/components/editor/MarkdownEditor.tsx`、`src/core/editor-bridge-registry.ts`、`src/core/event-bus.ts`
+
 ## 代码块语言高亮
 
 直接使用 `@codemirror/language-data` 的完整 `languages` 列表，支持 50+ 种语言。

@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomCommandBar } from "@/components/bottom-command-bar";
 import { CommandSheet, type CommandSheetRef } from "@/components/command-sheet";
 import { MarkdownEditor } from "@/components/editor/MarkdownEditor";
+import { PresenceAvatars } from "@/components/editor/PresenceAvatars";
 import { FilesPanel } from "@/components/files-panel";
 import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
@@ -59,6 +60,17 @@ export default function WorkspaceScreen() {
     [currentDocUuid, workspace],
   );
 
+  const onAwarenessUpdate = useCallback(
+    (update: Uint8Array) => {
+      if (currentDocUuid === null) return;
+      const buf = update.buffer.slice(update.byteOffset, update.byteOffset + update.byteLength);
+      workspace.broadcastAwareness(currentDocUuid, buf as ArrayBuffer).catch((err: unknown) => {
+        console.warn("[editor-host] broadcastAwareness failed:", err);
+      });
+    },
+    [currentDocUuid, workspace],
+  );
+
   const headerTitle =
     currentRelPath !== null ? basename(currentRelPath) : (workspaceInfo?.name ?? t`我的工作区`);
 
@@ -80,13 +92,16 @@ export default function WorkspaceScreen() {
             >
               {headerTitle}
             </Text>
-            <Pressable
-              onPress={openWorkspaceManager}
-              hitSlop={12}
-              accessibilityLabel={t`管理工作区`}
-            >
-              <EllipsisVertical color={colors.foreground} size={22} />
-            </Pressable>
+            <View className="flex-row items-center gap-3">
+              <PresenceAvatars />
+              <Pressable
+                onPress={openWorkspaceManager}
+                hitSlop={12}
+                accessibilityLabel={t`管理工作区`}
+              >
+                <EllipsisVertical color={colors.foreground} size={22} />
+              </Pressable>
+            </View>
           </View>
 
           {keychainEphemeral ? (
@@ -103,6 +118,7 @@ export default function WorkspaceScreen() {
               docUuid={currentDocUuid}
               initialState={currentInitialState}
               onCollabUpdate={onCollabUpdate}
+              onAwarenessUpdate={onAwarenessUpdate}
             />
           ) : (
             <View className="flex-1 items-center justify-center px-8">

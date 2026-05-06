@@ -6,6 +6,11 @@
  */
 import * as Y from 'yjs';
 import {
+  Awareness,
+  applyAwarenessUpdate,
+  encodeAwarenessUpdate,
+} from 'y-protocols/awareness';
+import {
   createEditor,
   DEFAULT_SETTINGS,
   EditorEventType,
@@ -15,18 +20,28 @@ import {
 } from '@swarmnote/editor';
 import { debugLog } from './comlink-endpoint';
 import type {
+  AwarenessUserState,
   EditorApi,
   HostApi,
   RuntimeCreateEditorOptions,
 } from './types';
 
 const REMOTE_COLLABORATION_ORIGIN = 'remote';
+const REMOTE_AWARENESS_ORIGIN = 'remote-awareness';
+const LOCAL_AWARENESS_ORIGIN = 'local-awareness';
 
 interface RuntimeState {
   editor: EditorControl | null;
   ydoc: Y.Doc | null;
+  awareness: Awareness | null;
   collaborationUpdateListener:
     | ((update: Uint8Array, origin: unknown) => void)
+    | null;
+  awarenessUpdateListener:
+    | ((
+        changed: { added: number[]; updated: number[]; removed: number[] },
+        origin: unknown,
+      ) => void)
     | null;
 }
 
@@ -71,7 +86,9 @@ export function createEditorRuntime(host: HostApi): EditorApi {
   const state: RuntimeState = {
     editor: null,
     ydoc: null,
+    awareness: null,
     collaborationUpdateListener: null,
+    awarenessUpdateListener: null,
   };
 
   function emitEditorEvent(event: EditorEvent): void {
@@ -84,6 +101,24 @@ export function createEditorRuntime(host: HostApi): EditorApi {
     }
     state.collaborationUpdateListener = null;
     state.ydoc = null;
+
+    if (state.awareness) {
+      if (state.awarenessUpdateListener) {
+        state.awareness.off('update', state.awarenessUpdateListener);
+      }
+      const presenceListener = (
+        state.awareness as unknown as { __presenceListener?: () => void }
+      ).__presenceListener;
+      if (presenceListener) {
+        state.awareness.off('change', presenceListener);
+      }
+      // Clear local state so peers see us go offline immediately rather than
+      // waiting for the heartbeat timeout.
+      state.awareness.setLocalState(null);
+      state.awareness.destroy();
+    }
+    state.awareness = null;
+    state.awarenessUpdateListener = null;
   }
 
   function resetEditor(): void {
@@ -123,10 +158,60 @@ export function createEditorRuntime(host: HostApi): EditorApi {
     state.collaborationUpdateListener = listener;
     ydoc.on('update', listener);
 
+    // Awareness lives on the same Y.Doc; runtime owns its lifecycle.
+    const awareness = new Awareness(ydoc);
+
+    const awarenessListener = (
+      changed: { added: number[]; updated: number[]; removed: number[] },
+      origin: unknown,
+    ) => {
+      if (origin === REMOTE_AWARENESS_ORIGIN) return;
+      const changedClients = [
+        ...changed.added,
+        ...changed.updated,
+        ...changed.removed,
+      ];
+      if (changedClients.length === 0) return;
+      const payload = encodeAwarenessUpdate(awareness, changedClients);
+      host.onAwarenessUpdate(payload);
+    };
+
+    state.awareness = awareness;
+    state.awarenessUpdateListener = awarenessListener;
+    awareness.on('update', awarenessListener);
+
+    // Mirror remote-only presence snapshots to host so RN PresenceAvatars
+    // can render without directly accessing the in-WebView Awareness.
+    const presenceListener = () => {
+      const localId = awareness.clientID;
+      const users: AwarenessUserState[] = [];
+      for (const [clientId, raw] of awareness.getStates()) {
+        if (clientId === localId) continue;
+        const u = (raw as { user?: AwarenessUserState }).user;
+        if (
+          u &&
+          typeof u.name === 'string' &&
+          typeof u.deviceId === 'string' &&
+          typeof u.color === 'string' &&
+          (u.platform === 'desktop' || u.platform === 'mobile')
+        ) {
+          users.push(u);
+        }
+      }
+      host.onPresenceChange(users);
+    };
+    awareness.on('change', presenceListener);
+    // Save under same listener slot — both fire on every awareness mutation,
+    // and we always tear them down together via resetCollaborationBinding.
+    // Stash the change-listener on awareness itself so cleanup can reach it.
+    (awareness as unknown as { __presenceListener?: () => void }).__presenceListener =
+      presenceListener;
+
     return {
       ...options.collaboration,
       remoteOrigin,
       ydoc,
+      awareness,
     };
   }
 
@@ -191,6 +276,18 @@ export function createEditorRuntime(host: HostApi): EditorApi {
         return;
       }
       Y.applyUpdate(state.ydoc, update, REMOTE_COLLABORATION_ORIGIN);
+    },
+
+    applyRemoteAwarenessUpdate(update: Uint8Array) {
+      if (!state.awareness) return;
+      // REMOTE_AWARENESS_ORIGIN is checked by the local listener to skip
+      // re-broadcasting; identical to the y-protocols loop guard pattern.
+      applyAwarenessUpdate(state.awareness, update, REMOTE_AWARENESS_ORIGIN);
+    },
+
+    setLocalUserState(userState: AwarenessUserState) {
+      if (!state.awareness) return;
+      state.awareness.setLocalStateField('user', userState);
     },
 
     select(selection) {

@@ -1,5 +1,5 @@
 import type { EditorEvent } from "@swarmnote/editor/events";
-import type { EditorApi, HostApi } from "@swarmnote/editor-web";
+import type { AwarenessUserState, EditorApi, HostApi } from "@swarmnote/editor-web";
 import * as Comlink from "comlink";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
@@ -17,6 +17,13 @@ interface UseEditorBridgeOptions {
    *  `onEditorEvent` because the Comlink transferHandler only fires for
    *  top-level RPC arguments — see HostApi docs in editor-web/src/types.ts. */
   onCollaborationUpdate?: (update: Uint8Array) => void;
+  /** Receives Awareness updates the WebView publishes; same top-level
+   *  Uint8Array rule as `onCollaborationUpdate`. */
+  onAwarenessUpdate?: (update: Uint8Array) => void;
+  /** Remote-only presence snapshot — recomputed on every awareness change.
+   *  RN cannot read the WebView's Awareness directly, so this is the channel
+   *  for PresenceAvatars / online-list UI. */
+  onPresenceChange?: (users: AwarenessUserState[]) => void;
 }
 
 interface EditorBridge {
@@ -58,6 +65,12 @@ export function useEditorBridge(options: UseEditorBridgeOptions = {}): EditorBri
       },
       onCollaborationUpdate(update) {
         optionsRef.current.onCollaborationUpdate?.(update);
+      },
+      onAwarenessUpdate(update) {
+        optionsRef.current.onAwarenessUpdate?.(update);
+      },
+      onPresenceChange(users) {
+        optionsRef.current.onPresenceChange?.(users);
       },
       log(message: string) {
         console.log("[Editor WebView]", message);

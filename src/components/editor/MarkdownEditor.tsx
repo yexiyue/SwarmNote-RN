@@ -1,12 +1,19 @@
 import type { EditorEvent } from "@swarmnote/editor/events";
 import { DEFAULT_SETTINGS } from "@swarmnote/editor/types";
-import type { EditorInitOptions } from "@swarmnote/editor-web";
+import type { AwarenessUserState, EditorInitOptions } from "@swarmnote/editor-web";
 import { Asset } from "expo-asset";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme, View } from "react-native";
 import type { WebViewMessageEvent } from "react-native-webview";
 import WebView from "react-native-webview";
-import { clear as clearBridge, register as registerBridge } from "@/core/editor-bridge-registry";
+import {
+  clearAwareness as clearAwarenessBridge,
+  clear as clearBridge,
+  registerAwareness as registerAwarenessBridge,
+  register as registerBridge,
+} from "@/core/editor-bridge-registry";
+import { colorForDevice } from "@/lib/awareness-color";
+import { useEditorPresenceStore } from "@/stores/editor-presence-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { useEditorBridge } from "./useEditorBridge";
 
@@ -26,6 +33,9 @@ interface MarkdownEditorProps {
   /** Called with each local Y.Doc update the editor produces. Caller forwards
    *  to `workspace.applyUpdate(docUuid, update)` for writeback. */
   onCollabUpdate?: (update: Uint8Array) => void;
+  /** Called with each local Awareness update the editor publishes. Caller
+   *  forwards to `workspace.broadcastAwareness(docUuid, update)`. */
+  onAwarenessUpdate?: (update: Uint8Array) => void;
   /** Non-collab editor events (Change, Focus, Blur, SearchStateChange …).
    *  CollaborationUpdate is filtered out — it goes through `onCollabUpdate`. */
   onEditorEvent?: (event: EditorEvent) => void;
@@ -39,6 +49,7 @@ export function MarkdownEditor({
   docUuid,
   initialState,
   onCollabUpdate,
+  onAwarenessUpdate,
   onEditorEvent,
   enableYjs = false,
 }: MarkdownEditorProps) {
@@ -46,6 +57,8 @@ export function MarkdownEditor({
   const [htmlUri, setHtmlUri] = useState<string | null>(null);
   const [runtimeReady, setRuntimeReady] = useState(false);
   const [editorCreated, setEditorCreated] = useState(false);
+  const setPresence = useEditorPresenceStore((s) => s.setPresence);
+  const clearPresence = useEditorPresenceStore((s) => s.clear);
 
   const collabMode = docUuid !== undefined && initialState !== undefined;
 
@@ -76,12 +89,28 @@ export function MarkdownEditor({
     [onCollabUpdate],
   );
 
+  const handleAwarenessUpdate = useCallback(
+    (update: Uint8Array) => {
+      onAwarenessUpdate?.(update);
+    },
+    [onAwarenessUpdate],
+  );
+
+  const handlePresenceChange = useCallback(
+    (users: AwarenessUserState[]) => {
+      setPresence(users);
+    },
+    [setPresence],
+  );
+
   const { editorApi, setWebViewRef, onWebViewMessage } = useEditorBridge({
     onRuntimeReady() {
       setRuntimeReady(true);
     },
     onEditorEvent,
     onCollaborationUpdate: handleCollaborationUpdate,
+    onAwarenessUpdate: handleAwarenessUpdate,
+    onPresenceChange: handlePresenceChange,
   });
 
   const handleRef = useCallback(
@@ -162,18 +191,50 @@ export function MarkdownEditor({
     const apply = (update: Uint8Array) => {
       void editorApi.applyRemoteCollaborationUpdate(update);
     };
+    const applyAwareness = (update: Uint8Array) => {
+      void editorApi.applyRemoteAwarenessUpdate(update);
+    };
     registerBridge(docUuid, apply);
+    registerAwarenessBridge(docUuid, applyAwareness);
     return () => {
       clearBridge(docUuid);
+      clearAwarenessBridge(docUuid);
     };
   }, [collabMode, editorCreated, editorApi, docUuid]);
+
+  // Seed local user state for awareness once the editor is up. Color is
+  // derived from peer_id so it stays stable across sessions and matches what
+  // the desktop / other peers compute independently.
+  useEffect(() => {
+    if (!collabMode || !editorCreated || !editorApi) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { getAppCore } = await import("@/core/app-core");
+        const info = await getAppCore().deviceInfo();
+        if (cancelled) return;
+        await editorApi.setLocalUserState({
+          name: info.deviceName,
+          platform: "mobile",
+          deviceId: info.peerId,
+          color: colorForDevice(info.peerId),
+        });
+      } catch (err) {
+        console.warn("[MarkdownEditor] setLocalUserState failed:", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [collabMode, editorCreated, editorApi]);
 
   useEffect(() => {
     return () => {
       if (!editorApi) return;
       void editorApi.destroyEditor();
+      clearPresence();
     };
-  }, [editorApi]);
+  }, [editorApi, clearPresence]);
 
   const handleMessage = useCallback(
     (event: WebViewMessageEvent) => {

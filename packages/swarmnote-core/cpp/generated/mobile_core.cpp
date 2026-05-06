@@ -293,6 +293,11 @@ extern "C" {
         RustBuffer doc_uuid, 
         RustBuffer update
     );
+    /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness(
+        /*handle*/ uint64_t ptr, 
+        RustBuffer doc_uuid, 
+        RustBuffer update
+    );
     /*handle*/ uint64_t uniffi_mobile_core_fn_method_uniffiworkspacecore_close(
         /*handle*/ uint64_t ptr
     );
@@ -679,6 +684,8 @@ extern "C" {
     uint16_t uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair(
     );
     uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(
+    );
+    uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness(
     );
     uint16_t uniffi_mobile_core_checksum_method_uniffiworkspacecore_close(
     );
@@ -3289,6 +3296,14 @@ NativeMobileCore::NativeMobileCore(
             return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness"),
+        3,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close"),
@@ -4145,6 +4160,14 @@ NativeMobileCore::NativeMobileCore(
             return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close"),
@@ -4846,6 +4869,13 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_free_uniffiworkspacecore(
 }
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2])
+        );
+
+        
+        return uniffi_jsi::Bridging</*handle*/ uint64_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness(uniffi_jsi::Bridging</*handle*/ uint64_t>::fromJs(rt, callInvoker, args[0]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::mobile_core::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2])
         );
 
         
@@ -5648,6 +5678,13 @@ jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_foreignkeych
 }
 jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeMobileCore::cpp_uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness(
         );
 
         

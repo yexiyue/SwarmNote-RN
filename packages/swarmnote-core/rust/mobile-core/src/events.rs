@@ -112,6 +112,21 @@ pub enum UniffiAppEvent {
         /// finish.
         cancelled: bool,
     },
+
+    // ── Collaboration awareness ──
+    //
+    // ⚠️ Position matters: UniFFI assigns numeric tags by declaration order, so
+    // newly-added variants MUST go at the end to keep older TS bindings (built
+    // before this variant existed) working — otherwise tag numbers of every
+    // variant after the insertion point shift by 1 and old bindings decode
+    // events into the wrong variant, causing field-shape mismatch panics.
+    //
+    /// Remote awareness (caret / presence) update for an open doc. Bytes are
+    /// an opaque y-protocols/awareness payload; never decoded, never persisted.
+    ExternalAwarenessUpdate {
+        doc_id: String,
+        update: Vec<u8>,
+    },
 }
 
 /// Trait the RN host implements. `emit` is called from the Rust runtime
@@ -160,6 +175,12 @@ fn map_event(event: AppEvent) -> UniffiAppEvent {
             doc_id: doc_id.to_string(),
             update,
         },
+        AppEvent::ExternalAwarenessUpdate { doc_id, update } => {
+            UniffiAppEvent::ExternalAwarenessUpdate {
+                doc_id: doc_id.to_string(),
+                update,
+            }
+        }
         AppEvent::ExternalConflict { doc_id, rel_path } => UniffiAppEvent::ExternalConflict {
             doc_id: doc_id.to_string(),
             rel_path,

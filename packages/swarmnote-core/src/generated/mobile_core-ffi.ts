@@ -54,6 +54,7 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_fn_clone_uniffiworkspacecore(handle: bigint, uniffi_out_err: UniffiRustCallStatus): bigint;
     ubrn_uniffi_mobile_core_fn_free_uniffiworkspacecore(handle: bigint, uniffi_out_err: UniffiRustCallStatus): void;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_apply_update(ptr: bigint, docUuid: Uint8Array, update: Uint8Array): bigint;
+    ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_broadcast_awareness(ptr: bigint, docUuid: Uint8Array, update: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close(ptr: bigint): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_close_doc(ptr: bigint, docUuid: Uint8Array): bigint;
     ubrn_uniffi_mobile_core_fn_method_uniffiworkspacecore_create_dir(ptr: bigint, relPath: Uint8Array): bigint;
@@ -161,6 +162,7 @@ interface NativeModuleInterface {
     ubrn_uniffi_mobile_core_checksum_method_foreigneventbus_emit(): number;
     ubrn_uniffi_mobile_core_checksum_method_foreignkeychainprovider_get_or_create_keypair(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_apply_update(): number;
+    ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_broadcast_awareness(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_close_doc(): number;
     ubrn_uniffi_mobile_core_checksum_method_uniffiworkspacecore_create_dir(): number;

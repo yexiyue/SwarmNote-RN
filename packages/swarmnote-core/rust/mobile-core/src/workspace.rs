@@ -368,6 +368,19 @@ impl UniffiWorkspaceCore {
         Ok(())
     }
 
+    /// Broadcast a local awareness (caret / presence) update for an open doc.
+    /// Bytes are an opaque y-protocols/awareness payload — never persisted,
+    /// never decoded by core. Best-effort: silently no-op when P2P is down.
+    pub async fn broadcast_awareness(
+        &self,
+        doc_uuid: String,
+        update: Vec<u8>,
+    ) -> Result<(), FfiError> {
+        let uuid = parse_uuid("doc_uuid", &doc_uuid)?;
+        self.inner.broadcast_awareness(uuid, update).await;
+        Ok(())
+    }
+
     /// Drop the in-memory Y.Doc. Flushes dirty state first. Safe to call
     /// even when the doc isn't open.
     pub async fn close_doc(&self, doc_uuid: String) -> Result<(), FfiError> {
