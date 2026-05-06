@@ -34,32 +34,25 @@ function stripExtension(name: string): string {
   return name.replace(/\.[^/.]+$/, "");
 }
 
-// Static `.cm-content { padding-bottom }` covers the "user scrolls to the
-// very end with their finger" case (CM doesn't auto-scroll on touch). Combined
-// with the dynamic `setScrollBottomMargin` call below — which handles the
-// "cursor moves into the obscured zone, CM auto-scrolls" case — the last line
-// stays visible whether the user is editing or just browsing.
-//
-// Padding is applied to `.cm-content` (the scrolled element), NOT
-// `.cm-scroller` (the overflow:auto container) — Chromium has a long-standing
-// bug where `padding-bottom` on an `overflow:auto` element can't be scrolled
-// into view (chromium #879745).
-const CONTENT_BOTTOM_PADDING_PX = 120;
-
-// Vertical room above the keyboard's top edge that the toolbar occupies, used
-// when computing the dynamic bottom scroll margin while the keyboard is open.
-// Toolbar 48 + gap 8 = 56.
+// Toolbar 48 + gap 8.
 const TOOLBAR_OVERLAY_PX = 56;
-// Vertical room above the safe-area bottom that BottomCommandBar occupies.
-// Bar height 52 + 16 px float gap = 68.
+// BottomCommandBar 52 + float gap 16.
 const BOTTOM_BAR_OVERLAY_PX = 68;
+
+// Pre-editor bootstrap fallback. Padding goes on `.cm-content` (the scrolled
+// element) — Chromium #879745 prevents padding-bottom on `.cm-scroller`
+// (overflow:auto container) from being scrolled into view. NO !important:
+// once the editor mounts, `setScrollBottomMargin` writes inline style via
+// `EditorView.contentAttributes` (specificity 1000) and must win over this
+// selector rule (specificity 10).
+const CONTENT_BOTTOM_PADDING_PX = BOTTOM_BAR_OVERLAY_PX + 2;
 const INJECTED_BOTTOM_PADDING_CSS = `
 (function () {
   var id = '__swarmnote_content_bottom_padding__';
   if (document.getElementById(id)) return;
   var style = document.createElement('style');
   style.id = id;
-  style.textContent = '.cm-content { padding-bottom: ${CONTENT_BOTTOM_PADDING_PX}px !important; }';
+  style.textContent = '.cm-content { padding-bottom: ${CONTENT_BOTTOM_PADDING_PX}px; }';
   document.head.appendChild(style);
 })();
 true;

@@ -175,46 +175,87 @@ editor 核心的 `toggleHeading(view, level)` 行为：当前行已是该 level 
 
 **不引入新命令**：与 highlight / blockquote 不同，heading sheet 完全在 RN 侧实现 + 复用现有 `toggleHeading`，不触发跨仓提交。
 
-## 防止浮层遮挡内容：CSS padding + 动态 scrollMargins
+## 防止浮层遮挡内容：单一入口同步 padding + scrollMargins
 
-工具栏 / 键盘 / BottomCommandBar 都浮在屏幕底部，会遮挡编辑器最后几行。**两种场景需要分别处理**：
+工具栏 / 键盘 / BottomCommandBar 都浮在屏幕底部，会遮挡编辑器最后几行。需要同时覆盖**两种滚动场景**，但两者由 **同一个入口** `EditorControl.setScrollBottomMargin(px)` 一次 dispatch 同步驱动 — 单一真值源，绝不会出现"两值不一致"的中间状态。
 
-| 场景 | 触发 | CM 是否主动滚动 | 解决 |
+| 场景 | 触发 | CM 是否主动滚动 | 由 `setScrollBottomMargin(px)` 驱动的机制 |
 |---|---|---|---|
-| 用户用手指拖动滚到末尾 | 用户操作 | 否 | 静态 CSS `.cm-content { padding-bottom: 120px }` |
-| 编辑时光标进入遮挡区 | 输入 / 光标移动 / scrollIntoView | 是 | 动态 `EditorView.scrollMargins.of({ bottom: X })` |
+| 编辑时光标进入遮挡区 | 输入 / 光标移动 / scrollIntoView | 是 | `EditorView.scrollMargins.of(() => ({ bottom: px }))` |
+| 用户用手指拖到末尾 | 用户主动滚 | 否 | `.cm-content` inline `padding-bottom: ${px}px`（经 `EditorView.contentAttributes`）|
 
-**两者必须同时存在** — padding 让用户拖到底有视觉缓冲，scrollMargins 让 CM 在编辑时主动滚。仅一者会留漏洞。
+`px` 表示"底部障碍区高度"。键盘弹起时 = `keyboardHeight + 56`，未弹起 = `insets.bottom + 68`。
 
-### CSS padding 必须加在 `.cm-content`，不是 `.cm-scroller`
+> 历史教训：早期 padding 是一段宿主一次性 inject 的 `<style>` 标签写死 120 px，scrollMargins 是动态的。键盘 (~300) + toolbar (56) ≈ 356 px 的浮层下，120 px 的 padding 让最后一行依然被遮 ~236 px，**手指怎么拖都看不到**。修复后两值同源，详见 OpenSpec change `editor-bottom-obstruction-padding`。
+
+### `.cm-content`（非 `.cm-scroller`）+ `EditorView.contentAttributes`
 
 Chromium 长期 bug [#879745](https://bugs.chromium.org/p/chromium/issues/detail?id=879745)：在 `overflow: auto` 元素上加 `padding-bottom`，padding 区不能滚到。CodeMirror 的 `.cm-scroller` 是 `overflow: auto` 容器、`.cm-content` 是被滚动的内容。padding 加在 `.cm-content` 上才有效。
 
-### `EditorView.scrollMargins` 链路（跨 RN ↔ WebView ↔ CM）
+`packages/editor/src/createEditor.ts` 用一个独立的 `Compartment` 容纳 `EditorView.contentAttributes.of({ style: 'padding-bottom: 0px' })`，与 `scrollMarginsCompartment` 并列。`EditorControl.setScrollBottomMargin(px)` 在一次 `view.dispatch` 内同时 `reconfigure` 两个 compartment，不直接改 `view.contentDOM.style`。
 
-CodeMirror 官方推荐 [`scrollMargins`](https://discuss.codemirror.net/t/cursorscrollmargin-for-v6/7448) 处理光标 vs viewport 的最小距离。本项目通过 RN 宿主动态推送：
+### 默认 `padding-bottom = 0`，宿主自管首屏空窗期
+
+Editor 核心初始 `padding-bottom: 0` —— 桌面端不调用 `setScrollBottomMargin`，编辑器底部不带任何附加留白。
+
+移动端在 `MarkdownEditor.tsx` 通过 `injectedJavaScript` 注入 `<style>` 兜底 `.cm-content { padding-bottom: 70px }` —— 仅作为 webview ready → editor created 之间几百毫秒的过渡，覆盖 BottomCommandBar (~68 px) 浮层。editor created + RN useEffect 跑后调 `setScrollBottomMargin`，inline style 优先级 1000 覆盖 `<style>` selector style，padding 由 editor 核心接管。
+
+#### `<style>` 兜底**不要**带 `!important`（自家压自家陷阱）
+
+历史踩坑：旧版本 `INJECTED_BOTTOM_PADDING_CSS` 写的是 `.cm-content { padding-bottom: 70px !important; }`，结果 editor 核心通过 `EditorView.contentAttributes` 写出的 inline `style="padding-bottom: 358px"` **被 `!important` 压住**——CSS specificity 规则下，任何 `!important` 声明（无论 selector 还是 inline）都胜过非 `!important` 的 inline style。表现是：键盘弹起后 setScrollBottomMargin 显然调用了（CDP `Runtime.evaluate` 看 `c.getAttribute('style')` 显示 `padding-bottom: 358px` 已写入），但 `getComputedStyle(c).paddingBottom` 仍然是 70px，最后几行依然被键盘盖。
+
+**正确做法**：
+
+- 兜底 `<style>` selector rule **不带 `!important`**（specificity 10）
+- editor 核心写 inline style **也不带 `!important`**（specificity 1000，自然胜出）
+- 加 `!important` 任意一边都会反向卡死
+
+**诊断手法（值得记）**：webview debugging 默认在 `react-native-webview` 的 dev build 上开启，但 mobile MCP 的 `system_webview` 工具有时连不上。可绕过为：
+
+```bash
+# 1. 找 devtools socket
+adb shell cat /proc/net/unix | grep webview
+# → @webview_devtools_remote_<pid>
+
+# 2. 转发到 PC
+adb forward tcp:9999 localabstract:webview_devtools_remote_<pid>
+
+# 3. 列页
+curl http://127.0.0.1:9999/json
+# → 拿到 webSocketDebuggerUrl
+
+# 4. 用 WebSocket + Runtime.evaluate 注入诊断 JS
+# 见 PowerShell 5.1 ClientWebSocket 范例（仓库 history 中有）
+```
+
+诊断 padding 时，**同时取** `getAttribute('style')`（什么被写入了）和 `getComputedStyle().paddingBottom`（最终生效是什么）；两者一致 = 没人覆盖；前者是新值后者是旧值 = 被覆盖（`!important` / theme / 别处 contributor）。
+
+### `setScrollBottomMargin` 链路（跨 RN ↔ WebView ↔ CM）
 
 ```
 RN MarkdownEditor
   ├─ useKeyboardState 拿 isVisible + height
   ├─ useSafeAreaInsets 拿 insets.bottom
-  └─ useEffect: editorApi.setScrollBottomMargin(margin)
+  └─ useEffect: editorApi.setScrollBottomMargin(px)
        ↓ Comlink RPC
      editor-runtime.setScrollBottomMargin(px)
        ↓
      EditorControl.setScrollBottomMargin(px)
-       ↓ view.dispatch({ effects: compartment.reconfigure(scrollMargins.of(...)) })
+       ↓ view.dispatch({
+       ↓   effects: [
+       ↓     scrollMarginsCompartment.reconfigure(EditorView.scrollMargins.of(() => ({ bottom: px }))),
+       ↓     contentPaddingCompartment.reconfigure(EditorView.contentAttributes.of({ style: `padding-bottom: ${px}px` })),
+       ↓   ],
+       ↓ })
      CodeMirror
 ```
 
-`createEditor.ts` 用 `Compartment` 容纳初始 `scrollMargins.of(() => ({ bottom: 0 }))`，`EditorControl.setScrollBottomMargin` reconfigure 它。
-
-**margin 数值（RN 端计算）**：
+**px 数值（RN 端计算）**：
 
 ```ts
 const TOOLBAR_OVERLAY_PX = 56;     // toolbar 48 + gap 8
 const BOTTOM_BAR_OVERLAY_PX = 68;  // BottomCommandBar 52 + 浮起 gap 16
-const margin = keyboardVisible
+const px = keyboardVisible
   ? keyboardHeight + TOOLBAR_OVERLAY_PX
   : insets.bottom + BOTTOM_BAR_OVERLAY_PX;
 ```
@@ -223,11 +264,11 @@ const margin = keyboardVisible
 
 ### 跨仓提交顺序
 
-scrollMargins 需要在 `packages/editor`（submodule）加 Compartment + EditorControl 方法，触发 [editor.md "Submodule 提交顺序"](./editor.md) 中描述的链路：
+修改 `packages/editor` 触发 [editor.md "Submodule 提交顺序"](./editor.md)：
 
 1. swarmnote-editor 仓库 commit + push
 2. SwarmNote-RN（移动）仓库 `git add packages/editor` bump pointer + commit
-3. SwarmNote（桌面）仓库同步 bump pointer，并按需 wire scrollMargins（桌面端有 menubar / status bar，可重用此机制）
+3. SwarmNote（桌面）仓库同步 bump pointer。**API 签名不变**（仅扩语义），桌面端无须 wire 任何代码。
 
 ## 与 BottomCommandBar 互斥联动
 
