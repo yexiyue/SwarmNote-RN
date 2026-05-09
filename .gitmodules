@@ -1,3 +1,0 @@
-[submodule "packages/editor"]
-	path = packages/editor
-	url = https://github.com/swarm-apps/swarmnote-editor.git
