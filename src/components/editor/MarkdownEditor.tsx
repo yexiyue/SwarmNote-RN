@@ -1,5 +1,4 @@
-import type { EditorEvent } from "@swarmnote/editor/events";
-import { DEFAULT_SETTINGS } from "@swarmnote/editor/types";
+import { DEFAULT_SETTINGS, type EditorEvent } from "@swarmnote/editor-core";
 import type { AwarenessUserState, EditorInitOptions } from "@swarmnote/editor-web";
 import { Asset } from "expo-asset";
 import { File } from "expo-file-system";

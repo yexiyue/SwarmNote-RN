@@ -1,5 +1,9 @@
-import { type EditorEvent, EditorEventType } from "@swarmnote/editor/events";
-import { DEFAULT_SELECTION_FORMATTING, type SelectionFormatting } from "@swarmnote/editor/types";
+import {
+  DEFAULT_SELECTION_FORMATTING,
+  type EditorEvent,
+  EditorEventType,
+  type SelectionFormatting,
+} from "@swarmnote/editor-core";
 import { useCallback, useState } from "react";
 
 interface EditorFormattingBridge {

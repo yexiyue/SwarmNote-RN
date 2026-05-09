@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import type { SelectionFormatting } from "@swarmnote/editor/types";
+import type { SelectionFormatting } from "@swarmnote/editor-core";
 import type { EditorApi } from "@swarmnote/editor-web";
 import type * as Comlink from "comlink";
 import {

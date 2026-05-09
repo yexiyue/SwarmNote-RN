@@ -1,4 +1,4 @@
-import type { EditorEvent } from "@swarmnote/editor/events";
+import type { EditorEvent } from "@swarmnote/editor-core";
 import type { AwarenessUserState, EditorApi, HostApi } from "@swarmnote/editor-web";
 import * as Comlink from "comlink";
 import { useCallback, useEffect, useMemo, useRef } from "react";

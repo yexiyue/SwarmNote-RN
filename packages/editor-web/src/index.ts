@@ -8,7 +8,7 @@
  */
 import 'katex/dist/katex.min.css';
 import * as Comlink from 'comlink';
-import { DEFAULT_SETTINGS } from '@swarmnote/editor';
+import { DEFAULT_SETTINGS } from '@swarmnote/editor-core';
 import {
   createWebViewEndpoint,
   isWebViewEnvironment,

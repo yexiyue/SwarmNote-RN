@@ -6,7 +6,7 @@ import type {
   EditorSettings,
   EditorSettingsUpdate,
   SearchState,
-} from '@swarmnote/editor';
+} from '@swarmnote/editor-core';
 
 export interface RuntimeInitOptions {
   initialText: string;

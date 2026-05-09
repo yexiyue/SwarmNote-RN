@@ -17,7 +17,7 @@ import {
   type EditorControl,
   type EditorEvent,
   type EditorSettingsUpdate,
-} from '@swarmnote/editor';
+} from '@swarmnote/editor-core';
 import { debugLog } from './comlink-endpoint';
 import type {
   AwarenessUserState,
