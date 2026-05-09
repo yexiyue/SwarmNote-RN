@@ -6,8 +6,6 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/assets/*": ["./assets/*"],
-      "@swarmnote/editor": ["./packages/editor/src/index.ts"],
-      "@swarmnote/editor/*": ["./packages/editor/src/*"],
       "@swarmnote/editor-web": ["./packages/editor-web/src/index.ts"],
       "@swarmnote/editor-web/*": ["./packages/editor-web/*"]
     }
