@@ -127,5 +127,5 @@ graph TD
 
 - 开始日期：2026-04-16
 - 目标发布日期：不设截止日期，按节奏推进
-- Milestone：[v0.2.0](https://github.com/yexiyue/SwarmNote-RN/milestone/2)
+- Milestone：[v0.2.0](https://github.com/swarm-apps/SwarmNote-RN/milestone/2)
 - Project：[SwarmNote Mobile](https://github.com/users/yexiyue/projects/4)

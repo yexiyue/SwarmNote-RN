@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.authors      = package["author"]
 
   s.platforms    = { :ios => min_ios_version_supported }
-  s.source       = { :git => "https://github.com/yexiyue/SwarmNote-RN.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/swarm-apps/SwarmNote-RN.git", :tag => "#{s.version}" }
 
   # RN 0.83 aggregated ReactCodegen target 统一编译 SwarmnoteCoreSpec,
   # 这里不能再 glob "ios/generated/**" 否则 libSwarmnoteCore.a 和 libReactCodegen.a 会产生 duplicate symbols

@@ -215,8 +215,8 @@ pub async fn apply_update(&self, doc_uuid: String, update: Vec<u8>) -> Result<()
 **1. 改 [packages/swarmnote-core/rust/mobile-core/Cargo.toml](../../packages/swarmnote-core/rust/mobile-core/Cargo.toml)**：注释掉 git 行，加 path 行（保留 git 行作为还原参考）：
 
 ```toml
-# swarmnote-core = { git = "https://github.com/yexiyue/swarmnote.git", branch = "develop" }
-# entity = { git = "https://github.com/yexiyue/swarmnote.git", branch = "develop" }
+# swarmnote-core = { git = "https://github.com/swarm-apps/SwarmNote.git", branch = "develop" }
+# entity = { git = "https://github.com/swarm-apps/SwarmNote.git", branch = "develop" }
 swarmnote-core = { path = "/Users/yexiyue/workspace/SwarmNote/crates/core" }
 entity = { path = "/Users/yexiyue/workspace/SwarmNote/crates/entity" }
 ```

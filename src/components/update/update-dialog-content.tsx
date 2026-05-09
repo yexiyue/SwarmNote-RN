@@ -13,7 +13,7 @@ import { Text } from "@/components/ui/text";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { toast } from "@/lib/toast";
 
-const REPO_RELEASES_URL = "https://github.com/yexiyue/SwarmNote-RN/releases";
+const REPO_RELEASES_URL = "https://github.com/swarm-apps/SwarmNote-RN/releases";
 const NOTES_MAX_HEIGHT = 220;
 
 interface UpdateDialogContentProps {

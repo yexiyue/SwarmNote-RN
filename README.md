@@ -22,7 +22,7 @@
 
 ## 这是什么
 
-[SwarmNote](https://github.com/yexiyue/SwarmNote) 的移动端实现——基于 **Expo + React Native**，通过 [`uniffi-bindgen-react-native`](https://github.com/jhugman/uniffi-bindgen-react-native) 桥接 Rust 核心逻辑。
+[SwarmNote](https://github.com/swarm-apps/SwarmNote) 的移动端实现——基于 **Expo + React Native**，通过 [`uniffi-bindgen-react-native`](https://github.com/jhugman/uniffi-bindgen-react-native) 桥接 Rust 核心逻辑。
 
 让你的手机加入桌面端组成的 swarm，笔记自动同步过来；离线编辑、回到联网时增量合并。**桌面端和移动端跑同一份 Rust 核心 (`swarmnote-core`)，共享同一份 CRDT 状态机和业务逻辑**。
 
@@ -65,7 +65,7 @@
 | `swarmnote-core` (path 依赖) | `swarmnote-core` (uniffi-bindgen-rn 桥接) |
 | BlockNote ❌（已迁移） | CodeMirror 6 in WebView |
 
-桌面端目前用的也是 CodeMirror 6（封装在 [`@swarmnote/editor`](https://github.com/yexiyue/swarmnote-editor) git submodule 里），移动端通过 WebView 加载同一份编辑器核心——**桌面 / 移动用户拿到完全一致的编辑体验**。
+桌面端目前用的也是 CodeMirror 6（封装在 [`@swarmnote/editor`](https://github.com/swarm-apps/swarmnote-editor) git submodule 里），移动端通过 WebView 加载同一份编辑器核心——**桌面 / 移动用户拿到完全一致的编辑体验**。
 
 ## 开发
 
@@ -79,12 +79,12 @@
 ### 初始化
 
 ```bash
-git clone --recurse-submodules https://github.com/yexiyue/SwarmNote-RN.git
+git clone --recurse-submodules https://github.com/swarm-apps/SwarmNote-RN.git
 cd SwarmNote-RN
 pnpm install
 ```
 
-> `packages/editor/` 是独立的 [`swarmnote-editor`](https://github.com/yexiyue/swarmnote-editor) git submodule。`--recurse-submodules` 必加，否则编辑器核心不会拉下来。
+> `packages/editor/` 是独立的 [`swarmnote-editor`](https://github.com/swarm-apps/swarmnote-editor) git submodule。`--recurse-submodules` 必加，否则编辑器核心不会拉下来。
 
 ### Android
 
@@ -193,7 +193,7 @@ graph TB
 | 包 | 角色 |
 |----|----|
 | `react-native-swarmnote-core` | Rust bridge / Turbo Module（uniffi 生成绑定 + Android/iOS native 代码） |
-| `@swarmnote/editor` | 平台无关 CodeMirror 6 核心（**git submodule** —— [`yexiyue/swarmnote-editor`](https://github.com/yexiyue/swarmnote-editor)，桌面端也引用同一仓库） |
+| `@swarmnote/editor` | 平台无关 CodeMirror 6 核心（**git submodule** —— [`swarm-apps/swarmnote-editor`](https://github.com/swarm-apps/swarmnote-editor)，桌面端也引用同一仓库） |
 | `@swarmnote/editor-web` | WebView bundle 入口 + 与 RN 端 Comlink RPC |
 
 ### 项目结构
@@ -249,10 +249,10 @@ swarmnote-mobile/
 
 | 项目 | 说明 | 状态 |
 |------|------|------|
-| [SwarmDrop](https://github.com/yexiyue/swarmdrop) | P2P 文件传输 | v0.4.4 |
-| [SwarmNote](https://github.com/yexiyue/SwarmNote) | P2P 笔记同步（桌面端） | v0.2.3 |
+| [SwarmDrop](https://github.com/swarm-apps/SwarmDrop) | P2P 文件传输 | v0.4.4 |
+| [SwarmNote](https://github.com/swarm-apps/SwarmNote) | P2P 笔记同步（桌面端） | v0.2.3 |
 | **SwarmNote-RN** | SwarmNote 移动端（本仓库） | 开发中 |
-| [swarm-p2p-core](https://github.com/yexiyue/swarm-p2p) | P2P 网络 SDK | 已完成 |
+| [swarm-p2p-core](https://github.com/swarm-apps/swarm-p2p) | P2P 网络 SDK | 已完成 |
 
 ## 路线图
 

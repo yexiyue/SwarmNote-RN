@@ -51,14 +51,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yexiyue/SwarmNote-RN.git"
+    "url": "git+https://github.com/swarm-apps/SwarmNote-RN.git"
   },
   "author": "yexiyue <yexiyue666@qq.com> (https://github.com/yexiyue)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yexiyue/SwarmNote-RN/issues"
+    "url": "https://github.com/swarm-apps/SwarmNote-RN/issues"
   },
-  "homepage": "https://github.com/yexiyue/SwarmNote-RN#readme",
+  "homepage": "https://github.com/swarm-apps/SwarmNote-RN#readme",
   "devDependencies": {
     "@react-native/babel-preset": "0.83.0",
     "del-cli": "^7.0.0",

@@ -249,7 +249,7 @@ Pod::Spec.new do |s|
   s.description   = 'uniffi-bindgen-react-native integration'
   
   s.authors       = { 'Your Name' => 'your@email.com' }
-  s.homepage      = 'https://github.com/yexiyue/swarmnote'
+  s.homepage      = 'https://github.com/swarm-apps/SwarmNote'
   s.license       = { :type => 'MIT' }
   s.platform      = :ios, '13.0'
   

@@ -112,14 +112,14 @@ pnpm --filter react-native-swarmnote-core ubrn:checkout
 `pnpm-workspace.yaml` 目前包含 3 个工作区包：
 
 - `react-native-swarmnote-core` — Rust bridge / native module
-- `@swarmnote/editor` — platform-agnostic editor core（**git submodule**，独立仓库 `yexiyue/swarmnote-editor`）
+- `@swarmnote/editor` — platform-agnostic editor core（**git submodule**，独立仓库 `swarm-apps/swarmnote-editor`）
 - `@swarmnote/editor-web` — WebView bundle and RPC host
 
 改动时优先保持边界清晰，不要把平台相关代码泄漏到共享层。
 
 ### Git submodule: `packages/editor/`
 
-`@swarmnote/editor` 是独立 Git 仓库（`yexiyue/swarmnote-editor`），通过 submodule 挂载在 `packages/editor/`。桌面端也会通过 submodule 引用同一个仓库，确保双端编辑器核心代码一致。
+`@swarmnote/editor` 是独立 Git 仓库（`swarm-apps/swarmnote-editor`），通过 submodule 挂载在 `packages/editor/`。桌面端也会通过 submodule 引用同一个仓库，确保双端编辑器核心代码一致。
 
 **克隆仓库后初始化 submodule**：
 

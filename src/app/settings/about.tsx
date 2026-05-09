@@ -110,7 +110,7 @@ export default function AboutSettings() {
             </Pressable>
           )}
           <Pressable
-            onPress={() => openUrl("https://github.com/yexiyue/SwarmNote/releases")}
+            onPress={() => openUrl("https://github.com/swarm-apps/SwarmNote/releases")}
             className="h-9 flex-row items-center gap-1.5 rounded-lg border border-border px-3.5"
             accessibilityLabel={t`更新日志`}
           >
@@ -127,19 +127,19 @@ export default function AboutSettings() {
         <LinkButton
           icon={Code}
           label="GitHub"
-          onPress={() => openUrl("https://github.com/yexiyue/SwarmNote")}
+          onPress={() => openUrl("https://github.com/swarm-apps/SwarmNote")}
         />
         <View className="h-3 w-px bg-border" />
         <LinkButton
           icon={BookOpen}
           label={t`文档`}
-          onPress={() => openUrl("https://yexiyue.github.io/SwarmNote/")}
+          onPress={() => openUrl("https://swarm-apps.github.io/SwarmNote/")}
         />
         <View className="h-3 w-px bg-border" />
         <LinkButton
           icon={MessageSquare}
           label={t`反馈`}
-          onPress={() => openUrl("https://github.com/yexiyue/SwarmNote/issues")}
+          onPress={() => openUrl("https://github.com/swarm-apps/SwarmNote/issues")}
         />
       </View>
     </SafeAreaView>

@@ -1,6 +1,6 @@
 # 快速启动指南
 
-新设备上从零跑起 SwarmNote Mobile 的完整流程。本仓库由 Expo + React Native + Rust（uniffi）+ CodeMirror（WebView）多层组成,跳过任何一层都跑不起来。
+新设备上从零跑起 SwarmNote Mobile 的完整流程。本仓库由 Expo + React Native + Rust（uniffi）+ CodeMirror（WebView）多层组成,跳过任何一层都**跑不起来**。
 
 > 一句话流程:**装环境 → 拉代码（含 submodule） → `pnpm install` → 编辑器 web bundle → Rust 桥接产物 → `expo prebuild` → `pnpm ios` / `pnpm android`**。
 
@@ -57,11 +57,11 @@ git-fetch-with-cli = true
 
 ## 2. 克隆仓库 + 初始化 submodule
 
-`packages/editor/` 是独立 Git 仓库(`yexiyue/swarmnote-editor`),通过 submodule 挂载,**漏掉这一步后续 `pnpm install` 会因为 workspace 解析失败而报错**。
+`packages/editor/` 是独立 Git 仓库(`swarm-apps/swarmnote-editor`),通过 submodule 挂载,**漏掉这一步后续 `pnpm install` 会因为 workspace 解析失败而报错**。
 
 ```bash
 # 一步到位
-git clone --recurse-submodules https://github.com/yexiyue/SwarmNote-RN.git
+git clone --recurse-submodules https://github.com/swarm-apps/SwarmNote-RN.git
 cd SwarmNote-RN
 
 # 或者已经 clone 了的:
