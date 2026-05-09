@@ -31,9 +31,12 @@ pnpm exec tsc --noEmit             # root TypeScript check
 pnpm lingui:extract                # extract i18n messages
 
 # editor packages
-pnpm --filter @swarmnote/editor typecheck
+# @swarmnote/editor-core 住在 sibling 仓 ../swarmnote-editor/packages/editor-core/
+# 本仓只有 @swarmnote/editor-web (WebView bundle)
 pnpm --filter @swarmnote/editor-web build
 pnpm --filter @swarmnote/editor-web dev
+# editor-core 改动后在 sibling 仓重 build：
+(cd ../swarmnote-editor && pnpm --filter @swarmnote/editor-core dev)  # watch 模式
 
 # rust bridge package
 pnpm --filter react-native-swarmnote-core typecheck
@@ -88,16 +91,16 @@ pnpm --filter react-native-swarmnote-core ubrn:checkout
 4. `packages/editor-web/`
    - WebView 侧入口，暴露 `EditorApi`
    - 创建 Yjs 文档、把编辑器事件回传给 RN
-5. `packages/editor/`
+5. `@swarmnote/editor-core`（住在 sibling 仓 `../swarmnote-editor/packages/editor-core/`，通过 `pnpm.overrides` 链入）
    - 平台无关的 CodeMirror 6 核心
    - `createEditor.ts` 里组装 markdown、history、selection、search、Yjs 扩展
 
 关键约束：
-- `packages/editor/` 保持平台无关，不引入 React Native 或 WebView 细节。
+- editor-core 保持平台无关，不引入 React Native 或 WebView 细节。
 - DOM / WebView 逻辑放 `packages/editor-web/`。
 - RN 容器和 bridge 逻辑放 `src/components/editor/`。
-- 修改 `packages/editor/` 或 `packages/editor-web/` 后，必须重新执行 `pnpm --filter @swarmnote/editor-web build`，否则移动端 WebView 仍会加载旧 bundle。
-- Android WebView 上必须禁用 CodeMirror 的 `EditContext`，该处理已在 `packages/editor/src/createEditor.ts` 中完成，不要删掉。
+- 修改 sibling 仓 editor-core 或 `packages/editor-web/` 后，必须重新执行 `pnpm --filter @swarmnote/editor-web build`（编辑 editor-core 还需要先在 sibling 仓 build dist），否则移动端 WebView 仍会加载旧 bundle。
+- Android WebView 上必须禁用 CodeMirror 的 `EditContext`，该处理已在 sibling 仓 `packages/editor-core/src/createEditor.ts` 中完成，不要删掉。
 
 ### Rust bridge: Turbo Module + uniffi
 
@@ -109,46 +112,49 @@ pnpm --filter react-native-swarmnote-core ubrn:checkout
 
 ### Monorepo package boundaries
 
-`pnpm-workspace.yaml` 目前包含 3 个工作区包：
+`pnpm-workspace.yaml` 包含 2 个工作区包：
 
 - `react-native-swarmnote-core` — Rust bridge / native module
-- `@swarmnote/editor` — platform-agnostic editor core（**git submodule**，独立仓库 `swarm-apps/swarmnote-editor`）
 - `@swarmnote/editor-web` — WebView bundle and RPC host
+
+平台无关的 `@swarmnote/editor-core` 是**独立 sibling 仓** `swarm-apps/swarmnote-editor` 内的 monorepo 包，本地通过 `pnpm.overrides` link 到 `../swarmnote-editor/packages/editor-core`。Metro 通过 `watchFolders` + `extraNodeModules` 直接解析。
 
 改动时优先保持边界清晰，不要把平台相关代码泄漏到共享层。
 
-### Git submodule: `packages/editor/`
+### Sibling 仓 `swarmnote-editor` (含 `@swarmnote/editor-core`)
 
-`@swarmnote/editor` 是独立 Git 仓库（`swarm-apps/swarmnote-editor`），通过 submodule 挂载在 `packages/editor/`。桌面端也会通过 submodule 引用同一个仓库，确保双端编辑器核心代码一致。
+`@swarmnote/editor-core` 住在独立 GitHub 仓库 `swarm-apps/swarmnote-editor`（pnpm workspace monorepo），与本仓和桌面端 SwarmNote 平行。本地接入方式：
 
-**克隆仓库后初始化 submodule**：
+- 把 sibling 仓 clone 到与本仓**同级**的 `../swarmnote-editor/`
+- 在 sibling 仓跑 `pnpm install && pnpm -r build` 产出 `packages/editor-core/dist/`
+- 本仓 root `package.json` 的 `pnpm.overrides.@swarmnote/editor-core` 已记录 `link:../swarmnote-editor/packages/editor-core`，`pnpm install` 会自动落 symlink 到 `node_modules/@swarmnote/editor-core` 和 `packages/editor-web/node_modules/@swarmnote/editor-core`
+- Metro `watchFolders` 包含 sibling editor-core 路径（可由 `EDITOR_CORE_LOCAL_PATH` 环境变量覆盖）
+
+**修改编辑器核心代码的流程**：
 
 ```bash
-git submodule update --init
-```
-
-**修改编辑器核心代码的提交流程**：
-
-```bash
-# 1. 在 submodule 内修改、提交、推送
-cd packages/editor
-git add .
+# 1. 在 sibling 仓修改、commit、push、开 PR
+cd ../swarmnote-editor
+git checkout -b feat/...
+# ... edit packages/editor-core/src/* ...
 git commit -m "feat: ..."
-git push origin main
+git push origin feat/...
+# 在 GitHub 开 PR 到 main，CI 通过后合并
 
-# 2. 回到主仓库，更新 submodule 引用
-cd ../..
-git add packages/editor
-git commit -m "chore: update editor submodule"
+# 2. 在 sibling 仓重 build dist（推荐 watch 模式）
+pnpm --filter @swarmnote/editor-core dev
+
+# 3. 回本仓重建 WebView bundle
+cd ../SwarmNote-RN
+pnpm --filter @swarmnote/editor-web build
 ```
 
 **关键注意事项**：
 
-- `packages/editor/` 有自己独立的 `.git`，在其中的 commit 不会自动出现在主仓库。
-- 主仓库只记录 submodule 指向的 commit hash，更新后需要 `git add packages/editor` 提交新的引用。
-- 不要在主仓库层面直接修改 `packages/editor/` 内的文件然后在主仓库提交——这样做不会推送到 submodule 仓库。
-- `pnpm-workspace.yaml` 的 `packages/*` 通配符自动覆盖 submodule 路径，workspace 依赖解析正常。
-- 拉取最新 submodule：`git submodule update --remote packages/editor`。
+- editor-core 是独立仓库，在那里的 commit **不会**出现在本仓 git history；它在本仓只是 `pnpm.overrides` 一条 link 配置
+- 本仓不再包含 `packages/editor/` 子目录，也不需要 `git submodule` 任何操作
+- 拉取最新 editor-core：`(cd ../swarmnote-editor && git pull && pnpm -r build)`
+- 不在本仓直接修改 `node_modules/@swarmnote/editor-core/` 内文件——它是 symlink 指向 sibling 仓，会污染 sibling working tree
 
 ## Documentation Conventions
 
@@ -174,7 +180,7 @@ git commit -m "chore: update editor submodule"
 - **`.npmrc` 中 `node-linker=hoisted` 不能删**：Metro 不兼容 pnpm 默认的 symlink node_modules 布局。
 - **`lightningcss` 必须锁定为 `1.30.1`**：否则 `src/global.css` 可能出现反序列化错误。
 - **改 `src/global.css` 后必须 `npx expo start --clear`**。
-- **改编辑器包后必须重建 `@swarmnote/editor-web` bundle**。
+- **改编辑器包后必须重建 `@swarmnote/editor-web` bundle**；如果改的是 sibling 仓 editor-core，还要先在 sibling 仓重 build editor-core dist。
 - **不要手改生成代码**：尤其是 `packages/swarmnote-core/src/generated/` 和 `packages/swarmnote-core/cpp/generated/`。
 
 ## Project Knowledge Sources

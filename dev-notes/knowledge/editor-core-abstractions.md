@@ -1,6 +1,6 @@
 # 编辑器核心抽象
 
-`packages/editor/src/core/` 提供给所有 widget / live-preview 扩展共用的四个原语。新写编辑器扩展时**优先使用这套抽象**，不要再各自写一遍光标判断或 update 调度。
+`../swarmnote-editor/packages/editor-core/src/core/` 提供给所有 widget / live-preview 扩展共用的四个原语。新写编辑器扩展时**优先使用这套抽象**，不要再各自写一遍光标判断或 update 调度。
 
 灵感来自 `codemirror-live-markdown`（克隆在 `D:/workspace/codemirror-live-markdown`），但完整移植到我们 codebase 内（不依赖 npm 包），保持 submodule 纯净度。
 
@@ -97,5 +97,5 @@ block-level decorations（影响垂直布局）必须通过 StateField 提供，
 
 ## 相关文件
 
-- `packages/editor/src/core/`
+- `../swarmnote-editor/packages/editor-core/src/core/`
 - 上游参考：`D:/workspace/codemirror-live-markdown/src/core/`
