@@ -64,3 +64,19 @@ packages:
 PR/push 到 main/develop 时自动跑 Biome lint + TypeScript check。
 
 配置文件：`.github/workflows/ci.yml`
+
+## Line endings
+
+The repo standard is LF for text files on every platform. `.editorconfig`
+controls editor behavior, and `.gitattributes` controls Git normalization.
+
+**Correct setup**:
+- Keep `.editorconfig` with `end_of_line = lf`.
+- Keep `.gitattributes` with `* text=auto eol=lf`.
+- On Windows, set repo-local Git config to avoid fighting those files:
+  `git config --local core.autocrlf false` and
+  `git config --local core.eol lf`.
+
+**Do not do**:
+- Do not rely on global `core.autocrlf=true`; it can make working-tree files
+  CRLF even when the repository and formatter expect LF.

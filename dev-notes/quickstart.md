@@ -1,6 +1,6 @@
 # 快速启动指南
 
-新设备上从零跑起 SwarmNote Mobile 的完整流程。本仓库由 Expo + React Native + Rust（uniffi）+ CodeMirror（WebView）多层组成,跳过任何一层都**跑不起来**。
+新设备上从零跑起 SwarmNote Mobile 的完整流程。本仓库由 Expo + React Native + Rust（uniffi）+ CodeMirror（WebView）多层组成,跳过任何一层都跑不起来。
 
 > 一句话流程:**装环境 → 拉代码（含 submodule） → `pnpm install` → 编辑器 web bundle → Rust 桥接产物 → `expo prebuild` → `pnpm ios` / `pnpm android`**。
 
@@ -55,18 +55,21 @@ git-fetch-with-cli = true
 
 ---
 
-## 2. 克隆仓库 + 初始化 submodule
+## 2. 克隆仓库 + 准备 sibling 编辑器仓
 
-`packages/editor/` 是独立 Git 仓库(`swarm-apps/swarmnote-editor`),通过 submodule 挂载,**漏掉这一步后续 `pnpm install` 会因为 workspace 解析失败而报错**。
+`@swarmnote/editor-core` 住在独立 sibling 仓 [`swarm-apps/swarmnote-editor`](https://github.com/swarm-apps/swarmnote-editor),通过 `pnpm.overrides` link 到 `../swarmnote-editor/packages/editor-core`,**漏掉 sibling clone+build 后续 `pnpm install` 会无法解析编辑器包**。
 
 ```bash
-# 一步到位
-git clone --recurse-submodules https://github.com/swarm-apps/SwarmNote-RN.git
+# clone 本仓
+git clone https://github.com/swarm-apps/SwarmNote-RN.git
 cd SwarmNote-RN
 
-# 或者已经 clone 了的:
-git submodule update --init
+# 与本仓同级 clone sibling 仓 + build editor-core 产出 dist
+git clone https://github.com/swarm-apps/swarmnote-editor.git ../swarmnote-editor
+(cd ../swarmnote-editor && pnpm install && pnpm -r build)
 ```
+
+> 如果把 sibling clone 到非默认位置,需要在启动 Metro 前 `export EDITOR_CORE_LOCAL_PATH=/abs/path/to/swarmnote-editor/packages/editor-core` 让 `metro.config.js` 的 `watchFolders` / `extraNodeModules` 解析正确。
 
 ---
 
@@ -78,7 +81,7 @@ pnpm install
 
 会发生:
 
-1. pnpm 按 `pnpm-workspace.yaml` 解析三个 workspace 包(`react-native-swarmnote-core`, `@swarmnote/editor`, `@swarmnote/editor-web`)。
+1. pnpm 按 `pnpm-workspace.yaml` 解析两个 workspace 包(`react-native-swarmnote-core`, `@swarmnote/editor-web`),并按 root `pnpm.overrides` 把 `@swarmnote/editor-core` link 到 sibling 仓 dist。
 2. 自动应用 `patches/uniffi-bindgen-react-native@0.31.0-2.patch`(Windows lld 路径修复)。
 3. `react-native-swarmnote-core` 的 `prepare` 脚本会跑 `bob build`,把 `packages/swarmnote-core/src/` 编译到 `lib/`(模块 + d.ts)。
 
@@ -94,7 +97,7 @@ pnpm install
 pnpm --filter @swarmnote/editor-web build
 ```
 
-> 之后如果改了 `packages/editor/` 或 `packages/editor-web/` 下的代码,必须重跑这条命令,否则 WebView 仍加载旧 bundle。详见 [CLAUDE.md](../CLAUDE.md) 的「Editor stack」段。
+> 之后如果改了 sibling 仓 `editor-core` 或本仓 `packages/editor-web/` 下的代码,必须重跑这条命令(改 editor-core 还要先在 sibling 仓重 build),否则 WebView 仍加载旧 bundle。详见 [CLAUDE.md](../CLAUDE.md) 的「Editor stack」段。
 
 ---
 
@@ -170,7 +173,7 @@ pnpm ios             # 等价于 expo run:ios
 
 ### `pnpm install` 卡在 `react-native-swarmnote-core prepare`
 
-通常是 `packages/editor/` submodule 没初始化,workspace 解析失败,bob build 找不到入口。`git submodule update --init` 后重试。
+通常是 sibling 仓 `../swarmnote-editor/packages/editor-core/` 还没 clone 或没 build,`pnpm.overrides` 解析的 link target 不存在导致 workspace 解析失败,bob build 找不到入口。按步骤 2 走一遍 sibling clone + build 后重试。
 
 ### iOS 链接报 `SwiftUICore.tbd ... not an allowed client`
 
@@ -198,7 +201,8 @@ npx expo start --clear
 
 | 改了什么 | 需要做的事 |
 |---|---|
-| `packages/editor/` 或 `packages/editor-web/` 任意源码 | `pnpm --filter @swarmnote/editor-web build` 后 reload app |
+| sibling 仓 `editor-core` 任意源码 | sibling 仓重 build editor-core(或保持 watch 模式)+ 本仓 `pnpm --filter @swarmnote/editor-web build` 后 reload app |
+| `packages/editor-web/` 任意源码 | `pnpm --filter @swarmnote/editor-web build` 后 reload app |
 | `rust/mobile-core/` Rust 源码 | `pnpm --filter react-native-swarmnote-core ubrn:android` 或 `ubrn:ios`,然后重跑 `pnpm android` / `pnpm ios` |
 | `app.json`、原生插件配置 | `npx expo prebuild --platform <ios\|android> --clean` 然后重跑 `pnpm ios` / `pnpm android` |
 | `src/global.css`、Metro / Babel / NativeWind 配置 | `npx expo start --clear` |
@@ -241,7 +245,7 @@ EXPO_PUBLIC_UPGRADELINK_APK_KEY=...
 
 - [theme-and-styling.md](knowledge/theme-and-styling.md) — NativeWind v5 + Tailwind 4 + CSS 变量主题
 - [editor.md](knowledge/editor.md) — 编辑器整体链路
-- [editor-core-abstractions.md](knowledge/editor-core-abstractions.md) — `@swarmnote/editor` 平台无关核心
+- [editor-core-abstractions.md](knowledge/editor-core-abstractions.md) — `@swarmnote/editor-core` 平台无关核心
 - [rust-bridge.md](knowledge/rust-bridge.md) — uniffi 桥接架构、async runtime、wrap 决策
 - [ubrn.md](knowledge/ubrn.md) — ubrn 构建工具链所有踩坑(iOS / Android / Windows / Xcode 26)
 - [toolchain.md](knowledge/toolchain.md) — Biome / Lingui / Lefthook / Metro

@@ -192,7 +192,7 @@ editor 核心的 `toggleHeading(view, level)` 行为：当前行已是该 level 
 
 Chromium 长期 bug [#879745](https://bugs.chromium.org/p/chromium/issues/detail?id=879745)：在 `overflow: auto` 元素上加 `padding-bottom`，padding 区不能滚到。CodeMirror 的 `.cm-scroller` 是 `overflow: auto` 容器、`.cm-content` 是被滚动的内容。padding 加在 `.cm-content` 上才有效。
 
-`packages/editor/src/createEditor.ts` 用一个独立的 `Compartment` 容纳 `EditorView.contentAttributes.of({ style: 'padding-bottom: 0px' })`，与 `scrollMarginsCompartment` 并列。`EditorControl.setScrollBottomMargin(px)` 在一次 `view.dispatch` 内同时 `reconfigure` 两个 compartment，不直接改 `view.contentDOM.style`。
+`../swarmnote-editor/packages/editor-core/src/createEditor.ts` 用一个独立的 `Compartment` 容纳 `EditorView.contentAttributes.of({ style: 'padding-bottom: 0px' })`，与 `scrollMarginsCompartment` 并列。`EditorControl.setScrollBottomMargin(px)` 在一次 `view.dispatch` 内同时 `reconfigure` 两个 compartment，不直接改 `view.contentDOM.style`。
 
 ### 默认 `padding-bottom = 0`，宿主自管首屏空窗期
 

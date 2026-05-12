@@ -86,8 +86,9 @@ WebView 支持 `<script type="module">`，vite 输出保持原样，不需要后
 
 **正确做法**：
 
-- 修改 `packages/editor/` 或 `packages/editor-web/` 后，必须在 `packages/editor-web/` 运行 `pnpm build`
-- 不重新构建的话，WebView 加载的还是旧 bundle
+- 修改 sibling 仓的 editor-core 后，必须先在 sibling 仓重 build editor-core dist（推荐 `pnpm --filter @swarmnote/editor-core dev` watch 模式）
+- 修改 editor-core 或 `packages/editor-web/` 后，再在本仓 `packages/editor-web/` 运行 `pnpm build` 重新打 WebView bundle
+- 任一步未做，WebView 加载的还是旧 bundle
 
 **相关文件**：`packages/editor-web/vite.config.ts`
 
@@ -95,14 +96,14 @@ WebView 支持 `<script type="module">`，vite 输出保持原样，不需要后
 
 Android 必须禁用 EditContext API，否则 IME 输入法组合事件会出 bug。
 
-**处理位置**：`packages/editor/src/createEditor.ts`
+**处理位置**：`../swarmnote-editor/packages/editor-core/src/createEditor.ts`
 
 ## 平台无关层
 
-`packages/editor/` 是平台无关的 CM6 编辑器核心。
+sibling 仓的 editor-core（`../swarmnote-editor/packages/editor-core/`） 是平台无关的 CM6 编辑器核心。
 
 **不要做**：
-- 不要在 `packages/editor/` 中引入 React Native 或 DOM 特定 API
+- 不要在 sibling 仓的 editor-core（`../swarmnote-editor/packages/editor-core/`） 中引入 React Native 或 DOM 特定 API
 - DOM 相关的逻辑放 `packages/editor-web/`
 - RN 相关的逻辑放 `src/components/editor/`
 
@@ -235,7 +236,7 @@ const listener = (update: Uint8Array, origin: unknown) => {
 
 `makeInlineReplaceExtension` 是 Live Preview 的核心引擎：接收一组 `InlineRenderingSpec`，遍历 Lezer 语法树，对匹配节点应用 `Decoration.replace` 或 Widget 替换。
 
-**已注册的替换**（`packages/editor/src/extensions/inlineRendering/index.ts`）：
+**已注册的替换**（`../swarmnote-editor/packages/editor-core/src/extensions/inlineRendering/index.ts`）：
 
 - `replaceCheckboxes` — `[ ]` / `[x]` → 交互式 checkbox
 - `replaceBulletLists` — `-` / `*` / `+` → styled bullet
@@ -256,7 +257,7 @@ const listener = (update: Uint8Array, origin: unknown) => {
 - 新增替换类型时实现 `InlineRenderingSpec` 接口，在 `index.ts` 注册
 - 为每种节点类型选择合适的 reveal 策略：行级元素用 `line`，内联元素用 `active`
 
-**相关文件**：`packages/editor/src/extensions/inlineRendering/`
+**相关文件**：`../swarmnote-editor/packages/editor-core/src/extensions/inlineRendering/`
 
 ### 块级图像渲染
 
@@ -271,7 +272,7 @@ const listener = (update: Uint8Array, origin: unknown) => {
 
 - 不要在 inline rendering 框架（`makeInlineReplaceExtension`）中处理块级元素
 
-**相关文件**：`packages/editor/src/extensions/renderBlockImages.ts`
+**相关文件**：`../swarmnote-editor/packages/editor-core/src/extensions/renderBlockImages.ts`
 
 ### 链接交互
 
@@ -282,7 +283,7 @@ const listener = (update: Uint8Array, origin: unknown) => {
 
 链接点击通过 `EditorEvent.LinkOpen` 事件回传给 RN 侧，URL 从 Lezer 语法树的 `Link` / `URL` 节点提取。
 
-**相关文件**：`packages/editor/src/extensions/links/`
+**相关文件**：`../swarmnote-editor/packages/editor-core/src/extensions/links/`
 
 ### 列表续行
 
@@ -298,7 +299,7 @@ const listener = (update: Uint8Array, origin: unknown) => {
 
 基于 CodeMirror 官方 `insertNewlineContinueMarkup` 的 Joplin fork 版本。
 
-**相关文件**：`packages/editor/src/editorCommands/insertNewlineContinueMarkup.ts`
+**相关文件**：`../swarmnote-editor/packages/editor-core/src/editorCommands/insertNewlineContinueMarkup.ts`
 
 ## 主题系统
 
@@ -308,7 +309,7 @@ const listener = (update: Uint8Array, origin: unknown) => {
 
 ### createEditorTheme
 
-`packages/editor/src/theme/createTheme.ts` 根据 config 生成 `EditorView.theme()`。内置蜂巢纸笺品牌色（与 `global.css` 的 HSL 变量一致），可被 `colors` 覆盖。
+`../swarmnote-editor/packages/editor-core/src/theme/createTheme.ts` 根据 config 生成 `EditorView.theme()`。内置蜂巢纸笺品牌色（与 `global.css` 的 HSL 变量一致），可被 `colors` 覆盖。
 
 **正确做法**：
 
@@ -321,7 +322,7 @@ const listener = (update: Uint8Array, origin: unknown) => {
 - 不要在 WebView HTML 中硬编码颜色 — 全部通过 `EditorView.theme()` 注入
 - 不要在 `markdownDecorationExtension` 的 theme 中放颜色 — 颜色统一由 `createEditorTheme` 管理
 
-**相关文件**：`packages/editor/src/theme/createTheme.ts`、`packages/editor/src/extensions/editorSettingsExtension.ts`
+**相关文件**：`../swarmnote-editor/packages/editor-core/src/theme/createTheme.ts`、`../swarmnote-editor/packages/editor-core/src/extensions/editorSettingsExtension.ts`
 
 ## v0.2 行为变更
 
@@ -390,14 +391,16 @@ const listener = (update: Uint8Array, origin: unknown) => {
 
 CM6 的 decoration set 是合并的。本次 MVP 只接 caret（细线 + 名字 tag），**不**接远端选区高亮，因为选区色块可能与 inline-rendering 的格式字符隐藏 / live-preview decoration 打架。后续如果要做选区高亮，需要先做兼容性测试。
 
-### Submodule 提交顺序
+### Sibling 仓提交顺序
 
-`packages/editor` 改动（`collaborationExtension.ts` 接 awareness 参数、`types.ts` 加 `awareness?: unknown`）属于 swarmnote-editor 子仓库。提交顺序固定：
-1. swarmnote-editor 仓库 commit + push
-2. SwarmNote 桌面仓库 `git submodule update --remote packages/editor` + bump pointer
-3. SwarmNote-RN 移动仓库同步 bump
+editor-core 改动（`collaborationExtension.ts` 接 awareness 参数、`types.ts` 加 `awareness?: unknown`）属于独立 sibling 仓 `swarm-apps/swarmnote-editor`。提交顺序固定：
 
-**相关文件**：`packages/editor/src/extensions/collaborationExtension.ts`、`packages/editor-web/src/editor-runtime.ts`、`src/components/editor/MarkdownEditor.tsx`、`src/core/editor-bridge-registry.ts`、`src/core/event-bus.ts`
+1. sibling 仓（`../swarmnote-editor`）开分支、commit、push、PR、合并到 main
+2. sibling 仓本地 `pnpm -r build` 产出新 dist；桌面端 SwarmNote 与本仓的 `node_modules/@swarmnote/editor-core` 是直接 symlink 到 sibling dist，自动看到变化
+3. 桌面端和移动端各自重 build 自己的 host bundle（桌面 vite，移动 `pnpm --filter @swarmnote/editor-web build`）
+4. 移动端 / 桌面端如需在 PR 描述里 reference 那条 editor-core PR URL（可选）
+
+**相关文件**：`../swarmnote-editor/packages/editor-core/src/extensions/collaborationExtension.ts`、`packages/editor-web/src/editor-runtime.ts`、`src/components/editor/MarkdownEditor.tsx`、`src/core/editor-bridge-registry.ts`、`src/core/event-bus.ts`
 
 ## 代码块语言高亮
 
@@ -408,4 +411,31 @@ CM6 的 decoration set 是合并的。本次 MVP 只接 caret（细线 + 名字 
 - `createEditor.ts` 中 `import { languages } from '@codemirror/language-data'` 传入 `markdown({ codeLanguages: languages })`
 - 不需要手动维护语言列表
 
-**相关文件**：`packages/editor/src/createEditor.ts`
+**相关文件**：`../swarmnote-editor/packages/editor-core/src/createEditor.ts`
+
+## RN host / WebView editor import boundary
+
+The native RN host must not value-import `@swarmnote/editor-core`.
+`editor-core` pulls CodeMirror, KaTeX CSS/fonts, and other browser-only assets;
+if Metro sees a runtime import from `src/**`, it tries to bundle those assets
+into the native app and fails on CSS-local-resource handling.
+
+**Correct pattern**:
+- RN host code imports shared host contracts from `@swarmnote/editor-web/contracts`.
+- That contracts entry may type-only re-export `editor-core` types and may define
+  small runtime mirrors such as `EditorEventType`, `DEFAULT_EDITOR_SETTINGS`, and
+  `DEFAULT_SELECTION_FORMATTING`.
+- `@swarmnote/editor-web/contracts` must not execute `packages/editor-web/src/index.ts`
+  and must not value-import `@swarmnote/editor-core`.
+- Value imports from `@swarmnote/editor-core` are allowed only inside
+  `packages/editor-web/src/**`, where Vite builds them into the WebView HTML bundle.
+
+**Do not do**:
+- Do not import `DEFAULT_SETTINGS`, `EditorEventType`, or any other runtime value
+  from `@swarmnote/editor-core` in `src/**`.
+- Do not fix this class of failure by teaching Metro how to bundle KaTeX CSS/fonts;
+  that treats the symptom instead of the architecture boundary violation.
+
+**Related files**: `packages/editor-web/contracts.ts`,
+`packages/editor-web/src/contracts.ts`, `src/components/editor/MarkdownEditor.tsx`,
+`src/components/editor/useEditorFormatting.ts`, `src/app/editor-test.tsx`.

@@ -1,6 +1,9 @@
-import type { EditorEvent } from "@swarmnote/editor/events";
-import { DEFAULT_SETTINGS } from "@swarmnote/editor/types";
-import type { AwarenessUserState, EditorInitOptions } from "@swarmnote/editor-web";
+import {
+  type AwarenessUserState,
+  DEFAULT_EDITOR_SETTINGS,
+  type EditorEvent,
+  type EditorInitOptions,
+} from "@swarmnote/editor-web/contracts";
 import { Asset } from "expo-asset";
 import { File } from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
@@ -180,7 +183,7 @@ export function MarkdownEditor({
       // after createEditor), so seed an empty string.
       initialText: collabMode ? "" : initialText,
       settings: {
-        ...DEFAULT_SETTINGS,
+        ...DEFAULT_EDITOR_SETTINGS,
         theme: { appearance },
       },
       collaboration:
