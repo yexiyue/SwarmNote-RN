@@ -412,3 +412,30 @@ editor-core 改动（`collaborationExtension.ts` 接 awareness 参数、`types.t
 - 不需要手动维护语言列表
 
 **相关文件**：`../swarmnote-editor/packages/editor-core/src/createEditor.ts`
+
+## RN host / WebView editor import boundary
+
+The native RN host must not value-import `@swarmnote/editor-core`.
+`editor-core` pulls CodeMirror, KaTeX CSS/fonts, and other browser-only assets;
+if Metro sees a runtime import from `src/**`, it tries to bundle those assets
+into the native app and fails on CSS-local-resource handling.
+
+**Correct pattern**:
+- RN host code imports shared host contracts from `@swarmnote/editor-web/contracts`.
+- That contracts entry may type-only re-export `editor-core` types and may define
+  small runtime mirrors such as `EditorEventType`, `DEFAULT_EDITOR_SETTINGS`, and
+  `DEFAULT_SELECTION_FORMATTING`.
+- `@swarmnote/editor-web/contracts` must not execute `packages/editor-web/src/index.ts`
+  and must not value-import `@swarmnote/editor-core`.
+- Value imports from `@swarmnote/editor-core` are allowed only inside
+  `packages/editor-web/src/**`, where Vite builds them into the WebView HTML bundle.
+
+**Do not do**:
+- Do not import `DEFAULT_SETTINGS`, `EditorEventType`, or any other runtime value
+  from `@swarmnote/editor-core` in `src/**`.
+- Do not fix this class of failure by teaching Metro how to bundle KaTeX CSS/fonts;
+  that treats the symptom instead of the architecture boundary violation.
+
+**Related files**: `packages/editor-web/contracts.ts`,
+`packages/editor-web/src/contracts.ts`, `src/components/editor/MarkdownEditor.tsx`,
+`src/components/editor/useEditorFormatting.ts`, `src/app/editor-test.tsx`.
