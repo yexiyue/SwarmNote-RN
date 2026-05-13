@@ -41,7 +41,8 @@
     "@rn-primitives/toggle": "^1.4.0",
     "@rn-primitives/tooltip": "^1.4.0",
     "@swarmnote/editor-core": "*",
-    "@swarmnote/editor-web": "workspace:*",
+    "@swarmnote/editor-web": "*",
+    "@swarmnote/editor-react-native": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "comlink": "^4.4.2",
@@ -114,7 +115,9 @@
     ],
     "overrides": {
       "lightningcss": "1.30.1",
-      "@swarmnote/editor-core": "link:../swarmnote-editor/packages/editor-core"
+      "@swarmnote/editor-core": "link:../swarmnote-editor/packages/editor-core",
+      "@swarmnote/editor-web": "link:../swarmnote-editor/packages/editor-web",
+      "@swarmnote/editor-react-native": "link:../swarmnote-editor/packages/editor-react-native"
     },
     "patchedDependencies": {
       "uniffi-bindgen-react-native@0.31.0-2": "patches/uniffi-bindgen-react-native@0.31.0-2.patch"

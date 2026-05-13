@@ -1,3 +1,4 @@
+import { useEditorBridge, useEditorFormatting } from "@swarmnote/editor-react-native";
 import {
   type AwarenessUserState,
   DEFAULT_EDITOR_SETTINGS,
@@ -30,8 +31,6 @@ import {
   type HeadingLevel,
 } from "./EditorHeadingSheet";
 import { EditorToolbar } from "./EditorToolbar";
-import { useEditorBridge } from "./useEditorBridge";
-import { useEditorFormatting } from "./useEditorFormatting";
 
 function stripExtension(name: string): string {
   return name.replace(/\.[^/.]+$/, "");
