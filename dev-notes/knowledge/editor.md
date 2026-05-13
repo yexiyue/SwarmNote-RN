@@ -439,3 +439,94 @@ into the native app and fails on CSS-local-resource handling.
 **Related files**: `packages/editor-web/contracts.ts`,
 `packages/editor-web/src/contracts.ts`, `src/components/editor/MarkdownEditor.tsx`,
 `src/components/editor/useEditorFormatting.ts`, `src/app/editor-test.tsx`.
+
+## Sibling 仓 Metro 接入的三个坑
+
+`split-editor-react-packages`（v0.2）把 editor-react-native 拆到独立 sibling 仓 `swarm-apps/swarmnote-editor` 后，
+本仓通过 `pnpm.overrides` + Metro `watchFolders` + `extraNodeModules` 接入。
+首次接入时连续踩到三个**互相耦合**的坑，漏掉任何一个 bundle / runtime 就会失败：
+
+### 1. React Compiler 不要处理 sibling dist
+
+`app.json` 启用 `experiments.reactCompiler: true` 后，`babel-preset-expo` 默认会对
+**所有** metro 解析的 JS/TS 文件跑 React Compiler，**包括 sibling 仓 dist 文件**。
+RC 会向函数组件注入 `import { c } from "react/compiler-runtime"`。
+Sibling 文件被注入后，metro 从 sibling 目录向上找不到 `react/compiler-runtime`（RC 版本依赖路径假设），bundle 失败：
+
+```text
+Unable to resolve "react/compiler-runtime" from "../swarmnote-editor/packages/editor-react-native/dist/index.mjs"
+```
+
+**正确做法**：在 `babel.config.js` 用 `react-compiler.sources` 回调把 RC 范围收窄到 host `src/**`：
+
+```js
+const projectSrc = path.join(__dirname, "src") + path.sep;
+// presets: [["babel-preset-expo", { "react-compiler": { sources: (f) => f.startsWith(projectSrc) } }]]
+```
+
+**不要做**：
+
+- 不要关掉 `experiments.reactCompiler` 来绕开（放弃了 host 的 RC 优化）
+- 不要在 sibling 包构建侧启用 RC 来"对齐"——会让 sibling 强绑 RC 工具链
+
+### 2. watchFolders 必须包含 sibling 仓 root（不是单个 packages/*）
+
+只把 `swarmnote-editor/packages/editor-{core,web,react-native}` 加进 watchFolders 不够。
+Sibling 仓本身用 pnpm 默认 symlink 布局，peer-dep（comlink / react / lucide-react 等）实际文件落在
+`swarmnote-editor/node_modules/.pnpm/<pkg>@<ver>/node_modules/<pkg>/`。
+
+Metro 跨 watchFolder 解析时**只允许读 watch 范围内的文件**——即使 symlink 能解析到 `.pnpm` 目录的真实路径，
+若该路径不在某个 watchFolder 内 metro 也拒绝读：
+
+```text
+Unable to resolve "comlink" from "../swarmnote-editor/packages/editor-react-native/dist/index.mjs"
+```
+
+**正确做法**：在 `metro.config.js` 把 `siblingEditorRoot` 整个加进 watchFolders（覆盖 `.pnpm` store），并启用 `unstable_enableSymlinks` 让 metro follow sibling 的 pnpm symlink：
+
+```js
+config.watchFolders = [...(config.watchFolders ?? []), siblingEditorRoot];
+config.resolver.unstable_enableSymlinks = true;
+```
+
+**不要做**：
+
+- 不要只 watch sibling 仓的 `packages/*`，会漏掉 `.pnpm` store
+- 不要改本仓 `.npmrc` 的 `node-linker=hoisted`——本仓的 hoisted 布局与 sibling 仓 symlink 布局独立，启 `unstable_enableSymlinks` 只影响 metro 跨仓解析行为
+
+### 3. react / react-native 必须强制走 host node_modules
+
+Sibling 包 `package.json` 把 react/react-native 声明为 `peerDependencies`，但 `devDependencies` 同样列了一份，
+sibling 仓 `pnpm install` 会把 dev 副本装进 sibling `node_modules`。
+启用 `unstable_enableSymlinks` 后，metro 解析 sibling dist 里的 `import 'react'` 会走 sibling devDep 那份，
+host MarkdownEditor 走 host node_modules 那份——**同一进程两份 React**，hook context 不通：
+
+```text
+Invalid hook call. Hooks can only be called inside of the body of a function component.
+TypeError: Cannot read property 'useState' of null
+```
+
+**正确做法**：在 `metro.config.js` 用 `resolver.resolveRequest` 把单例敏感包强制指回 host：
+
+```js
+const HOST_SINGLETONS = new Set([
+  "react", "react/jsx-runtime", "react/jsx-dev-runtime",
+  "react/compiler-runtime", "react-native", "scheduler",
+]);
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (HOST_SINGLETONS.has(moduleName)) {
+    return context.resolveRequest(
+      { ...context, originModulePath: path.join(__dirname, "package.json") },
+      moduleName, platform,
+    );
+  }
+  return context.resolveRequest(context, moduleName, platform);
+};
+```
+
+**不要做**：
+
+- 不要试图改 sibling `package.json` 删 `devDependencies.react` —— sibling 包自己也要能独立 build/typecheck
+- 不要寄希望于 `extraNodeModules` 的 react 映射来"覆盖"——`extraNodeModules` 是 lookup 失败后的兜底，不抢占 hierarchical lookup 结果，必须 `resolveRequest`
+
+**相关文件**：[`babel.config.js`](../../babel.config.js)、[`metro.config.js`](../../metro.config.js)
