@@ -1,4 +1,4 @@
-import type { AwarenessUserState } from "@swarmnote/editor-web";
+import type { AwarenessUserState } from "@swarmnote/editor-react-native/contracts";
 import { create } from "zustand";
 
 /** Remote-only presence snapshot for the active doc — recomputed on every

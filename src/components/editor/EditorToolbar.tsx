@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import type { EditorApi, SelectionFormatting } from "@swarmnote/editor-web/contracts";
+import type { EditorApi, SelectionFormatting } from "@swarmnote/editor-react-native/contracts";
 import type * as Comlink from "comlink";
 import {
   Bold,

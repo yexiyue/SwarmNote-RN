@@ -3,8 +3,12 @@ import {
   type AwarenessUserState,
   DEFAULT_EDITOR_SETTINGS,
   type EditorEvent,
+  EditorEventType,
   type EditorInitOptions,
-} from "@swarmnote/editor-web/contracts";
+  type SelectionToolbarMatch,
+  type SlashTriggerMatch,
+  type WikilinkTriggerMatch,
+} from "@swarmnote/editor-react-native/contracts";
 import { Asset } from "expo-asset";
 import { File } from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
@@ -24,6 +28,7 @@ import { colorForDevice } from "@/lib/awareness-color";
 import { useOptionalWorkspace } from "@/providers/workspace-provider";
 import { useCurrentDocStore } from "@/stores/current-doc-store";
 import { useEditorPresenceStore } from "@/stores/editor-presence-store";
+import { useFileTreeStore } from "@/stores/file-tree-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import {
   EditorHeadingSheet,
@@ -31,6 +36,10 @@ import {
   type HeadingLevel,
 } from "./EditorHeadingSheet";
 import { EditorToolbar } from "./EditorToolbar";
+import { buildSlashItems, buildWikilinkItems, resolveInternalLink } from "./interaction-providers";
+import { SelectionToolbarFloat } from "./selection-toolbar-float";
+import { SlashSheet } from "./slash-sheet";
+import { WikilinkSheet } from "./wikilink-sheet";
 
 function stripExtension(name: string): string {
   return name.replace(/\.[^/.]+$/, "");
@@ -61,7 +70,7 @@ true;
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const EDITOR_HTML_MODULE = require("@swarmnote/editor-web/dist/index.html");
+const EDITOR_HTML_MODULE = require("@swarmnote/editor-react-native/webview");
 
 interface MarkdownEditorProps {
   /** Fallback text-mode content. Used only when `docUuid` is not provided. */
@@ -96,7 +105,7 @@ export function MarkdownEditor({
   onEditorEvent,
   enableYjs = false,
 }: MarkdownEditorProps) {
-  const webviewRef = useRef<WebView>(null);
+  const webviewRef = useRef<WebView | null>(null);
   const [htmlUri, setHtmlUri] = useState<string | null>(null);
   const [runtimeReady, setRuntimeReady] = useState(false);
   const [editorCreated, setEditorCreated] = useState(false);
@@ -150,14 +159,68 @@ export function MarkdownEditor({
   // Forwards every other event to the upstream `onEditorEvent` prop untouched.
   const { formatting, handleEditorEvent } = useEditorFormatting(onEditorEvent);
 
+  // v0.4: trio interaction match state (slash / wikilink / selection toolbar).
+  // Events surface through editor-web contracts; UI rendered by registry
+  // components (slash-sheet / wikilink-sheet / selection-toolbar-float).
+  const [slashMatch, setSlashMatch] = useState<SlashTriggerMatch | null>(null);
+  const [wikilinkMatch, setWikilinkMatch] = useState<WikilinkTriggerMatch | null>(null);
+  const [selToolbarMatch, setSelToolbarMatch] = useState<SelectionToolbarMatch | null>(null);
+
+  const handleEditorEventWithTrio = useCallback(
+    (event: EditorEvent) => {
+      // Intercept trio + link events before delegating to formatting + upstream.
+      // Cast through unknown — editor-web contracts surface these as opaque
+      // event kinds; payload shape comes from editor-core's exported types.
+      const kind = (event as unknown as { kind: string }).kind;
+      if (kind === EditorEventType.SlashTriggerChange) {
+        const match = (event as unknown as { match: SlashTriggerMatch }).match;
+        setSlashMatch(match.active ? match : null);
+      } else if (kind === EditorEventType.WikilinkTriggerChange) {
+        const match = (event as unknown as { match: WikilinkTriggerMatch }).match;
+        setWikilinkMatch(match.active ? match : null);
+      } else if (kind === EditorEventType.SelectionToolbarChange) {
+        const match = (event as unknown as { match: SelectionToolbarMatch }).match;
+        setSelToolbarMatch(match.active ? match : null);
+      } else if (kind === EditorEventType.LinkOpen) {
+        // Wikilink + markdown link clicks. editor-web doesn't wire
+        // host.openLink (no Comlink callback for it), so editor-core falls
+        // back to emitting LinkOpen. Resolve internal note → open via doc
+        // store; external URLs intentionally no-op on RN (host could plug
+        // expo-web-browser if desired).
+        const url = (event as unknown as { url: string }).url;
+        const tree = useFileTreeStore.getState().tree;
+        const internal = resolveInternalLink(url, tree);
+        if (internal) {
+          void useCurrentDocStore.getState().open(internal.id);
+        }
+      }
+      handleEditorEvent(event);
+    },
+    [handleEditorEvent],
+  );
+
+  // v0.4: provide slash + wikilink items via Comlink RPC. Items must be
+  // JSON-serializable; we use commandId/commandArgs paths (closures don't
+  // survive Comlink). Note tree comes from the host's file-tree store.
+  const getSlashItems = useCallback(async (query: string) => {
+    return buildSlashItems(query);
+  }, []);
+
+  const getWikilinkItems = useCallback(async (query: string) => {
+    const tree = useFileTreeStore.getState().tree;
+    return buildWikilinkItems(query, tree);
+  }, []);
+
   const { editorApi, setWebViewRef, onWebViewMessage } = useEditorBridge({
     onRuntimeReady() {
       setRuntimeReady(true);
     },
-    onEditorEvent: handleEditorEvent,
+    onEditorEvent: handleEditorEventWithTrio,
     onCollaborationUpdate: handleCollaborationUpdate,
     onAwarenessUpdate: handleAwarenessUpdate,
     onPresenceChange: handlePresenceChange,
+    getSlashItems,
+    getWikilinkItems,
   });
 
   const handleRef = useCallback(
@@ -166,7 +229,7 @@ export function MarkdownEditor({
         setRuntimeReady(false);
         setEditorCreated(false);
       }
-      (webviewRef as React.MutableRefObject<WebView | null>).current = ref;
+      webviewRef.current = ref;
       setWebViewRef(ref ? { injectJavaScript: (js: string) => ref.injectJavaScript(js) } : null);
     },
     [setWebViewRef],
@@ -193,6 +256,25 @@ export function MarkdownEditor({
             }
           : undefined,
       workspacePath,
+      // v0.4: enable all built-in plugins (table / math / mermaid / slash /
+      // wikilink / selectionToolbar / etc.). Without this, the WebView ran
+      // with zero plugins and table rendering / slash popover / etc. were
+      // silently disabled. Editor-web's RuntimeInitOptions defaults the full
+      // set when omitted, but we pass it explicitly for clarity.
+      enabledPluginIds: [
+        "math",
+        "table",
+        "mermaid",
+        "admonition",
+        "codeBlock",
+        "blockImage",
+        "rawHtml",
+        "smartPaste",
+        "slash",
+        "wikilink",
+        "selectionToolbar",
+      ],
+      codeBlockMode: "inline",
     }),
     [appearance, collabMode, enableYjs, initialText, workspacePath],
   );
@@ -396,6 +478,30 @@ export function MarkdownEditor({
         contentInsetAdjustmentBehavior="never"
         overScrollMode="never"
         setSupportMultipleWindows={false}
+      />
+      <SlashSheet
+        match={slashMatch}
+        onPick={(idx) => {
+          void editorApi?.execCommand("slash.confirmAt", idx);
+        }}
+        onDismiss={() => {
+          void editorApi?.execCommand("slash.dismiss");
+        }}
+      />
+      <WikilinkSheet
+        match={wikilinkMatch}
+        onPick={(idx) => {
+          void editorApi?.execCommand("wikilink.confirmAt", idx);
+        }}
+        onDismiss={() => {
+          void editorApi?.execCommand("wikilink.dismiss");
+        }}
+      />
+      <SelectionToolbarFloat
+        match={selToolbarMatch}
+        onAction={(commandId) => {
+          void editorApi?.execCommand(commandId);
+        }}
       />
       {editorApi && editorCreated ? (
         <EditorToolbar

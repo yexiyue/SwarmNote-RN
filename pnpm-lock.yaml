@@ -7,7 +7,6 @@ settings:
 overrides:
   lightningcss: 1.30.1
   '@swarmnote/editor-core': link:../swarmnote-editor/packages/editor-core
-  '@swarmnote/editor-web': link:../swarmnote-editor/packages/editor-web
   '@swarmnote/editor-react-native': link:../swarmnote-editor/packages/editor-react-native
 
 patchedDependencies:
@@ -97,9 +96,6 @@ importers:
       '@swarmnote/editor-react-native':
         specifier: link:../swarmnote-editor/packages/editor-react-native
         version: link:../swarmnote-editor/packages/editor-react-native
-      '@swarmnote/editor-web':
-        specifier: link:../swarmnote-editor/packages/editor-web
-        version: link:../swarmnote-editor/packages/editor-web
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1

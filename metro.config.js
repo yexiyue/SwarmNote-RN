@@ -11,8 +11,9 @@ config.resolver.assetExts.push("html");
 config.resolver.sourceExts.push("po", "pot");
 config.transformer.babelTransformerPath = require.resolve("@lingui/metro-transformer/expo");
 
-// @swarmnote/editor-{core,web,react-native} 通过 pnpm.overrides 链到 sibling 仓
-// `../swarmnote-editor/packages/{editor-core,editor-web,editor-react-native}`。
+// @swarmnote/editor-{core,react-native} 通过 pnpm.overrides 链到 sibling 仓
+// `../swarmnote-editor/packages/{editor-core,editor-react-native}`。
+// v0.4 起 editor-web 已合并进 editor-react-native(./webview)，不再是独立包。
 // Metro 默认不 watch 也不 resolve monorepo 外的 symlink target，需要显式声明。
 // 路径可由 SWARMNOTE_EDITOR_LOCAL_PATH 环境变量覆盖（CI 或开发者把 sibling clone 到非默认位置时使用）。
 const siblingEditorRoot = process.env.SWARMNOTE_EDITOR_LOCAL_PATH
@@ -20,7 +21,6 @@ const siblingEditorRoot = process.env.SWARMNOTE_EDITOR_LOCAL_PATH
   : path.resolve(__dirname, "../swarmnote-editor");
 
 const editorCoreLocalPath = path.join(siblingEditorRoot, "packages/editor-core");
-const editorWebLocalPath = path.join(siblingEditorRoot, "packages/editor-web");
 const editorRNLocalPath = path.join(siblingEditorRoot, "packages/editor-react-native");
 
 // watch sibling root（不是单个 packages/*），覆盖 sibling pnpm .pnpm store。
@@ -30,7 +30,6 @@ config.watchFolders = [...(config.watchFolders ?? []), siblingEditorRoot];
 config.resolver.extraNodeModules = {
   ...config.resolver.extraNodeModules,
   "@swarmnote/editor-core": editorCoreLocalPath,
-  "@swarmnote/editor-web": editorWebLocalPath,
   "@swarmnote/editor-react-native": editorRNLocalPath,
 };
 

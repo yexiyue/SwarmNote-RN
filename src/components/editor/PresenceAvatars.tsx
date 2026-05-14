@@ -1,4 +1,4 @@
-import type { AwarenessUserState } from "@swarmnote/editor-web";
+import type { AwarenessUserState } from "@swarmnote/editor-react-native/contracts";
 import { Laptop, Smartphone } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

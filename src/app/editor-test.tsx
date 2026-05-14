@@ -1,4 +1,4 @@
-import { type EditorEvent, EditorEventType } from "@swarmnote/editor-web/contracts";
+import { type EditorEvent, EditorEventType } from "@swarmnote/editor-react-native/contracts";
 import { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
