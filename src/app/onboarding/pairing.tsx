@@ -8,11 +8,11 @@ import { type UniffiDevice, UniffiPairingMethod } from "react-native-swarmnote-c
 import { CodePairingCard } from "@/components/code-pairing-card";
 import { Text } from "@/components/ui/text";
 import { getAppCore } from "@/core/app-core";
-import { usePairingCodeGenerator } from "@/hooks/usePairingCodeGenerator";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { devicePlatformIcon } from "@/lib/device-platform";
 import { useNetworkPreferenceStore } from "@/stores/network-preference-store";
 import { useOnboardingStore } from "@/stores/onboarding-store";
+import { usePairingCodeStore } from "@/stores/pairing-code-store";
 import { useSwarmStore } from "@/stores/swarm-store";
 
 export default function Pairing() {
@@ -23,7 +23,9 @@ export default function Pairing() {
   const online = useSwarmStore((s) => s.online);
   const devices = useSwarmStore((s) => s.devices);
   const nextStep = useOnboardingStore((s) => s.nextStep);
-  const { code, expiresAt, generating, generate, reset } = usePairingCodeGenerator();
+  const codeInfo = usePairingCodeStore((s) => s.codeInfo);
+  const generating = usePairingCodeStore((s) => s.generating);
+  const ensureCode = usePairingCodeStore((s) => s.ensure);
 
   const deviceMeta = (device: UniffiDevice): string => {
     const os = device.os ? device.os : t`未知`;
@@ -114,11 +116,10 @@ export default function Pairing() {
 
         <View className="gap-2">
           <CodePairingCard
-            code={code ?? undefined}
-            expiresAt={expiresAt ?? undefined}
+            code={codeInfo?.code ?? undefined}
+            expiresAt={codeInfo?.expiresAt ?? undefined}
             loading={generating}
-            onGenerate={generate}
-            onExpire={reset}
+            onGenerate={() => void ensureCode()}
           />
           <Pressable
             onPress={() => router.push("/pairing/input-code" as never)}

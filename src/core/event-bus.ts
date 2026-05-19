@@ -9,6 +9,7 @@ import {
 } from "@/core/editor-bridge-registry";
 import { useFileTreeStore } from "@/stores/file-tree-store";
 import { useNotificationStore } from "@/stores/notification-store";
+import { usePairingCodeStore } from "@/stores/pairing-code-store";
 import { syncKey, useSwarmStore } from "@/stores/swarm-store";
 import { useSyncPersistStore } from "@/stores/sync-persist-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -70,6 +71,10 @@ export class EventBus implements ForeignEventBus {
       }
 
       case UniffiAppEvent_Tags.PairedDeviceAdded:
+        refreshPairedDevices();
+        // 配对码被消耗后端会触发 PairedDeviceAdded —— 通知 store 续生
+        usePairingCodeStore.getState().markConsumed();
+        break;
       case UniffiAppEvent_Tags.PairedDeviceRemoved:
         refreshPairedDevices();
         break;

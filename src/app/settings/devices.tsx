@@ -21,11 +21,11 @@ import { CodePairingCard } from "@/components/code-pairing-card";
 import { SettingsHeader } from "@/components/settings-header";
 import { Text } from "@/components/ui/text";
 import { getAppCore } from "@/core/app-core";
-import { usePairingCodeGenerator } from "@/hooks/usePairingCodeGenerator";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { devicePlatformIcon } from "@/lib/device-platform";
 import { truncatePeerId } from "@/lib/peer-id";
 import { toast } from "@/lib/toast";
+import { usePairingCodeStore } from "@/stores/pairing-code-store";
 import { useSwarmStore } from "@/stores/swarm-store";
 
 export default function DevicesSettings() {
@@ -44,7 +44,10 @@ export default function DevicesSettings() {
     }
   }, []);
 
-  const { code, expiresAt, generating, generate, reset } = usePairingCodeGenerator();
+  const codeInfo = usePairingCodeStore((s) => s.codeInfo);
+  const generating = usePairingCodeStore((s) => s.generating);
+  const ensureCode = usePairingCodeStore((s) => s.ensure);
+  const code = codeInfo?.code ?? null;
   const nearby = devices.filter((d) => !d.isPaired);
 
   const [pairingPeerId, setPairingPeerId] = useState<string | null>(null);
@@ -115,10 +118,9 @@ export default function DevicesSettings() {
 
         <CodePairingCard
           code={code ?? undefined}
-          expiresAt={expiresAt ?? undefined}
+          expiresAt={codeInfo?.expiresAt ?? undefined}
           loading={generating}
-          onGenerate={generate}
-          onExpire={reset}
+          onGenerate={() => void ensureCode()}
           onCopy={
             code === null
               ? undefined
